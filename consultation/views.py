@@ -4,6 +4,7 @@ from .models import ConsultationRequest
 from agritech.utils import login_required_session
 
 
+@login_required_session
 def consultation(request):
 
     if request.method == 'POST':
@@ -12,16 +13,11 @@ def consultation(request):
 
         if form.is_valid():
 
-            consultation = form.save(
-                commit=False
-            )
+            consultation = form.save(commit=False)
 
-            farmer_id = request.session.get(
-                'farmer_id'
-            )
+            farmer_id = request.session.get('farmer_id')
 
             if farmer_id:
-
                 consultation.farmer_id = farmer_id
 
             consultation.save()
@@ -39,7 +35,6 @@ def consultation(request):
             print(form.errors)
 
     else:
-
         form = ConsultationForm()
 
     return render(
@@ -49,15 +44,12 @@ def consultation(request):
             'form': form
         }
     )
+
+
+@login_required_session
 def my_consultations(request):
 
-    farmer_id = request.session.get(
-        'farmer_id'
-    )
-
-    if not farmer_id:
-
-        return redirect('login')
+    farmer_id = request.session.get('farmer_id')
 
     consultations = ConsultationRequest.objects.filter(
         farmer_id=farmer_id
@@ -70,7 +62,3 @@ def my_consultations(request):
             'consultations': consultations
         }
     )
-@login_required_session
-def consultation(request):
-
-    ...

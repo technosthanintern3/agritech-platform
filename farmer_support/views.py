@@ -1,10 +1,10 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from .forms import CropProblemForm
-from django.shortcuts import redirect
 from .models import CropProblem
 from agritech.utils import login_required_session
 
 
+@login_required_session
 def farmer_support(request):
 
     if request.method == 'POST':
@@ -25,7 +25,6 @@ def farmer_support(request):
             )
 
             if farmer_id:
-
                 problem.farmer_id = farmer_id
 
             problem.save()
@@ -50,15 +49,14 @@ def farmer_support(request):
             'form': form
         }
     )
+
+
+@login_required_session
 def my_problems(request):
 
     farmer_id = request.session.get(
         'farmer_id'
     )
-
-    if not farmer_id:
-
-        return redirect('login')
 
     problems = CropProblem.objects.filter(
         farmer_id=farmer_id
@@ -71,7 +69,3 @@ def my_problems(request):
             'problems': problems
         }
     )
-@login_required_session
-def farmer_support(request):
-
-    ...

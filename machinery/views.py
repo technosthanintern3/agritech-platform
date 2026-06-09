@@ -4,6 +4,7 @@ from .models import TractorBooking, Machinery
 from agritech.utils import login_required_session
 
 
+@login_required_session
 def tractor_booking(request):
 
     machines = Machinery.objects.all()
@@ -23,7 +24,6 @@ def tractor_booking(request):
             )
 
             if farmer_id:
-
                 booking.farmer_id = farmer_id
 
             booking.save()
@@ -52,15 +52,12 @@ def tractor_booking(request):
     )
 
 
+@login_required_session
 def my_bookings(request):
 
     farmer_id = request.session.get(
         'farmer_id'
     )
-
-    if not farmer_id:
-
-        return redirect('login')
 
     bookings = TractorBooking.objects.filter(
         farmer_id=farmer_id
@@ -73,7 +70,3 @@ def my_bookings(request):
             'bookings': bookings
         }
     )
-@login_required_session
-def tractor_booking(request):
-
-    ...
