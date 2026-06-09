@@ -1,0 +1,184 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<div class="container py-5">
+
+    <div class="row justify-content-center">
+
+        <div class="col-md-6">
+
+            <div class="card shadow p-4">
+
+                <h2 class="text-center mb-4">
+                    User Registration
+                </h2>
+
+                {% if success %}
+                    <div class="alert alert-success">
+                        Registration Successful
+                    </div>
+                {% endif %}
+
+                <form method="POST">
+
+                    {% csrf_token %}
+
+                    <div class="mb-3">
+                        <label class="form-label">
+                            Name
+                        </label>
+                        {{ form.name }}
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">
+                            Email
+                        </label>
+                        {{ form.email }}
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">
+                            Phone
+                        </label>
+                        {{ form.phone }}
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">
+                            Address
+                        </label>
+                        {{ form.address }}
+                    </div>
+
+                    <div class="mb-3 position-relative">
+
+                        <label class="form-label">
+                            Password
+                        </label>
+
+                        {{ form.password }}
+
+                        <i
+                            class="bi bi-eye-fill password-toggle"
+                            onclick="togglePassword('id_password', this)">
+                        </i>
+
+                    </div>
+
+                    <div class="mb-3 position-relative">
+
+                        <label class="form-label">
+                            Confirm Password
+                        </label>
+
+                        {{ form.confirm_password }}
+
+                        <i
+                            class="bi bi-eye-fill password-toggle"
+                            onclick="togglePassword('id_confirm_password', this)">
+                        </i>
+
+                    </div>
+
+                    {% if form.errors %}
+
+                        <div class="alert alert-danger">
+
+                            {% for field in form %}
+                                {% for error in field.errors %}
+                                    <p>{{ error }}</p>
+                                {% endfor %}
+                            {% endfor %}
+
+                            {% for error in form.non_field_errors %}
+                                <p>{{ error }}</p>
+                            {% endfor %}
+
+                        </div>
+
+                    {% endif %}
+
+                    <button
+                        type="submit"
+                        class="btn btn-success w-100">
+
+                        Register
+
+                    </button>
+
+                </form>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+<style>
+
+.password-toggle {
+
+    position: absolute;
+
+    right: 15px;
+
+    top: 47px;
+
+    cursor: pointer;
+
+    color: #6c757d;
+
+    z-index: 10;
+
+}
+
+.password-toggle:hover {
+
+    color: #198754;
+
+}
+
+</style>
+
+<script>
+
+function togglePassword(fieldId, icon) {
+
+    let field =
+        document.getElementById(fieldId);
+
+    if (field.type === "password") {
+
+        field.type = "text";
+
+        icon.classList.remove(
+            "bi-eye-fill"
+        );
+
+        icon.classList.add(
+            "bi-eye-slash-fill"
+        );
+
+    } else {
+
+        field.type = "password";
+
+        icon.classList.remove(
+            "bi-eye-slash-fill"
+        );
+
+        icon.classList.add(
+            "bi-eye-fill"
+        );
+
+    }
+
+}
+
+</script>
+
+{% endblock %}

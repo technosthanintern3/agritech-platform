@@ -1,0 +1,145 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<div class="container py-5">
+
+    <div class="row justify-content-center">
+
+        <div class="col-md-6">
+
+            <div class="card shadow">
+
+                <div class="card-body">
+
+                    <h1 class="text-center mb-4">
+
+                        User Login
+
+                    </h1>
+
+                    {% if error %}
+
+                    <div class="alert alert-danger">
+
+                        {{ error }}
+
+                    </div>
+
+                    {% endif %}
+
+                    <form method="POST">
+
+    {% csrf_token %}
+
+    <div class="mb-3">
+
+        <label>Email</label>
+
+        {{ form.email }}
+
+    </div>
+
+   <div class="mb-3 position-relative">
+
+    <label class="form-label">
+        Password
+    </label>
+
+    {{ form.password }}
+
+    <i
+        class="bi bi-eye-fill password-toggle"
+        onclick="togglePassword()">
+    </i>
+
+</div>
+
+    <div class="d-flex gap-2">
+
+        <button
+            type="submit"
+            class="btn btn-success">
+
+            Login
+
+        </button>
+{% comment %} 
+        <a
+            href="{% url 'register' %}"
+            class="btn btn-outline-primary">
+
+            Register
+
+        </a> {% endcomment %}
+
+    </div>
+
+</form>
+
+                    <hr>
+
+                    <p class="text-center mt-3">
+
+                        Don't have an account?
+
+                        <a href="{% url 'register' %}">
+
+                            Register Here
+
+                        </a>
+
+                    </p>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+<script>
+
+function togglePassword() {
+
+    const passwordField =
+        document.getElementById("id_password");
+
+    const eyeIcon =
+        document.querySelector(".password-toggle");
+
+    if (passwordField.type === "password") {
+
+        passwordField.type = "text";
+
+        eyeIcon.classList.remove(
+            "bi-eye-fill"
+        );
+
+        eyeIcon.classList.add(
+            "bi-eye-slash-fill"
+        );
+
+    }
+
+    else {
+
+        passwordField.type = "password";
+
+        eyeIcon.classList.remove(
+            "bi-eye-slash-fill"
+        );
+
+        eyeIcon.classList.add(
+            "bi-eye-fill"
+        );
+
+    }
+
+}
+
+</script>
+
+{% endblock %}

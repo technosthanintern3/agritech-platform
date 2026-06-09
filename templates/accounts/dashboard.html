@@ -1,0 +1,195 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<div class="container py-5">
+
+    <h1 class="text-center mb-4">
+        Welcome {{ farmer.name }}
+    </h1>
+
+    <hr>
+
+    <div class="row mb-5">
+
+        <div class="col-md-3">
+            <div class="card text-center p-3 shadow">
+                <h3>{{ consultations }}</h3>
+                <p>Consultations</p>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="card text-center p-3 shadow">
+                <h3>{{ bookings }}</h3>
+                <p>Machinery</p>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="card text-center p-3 shadow">
+                <h3>{{ services }}</h3>
+                <p>Service Requests</p>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="card text-center p-3 shadow">
+                <h3>{{ problems }}</h3>
+                <p>Crop Problems</p>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="row g-4">
+
+        <!-- Consultation -->
+
+        <div class="col-md-6">
+
+            <div class="card shadow h-100">
+
+                <div class="card-body text-center">
+
+                    <h3>🌾 Consultation</h3>
+
+                    <p>
+                        Get expert farming advice and crop guidance.
+                    </p>
+
+                    <a href="/consultation/"
+                       class="btn btn-primary mb-2">
+
+                        Book Consultation
+
+                    </a>
+
+                    <br>
+
+                    <a href="/consultation/my-consultations/"
+                       class="btn btn-outline-primary">
+
+                        My Consultations
+
+                    </a>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <!-- Machinery Booking -->
+
+        <div class="col-md-6">
+
+            <div class="card shadow h-100">
+
+                <div class="card-body text-center">
+
+                    <h3>🚜 Machinery Booking</h3>
+
+                    <p>
+                       ook tractors, harvesters, rotavators and other agricultural machinery.
+                    </p>
+
+                    <a href="/tractor-booking/"
+                       class="btn btn-warning mb-2">
+
+                        Book Machinery
+
+                    </a>
+
+                    <br>
+
+                    <a href="/tractor-booking/my-bookings/"
+                       class="btn btn-outline-warning">
+
+                        My Machinery Bookings
+
+                    </a>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <!-- Services -->
+
+        <div class="col-md-6">
+
+            <div class="card shadow h-100">
+
+                <div class="card-body text-center">
+
+                    <h3>🛠 Services</h3>
+
+                    <p>
+                        Request farming services and assistance.
+                    </p>
+
+                    <a href="/services/"
+                       class="btn btn-success mb-2">
+
+                        Request Service
+
+                    </a>
+
+                    <br>
+
+                    <a href="/services/my-requests/"
+                       class="btn btn-outline-success">
+
+                        My Service Requests
+
+                    </a>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <!-- Crop Problems -->
+
+        <div class="col-md-6">
+
+            <div class="card shadow h-100">
+
+                <div class="card-body text-center">
+
+                    <h3>🌱 Crop Problems</h3>
+
+                    <p>
+                        Submit crop disease and farming issues.
+                    </p>
+
+                    <a href="/farmer-support/"
+                       class="btn btn-danger mb-2">
+
+                        Report Problem
+
+                    </a>
+
+                    <br>
+
+                    <a href="/farmer-support/my-problems/"
+                       class="btn btn-outline-danger">
+
+                        My Crop Problems
+
+                    </a>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}

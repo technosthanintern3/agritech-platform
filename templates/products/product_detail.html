@@ -1,0 +1,205 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<div class="container py-5">
+
+    <div class="row">
+
+        <div class="col-md-6">
+
+            <img
+                src="{{ seed.image.url }}"
+                class="img-fluid rounded">
+
+        </div>
+
+        <div class="col-md-6">
+
+           {% if average_rating %}
+
+<h5 class="text-warning">
+
+    ⭐ {{ average_rating|floatformat:1 }}/5
+
+</h5>
+
+{% endif %}
+
+            <p>
+                <strong>Crop:</strong>
+                {{ seed.crop }}
+            </p>
+
+            <p>
+                <strong>Soil Type:</strong>
+                {{ seed.soil_type }}
+            </p>
+
+            <p>
+                <strong>Season:</strong>
+                {{ seed.season }}
+            </p>
+
+            <p>
+                <strong>Water Requirement:</strong>
+                {{ seed.water_requirement }}
+            </p>
+
+            <p>
+                <strong>Description:</strong>
+                {{ seed.description }}
+            </p>
+
+            <h3>
+                ₹ {{ seed.price }}
+            </h3>
+
+        <form
+            method="POST"
+            action="{% url 'add_to_cart' seed.id %}">
+
+    {% csrf_token %}
+
+    <div class="mb-3">
+
+        <label class="form-label">
+
+            Quantity
+
+        </label>
+
+        <input
+            type="number"
+            name="quantity"
+            value="1"
+            min="1"
+            class="form-control">
+
+    </div>
+
+    <button
+        type="submit"
+        class="btn btn-success">
+
+        🛒 Add To Cart
+
+    </button>
+
+</form>
+
+            <a
+               href="{% url 'cart' %}"
+               class="btn btn-outline-success">
+
+               View Cart
+
+            </a>
+
+            <hr>
+
+            <h3 class="mt-4">
+                ⭐ Customer Reviews
+            </h3>
+
+{% for review in reviews %}
+
+            <div class="card mb-3">
+
+                <div class="card-body">
+
+                    <h5>
+
+                        {{ review.name }}
+
+                    </h5>
+
+                    <p>
+
+                        {% for i in "12345" %}
+
+                            {% if forloop.counter <= review.rating %}
+
+                                ⭐
+
+                        {% endif %}
+
+{% endfor %}
+                    </p>
+
+                    <p>
+
+                        {{ review.comment }}
+
+                    </p>
+
+    </div>
+
+</div>
+
+{% empty %}
+
+<div class="alert alert-info">
+
+    No reviews yet.
+
+</div>
+
+{% endfor %}
+                <hr>
+
+                <h3 class="mt-5">
+                     ⭐ Write a Review
+                </h3>
+
+                <form method="POST">
+
+                       {% csrf_token %}
+
+                 <div class="mb-3">
+
+                        <label class="form-label">
+                            Your Name
+                        </label>
+
+                        {{ form.name }}
+
+                    </div>
+
+                    <div class="mb-3">
+
+                            <label class="form-label">
+                               Rating
+                            </label>
+
+                            {{ form.rating }}
+
+                    </div>
+
+                    <div class="mb-3">
+
+                        <label class="form-label">
+                                Your Review
+                        </label>
+
+                        {{ form.comment }}
+
+                    </div>
+
+                    <button
+                        type="submit"
+                        class="btn btn-success">
+
+                        Submit Review
+
+                    </button>
+
+</form>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}

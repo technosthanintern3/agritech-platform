@@ -1,0 +1,74 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<div class="container py-5">
+
+    <div class="card shadow-lg border-0">
+
+        <div class="card-body p-5">
+
+            <h1 class="text-success">
+
+                {{ service.title }}
+
+            </h1>
+
+            <hr>
+
+            <p class="lead">
+
+                {{ service.description }}
+
+            </p>
+
+            <h3 class="mt-4 text-primary">
+
+                Service Benefits
+
+            </h3>
+
+            <ul class="list-group mb-4">
+
+                {% for benefit in service.benefits %}
+
+                <li class="list-group-item">
+
+                    ✅ {{ benefit }}
+
+                </li>
+
+                {% endfor %}
+
+            </ul>
+            <div class="alert alert-success">
+
+                <strong>
+                   Why Choose This Service?
+                </strong>
+
+                <br><br>
+
+                {{ service.why_choose }}
+
+            </div>
+
+            <div class="text-center mt-4">
+
+                <a
+                    href="{% url 'services' %}"
+                    class="btn btn-success btn-lg">
+
+                    Request Service
+
+                </a>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}

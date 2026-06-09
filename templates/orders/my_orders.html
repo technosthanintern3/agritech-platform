@@ -1,0 +1,87 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<div class="container py-5">
+
+    <h1 class="mb-4">
+
+        📦 My Orders
+
+    </h1>
+
+    {% if orders %}
+
+    <table class="table table-bordered">
+
+        <thead class="table-success">
+
+            <tr>
+
+                <th>Order ID</th>
+                <th>Name</th>
+                <th>Total Amount</th>
+                <th>Status</th>
+                <th>Date</th>
+
+            </tr>
+
+        </thead>
+
+        <tbody>
+
+            {% for order in orders %}
+
+            <tr>
+
+                <td>
+                    #{{ order.id }}
+                </td>
+
+                <td>
+                    {{ order.name }}
+                </td>
+
+                <td>
+                    ₹ {{ order.total_amount }}
+                </td>
+
+                <td>
+
+                    {% if order.status %}
+
+                        {{ order.status }}
+
+                    {% else %}
+
+                        Pending
+
+                    {% endif %}
+
+                </td>
+
+                <td>
+                    {{ order.created_at }}
+                </td>
+
+            </tr>
+
+            {% endfor %}
+
+        </tbody>
+
+    </table>
+
+    {% else %}
+
+    <div class="alert alert-warning">
+
+        No orders found.
+
+    </div>
+
+    {% endif %}
+
+</div>
+
+{% endblock %}

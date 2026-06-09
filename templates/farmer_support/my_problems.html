@@ -1,0 +1,78 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<div class="container py-5">
+
+    <h1 class="mb-4">
+        My Crop Problems
+    </h1>
+
+    <table class="table table-bordered table-striped">
+
+        <thead class="table-danger">
+
+            <tr>
+
+                <th>Crop</th>
+                <th>Problem</th>
+                <th>Admin Reply</th>
+                <th>Date</th>
+
+            </tr>
+
+        </thead>
+
+        <tbody>
+
+            {% for problem in problems %}
+
+        <tr>
+
+            <td>{{ problem.crop_name }}</td>
+
+            <td>{{ problem.problem }}</td>
+
+            <td>
+
+                {% if problem.adminreply %}
+
+                    <span class="text-success">
+                        {{ problem.adminreply.reply }}
+                    </span>
+
+        {% else %}
+
+            <span class="text-warning">
+                Pending Reply
+            </span>
+
+        {% endif %}
+
+    </td>
+
+    <td>{{ problem.created_at }}</td>
+
+</tr>
+
+            {% empty %}
+
+            <tr>
+
+                <td colspan="3" class="text-center">
+
+                    No crop problems found.
+
+                </td>
+
+            </tr>
+
+            {% endfor %}
+
+        </tbody>
+
+    </table>
+
+</div>
+
+{% endblock %}

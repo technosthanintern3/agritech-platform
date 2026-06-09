@@ -1,0 +1,164 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<div class="container py-5">
+
+    <div class="text-center mb-5">
+
+        <h1 class="fw-bold">
+            Our Agricultural Services
+        </h1>
+
+        <p class="text-muted">
+            Smart farming solutions for modern agriculture.
+        </p>
+
+    </div>
+<div class="row g-4">
+
+    <div class="col-md-3">
+        <div class="card service-card p-4 text-center">
+            <h4>🌿 Crop Advisory</h4>
+            <p>Expert guidance for better crop productivity.</p>
+
+            <a
+                href="{% url 'service_info' 'crop-advisory' %}"
+                class="btn btn-primary">
+
+                View Details
+
+            </a>
+
+        </div>
+    </div>
+
+    <div class="col-md-3">
+        <div class="card service-card p-4 text-center">
+            <h4>💧 Soil Testing</h4>
+            <p> Analyze soil nutrients and health for regional farming outcomes.</p>
+
+            <a
+                href="{% url 'service_info' 'soil-testing' %}"
+                class="btn btn-primary">
+
+                View Details
+
+            </a>
+
+        </div>
+    </div>
+
+    <div class="col-md-3">
+        <div class="card service-card p-4 text-center">
+            <h4>🛡 Disease Identification</h4>
+            <p>Early detection and crop protection.</p>
+
+            <a
+                href="{% url 'service_info' 'disease-identification' %}"
+                class="btn btn-primary">
+
+                View Details
+
+            </a>
+
+        </div>
+    </div>
+
+    <div class="col-md-3">
+        <div class="card service-card p-4 text-center">
+            <h4>❤️ Plant Doctor</h4>
+            <p>Crop health consultation from experts.</p>
+
+            <a
+                href="{% url 'service_info' 'plant-doctor' %}"
+                class="btn btn-primary">
+
+                View Details
+
+            </a>
+
+        </div>
+    </div>
+
+    <div class="col-md-3">
+        <div class="card service-card p-4 text-center">
+            <h4>👨‍🌾 Farmer Consultation</h4>
+            <p>One-to-one agriculture consultation.</p>
+
+            <a
+                href="{% url 'service_info' 'farmer-consultation' %}"
+                class="btn btn-primary">
+
+                View Details
+
+            </a>
+
+        </div>
+    </div>
+
+    <div class="col-md-3">
+        <div class="card service-card p-4 text-center">
+            <h4>☁️ Weather Information</h4>
+            <p>Weather updates for better planning.</p>
+
+            <a
+                href="{% url 'service_info' 'weather-information' %}"
+                class="btn btn-primary">
+
+                View Details
+
+            </a>
+
+        </div>
+    </div>
+
+    <div class="col-md-3">
+        <div class="card service-card p-4 text-center">
+            <h4>📈 Market Price Information</h4>
+            <p>Latest crop market rates and trends across India.</p>
+
+            <a
+                href="{% url 'service_info' 'market-price' %}"
+                class="btn btn-primary">
+
+                View Details
+
+            </a>
+
+        </div>
+    </div>
+
+</div>
+
+    <hr class="my-5">
+
+    <h2 class="text-center mb-4">
+        Request a Service
+    </h2>
+
+    {% if success %}
+        <div class="alert alert-success">
+            Service Request Submitted Successfully
+        </div>
+    {% endif %}
+
+    <form method="POST" enctype="multipart/form-data">
+
+        {% csrf_token %}
+
+        {{ form.as_p }}
+
+        <button
+            type="submit"
+            class="btn btn-success">
+
+            Submit Request
+
+        </button>
+
+    </form>
+
+</div>
+
+{% endblock %}

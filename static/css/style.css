@@ -1,0 +1,167 @@
+.hero-section {
+
+    min-height: calc(100vh - 70px);
+
+    background:
+        linear-gradient(
+            rgba(0,0,0,0.5),
+            rgba(0,0,0,0.5)
+        ),
+        url('/static/images/hero-desktop.jpeg');
+
+    background-size: cover;
+    background-position: center center;
+    background-repeat: no-repeat;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    text-align: center;
+    color: white;
+
+    padding: 20px;
+}
+
+.hero-content h1 {
+    font-size: 3.5rem;
+    font-weight: bold;
+}
+
+.hero-content p {
+    font-size: 1.3rem;
+}
+
+.service-card:hover,
+.product-card:hover {
+    transform: translateY(-5px);
+    transition: 0.3s;
+}
+.logo {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+.service-card {
+    background: white;
+    border-radius: 20px;
+    padding: 30px;
+    text-align: center;
+    border: none;
+    transition: all 0.4s ease;
+    box-shadow: 0 8px 25px rgba(0,0,0,0.08);
+    height: 100%;
+}
+
+.service-card:hover {
+    transform: translateY(-12px);
+    box-shadow: 0 15px 35px rgba(0,0,0,0.18);
+}
+
+.service-icon {
+    font-size: 60px;
+    color: #2e7d32;
+    margin-bottom: 20px;
+}
+
+.service-card h4 {
+    font-weight: 700;
+    margin-bottom: 15px;
+}
+
+.service-card p {
+    color: #666;
+}
+.product-card{
+    transition:0.3s;
+    border:none;
+    border-radius:15px;
+}
+
+.product-card:hover{
+    transform:translateY(-8px);
+    box-shadow:0 15px 30px rgba(0,0,0,0.15);
+}
+.card-header {
+    border-radius: 15px 15px 0 0 !important;
+}
+
+form p {
+    margin-bottom: 18px;
+}
+
+form input,
+form textarea,
+form select {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #ced4da;
+    border-radius: 10px;
+}
+
+form input:focus,
+form textarea:focus,
+form select:focus {
+    border-color: #198754;
+    box-shadow: 0 0 8px rgba(25, 135, 84, 0.25);
+    outline: none;
+}
+@media (max-width: 768px) {
+
+    .hero-section {
+
+        background:
+            linear-gradient(
+                rgba(0,0,0,0.5),
+                rgba(0,0,0,0.5)
+            ),
+            url('/static/images/hero-mobile.png');
+
+        background-size: cover;
+        background-position: center center;
+        background-repeat: no-repeat;
+
+        min-height: calc(100vh - 56px);
+
+    }
+
+    .hero-content h1 {
+
+        font-size: 2rem;
+        margin-bottom: 15px;
+
+    }
+
+    .hero-content p {
+
+        font-size: 1rem;
+        margin-bottom: 20px;
+
+    }
+
+    .hero-content .btn {
+
+        display: block;
+        width: 100%;
+        max-width: 250px;
+        margin: 10px auto;
+
+    }
+
+}
+.password-toggle {
+
+    position: absolute;
+
+    right: 15px;
+
+    top: 48px;
+
+    cursor: pointer;
+
+    color: #6c757d;
+
+    z-index: 1000;
+
+}
