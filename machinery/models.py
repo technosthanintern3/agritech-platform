@@ -30,6 +30,7 @@ class TractorBooking(models.Model):
         ('Harvester', 'Harvester'),
         ('Rotavator', 'Rotavator'),
         ('Seed Drill', 'Seed Drill'),
+        ('Drone', 'Drone')
     ]
 
     farmer = models.ForeignKey(
