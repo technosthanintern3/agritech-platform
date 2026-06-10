@@ -1,4 +1,4 @@
-{% extends 'base.html' %}
+{% comment %} {% extends 'base.html' %}
 
 {% block content %}
 
@@ -149,6 +149,140 @@
         </div>
 
     </div>
+
+</div>
+```
+
+</div>
+
+{% endblock %} {% endcomment %}
+{% extends 'base.html' %}
+
+{% block content %}
+
+<div class="container py-5">
+
+```
+<div class="text-center mb-5">
+
+    <h1 class="text-success">
+        🌾 Expert Farming Consultation
+    </h1>
+
+    <p class="lead">
+
+        Get professional agricultural guidance from our experts.
+        We help farmers improve crop productivity, solve farming
+        challenges, manage irrigation and increase farm profits.
+
+    </p>
+
+</div>
+
+<div class="row mb-5">
+
+    <div class="col-md-4">
+
+        <div class="card service-card p-4">
+
+            <div class="service-icon">
+                🌱
+            </div>
+
+            <h4>
+                Crop Planning
+            </h4>
+
+            <p>
+                Expert recommendations for crop selection,
+                sowing methods and yield improvement.
+            </p>
+
+        </div>
+
+    </div>
+
+    <div class="col-md-4">
+
+        <div class="card service-card p-4">
+
+            <div class="service-icon">
+                💧
+            </div>
+
+            <h4>
+                Irrigation Guidance
+            </h4>
+
+            <p>
+                Learn modern irrigation techniques and
+                water management practices.
+            </p>
+
+        </div>
+
+    </div>
+
+    <div class="col-md-4">
+
+        <div class="card service-card p-4">
+
+            <div class="service-icon">
+                🛡️
+            </div>
+
+            <h4>
+                Disease Prevention
+            </h4>
+
+            <p>
+                Identify crop diseases early and receive
+                preventive treatment recommendations.
+            </p>
+
+        </div>
+
+    </div>
+
+</div>
+
+<div class="card shadow p-4">
+
+    <h2 class="text-center mb-4">
+        Submit Consultation Request
+    </h2>
+
+    {% if success %}
+
+    <div class="alert alert-success">
+
+        Consultation request submitted successfully.
+
+    </div>
+
+    {% endif %}
+
+    {{ form.errors }}
+
+    <form method="POST">
+
+        {% csrf_token %}
+
+        {{ form.as_p }}
+
+        <div class="text-center">
+
+            <button
+                type="submit"
+                class="btn btn-success btn-lg">
+
+                Book Consultation
+
+            </button>
+
+        </div>
+
+    </form>
 
 </div>
 ```
