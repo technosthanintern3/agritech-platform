@@ -17,7 +17,9 @@ def checkout(request):
 
     for product_id, quantity in cart.items():
 
-        seed = SeedVariety.objects.get(id=product_id)
+        seed = SeedVariety.objects.get(
+            id=product_id
+        )
 
         total += seed.price * quantity
 
@@ -29,7 +31,13 @@ def checkout(request):
 
             order = form.save(commit=False)
 
-            order.farmer_id = request.session.get('farmer_id')
+            farmer_id = request.session.get(
+                'farmer_id'
+            )
+
+            if farmer_id:
+                order.farmer_id = farmer_id
+
             order.total_amount = total
 
             order.save()
