@@ -1,4 +1,5 @@
 import os
+import cloudinary
 from pathlib import Path
 from dotenv import load_dotenv
 import dj_database_url
@@ -28,6 +29,8 @@ INSTALLED_APPS = [
     'accounts',
     'farmer_support',
     'orders',
+    'cloudinary',
+    'cloudinary_storage',
 ]
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -69,6 +72,13 @@ DATABASES = {
         default=os.getenv('DATABASE_URL')
     )
 }
+CLOUDINARY_STORAGE = {
+    'CLOUD_NAME': os.getenv('CLOUDINARY_CLOUD_NAME'),
+    'API_KEY': os.getenv('CLOUDINARY_API_KEY'),
+    'API_SECRET': os.getenv('CLOUDINARY_API_SECRET'),
+}
+
+DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
 
 
 # Password validation
