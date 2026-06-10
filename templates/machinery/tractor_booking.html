@@ -1,249 +1,9 @@
-{% comment %} {% extends 'base.html' %}
-
-{% block content %}
-
-<div class="container py-5">
-
-```
-<div class="text-center mb-5">
-
-    <h1 class="text-success">
-        🚜 Agricultural Machinery Services
-    </h1>
-
-    <p class="lead">
-
-        Rent modern agricultural machinery to improve
-        farming efficiency, reduce labor costs and
-        increase productivity.
-
-    </p>
-
-</div>
-
-<div class="row mb-5">
-
-    {% for machine in machines %}
-
-    <div class="col-md-3 mb-4">
-
-        <div class="card h-100 shadow service-card">
-
-            <img
-                src="{{ machine.image.url }}"
-                class="card-img-top"
-                height="200">
-
-            <div class="card-body text-center">
-
-                <h5>
-                    {{ machine.name }}
-                </h5>
-
-                <p>
-                    {{ machine.description }}
-                </p>
-
-                <p class="text-success">
-
-                    <strong>
-                        ₹ {{ machine.price_per_day }}/day
-                    </strong>
-
-                </p>
-
-                <button
-                    type="button"
-                    class="btn btn-success"
-                    onclick="selectMachine('{{ machine.name }}')">
-
-                    Book This Machine
-
-                </button>
-
-            </div>
-
-        </div>
-
-    </div>
-
-    {% empty %}
-
-    <div class="col-12">
-
-        <div class="alert alert-warning text-center">
-
-            No machinery available.
-            Please add machinery from Admin Panel.
-
-        </div>
-
-    </div>
-
-    {% endfor %}
-
-</div>
-
-<div class="row justify-content-center">
-
-    <div class="col-md-8">
-
-        <div class="card shadow-lg border-0">
-
-            <div class="card-header bg-success text-white text-center py-3">
-
-                <h3>
-                    Machinery Booking Form
-                </h3>
-
-            </div>
-
-            <div class="card-body p-4">
-
-                {% if success %}
-
-                <div class="alert alert-success">
-
-                    Booking Submitted Successfully
-
-                </div>
-
-                {% endif %}
-
-                <form method="POST" id="booking-form">
-
-                    {% csrf_token %}
-
-                    <div class="mb-3">
-
-                        <label class="form-label">
-                            Machinery Type
-                        </label>
-
-                        {{ form.machinery_type }}
-
-                    </div>
-
-                    <div class="mb-3">
-
-                        <label class="form-label">
-                            Full Name
-                        </label>
-
-                        {{ form.name }}
-
-                    </div>
-
-                    <div class="mb-3">
-
-                        <label class="form-label">
-                            Email Address
-                        </label>
-
-                        {{ form.email }}
-
-                    </div>
-
-                    <div class="mb-3">
-
-                        <label class="form-label">
-                            Phone Number
-                        </label>
-
-                        {{ form.phone }}
-
-                    </div>
-
-                    <div class="mb-3">
-
-                        <label class="form-label">
-                            Address
-                        </label>
-
-                        {{ form.address }}
-
-                    </div>
-
-                    <div class="mb-3">
-
-                        <label class="form-label">
-                            Booking Date
-                        </label>
-
-                        {{ form.booking_date }}
-
-                    </div>
-
-                    <div class="mb-3">
-
-                        <label class="form-label">
-                            Purpose
-                        </label>
-
-                        {{ form.purpose }}
-
-                    </div>
-
-                    <div class="text-center">
-
-                        <button
-                            type="submit"
-                            class="btn btn-success btn-lg px-5">
-
-                            Book Machinery
-
-                        </button>
-
-                    </div>
-
-                </form>
-
-            </div>
-
-        </div>
-
-    </div>
-
-</div>
-```
-
-</div>
-
-<script>
-
-function selectMachine(machineName) {
-
-    let dropdown =
-        document.getElementById(
-            "id_machinery_type"
-        );
-
-    if (dropdown) {
-
-        dropdown.value =
-            machineName;
-
-    }
-
-    document
-        .getElementById(
-            "booking-form"
-        )
-        .scrollIntoView({
-            behavior: "smooth"
-        });
-
-}
-
-</script>
-
-{% endblock %} {% endcomment %}
 {% extends 'base.html' %}
 
 {% block content %}
 
 <div class="container py-5">
-    
+
 <div class="text-center mb-5">
 
     <h1 class="text-success">
@@ -462,3 +222,242 @@ function selectMachine(machineName) {
 </script>
 
 {% endblock %}
+{% comment %} {% extends 'base.html' %}
+
+{% block content %}
+
+<div class="container py-5">
+
+<div class="text-center mb-5">
+
+    <h1 class="text-success">
+        🚜 Agricultural Machinery Services
+    </h1>
+
+    <p class="lead">
+
+        Rent modern agricultural machinery to improve
+        farming efficiency, reduce labor costs and
+        increase productivity.
+
+    </p>
+
+</div>
+
+<div class="row mb-5">
+
+    {% for machine in machines %}
+
+    <div class="col-md-3 mb-4">
+
+        <div class="card h-100 shadow service-card">
+
+            <img
+                src="{{ machine.image.url }}"
+                class="card-img-top"
+                height="200">
+
+            <div class="card-body text-center">
+
+                <h5>
+                    {{ machine.name }}
+                </h5>
+
+                <p>
+                    {{ machine.description }}
+                </p>
+
+                <p class="text-success">
+
+                    <strong>
+                        ₹ {{ machine.price_per_day }}/day
+                    </strong>
+
+                </p>
+
+                <button
+                    type="button"
+                    class="btn btn-success"
+                    onclick="selectMachine('{{ machine.name }}')">
+
+                    Book This Machine
+
+                </button>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    {% empty %}
+
+    <div class="col-12">
+
+        <div class="alert alert-warning text-center">
+
+            No machinery available.
+            Please add machinery from Admin Panel.
+
+        </div>
+
+    </div>
+
+    {% endfor %}
+
+</div>
+
+<div class="row justify-content-center">
+
+    <div class="col-md-8">
+
+        <div class="card shadow-lg border-0">
+
+            <div class="card-header bg-success text-white text-center py-3">
+
+                <h3>
+                    Machinery Booking Form
+                </h3>
+
+            </div>
+
+            <div class="card-body p-4">
+
+                {% if success %}
+
+                <div class="alert alert-success">
+
+                    Booking Submitted Successfully
+
+                </div>
+
+                {% endif %}
+
+                <form method="POST" id="booking-form">
+
+                    {% csrf_token %}
+
+                    <div class="mb-3">
+
+                        <label class="form-label">
+                            Machinery Type
+                        </label>
+
+                        {{ form.machinery_type }}
+
+                    </div>
+
+                    <div class="mb-3">
+
+                        <label class="form-label">
+                            Full Name
+                        </label>
+
+                        {{ form.name }}
+
+                    </div>
+
+                    <div class="mb-3">
+
+                        <label class="form-label">
+                            Email Address
+                        </label>
+
+                        {{ form.email }}
+
+                    </div>
+
+                    <div class="mb-3">
+
+                        <label class="form-label">
+                            Phone Number
+                        </label>
+
+                        {{ form.phone }}
+
+                    </div>
+
+                    <div class="mb-3">
+
+                        <label class="form-label">
+                            Address
+                        </label>
+
+                        {{ form.address }}
+
+                    </div>
+
+                    <div class="mb-3">
+
+                        <label class="form-label">
+                            Booking Date
+                        </label>
+
+                        {{ form.booking_date }}
+
+                    </div>
+
+                    <div class="mb-3">
+
+                        <label class="form-label">
+                            Purpose
+                        </label>
+
+                        {{ form.purpose }}
+
+                    </div>
+
+                    <div class="text-center">
+
+                        <button
+                            type="submit"
+                            class="btn btn-success btn-lg px-5">
+
+                            Book Machinery
+
+                        </button>
+
+                    </div>
+
+                </form>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+</div>
+
+<script>
+
+function selectMachine(machineName) {
+
+    let dropdown =
+        document.getElementById(
+            "id_machinery_type"
+        );
+
+    if (dropdown) {
+
+        dropdown.value =
+            machineName;
+
+    }
+
+    document
+        .getElementById(
+            "booking-form"
+        )
+        .scrollIntoView({
+            behavior: "smooth"
+        });
+
+}
+
+</script>
+
+{% endblock %} {% endcomment %}
+
