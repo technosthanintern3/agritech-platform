@@ -5,24 +5,19 @@ from products.models import SeedVariety
 from agritech.utils import login_required_session
 
 
+@login_required_session
 def checkout(request):
 
-    cart = request.session.get(
-        'cart',
-        {}
-    )
+    cart = request.session.get('cart', {})
 
     if not cart:
-
         return redirect('cart')
 
     total = 0
 
     for product_id, quantity in cart.items():
 
-        seed = SeedVariety.objects.get(
-            id=product_id
-        )
+        seed = SeedVariety.objects.get(id=product_id)
 
         total += seed.price * quantity
 
@@ -33,14 +28,8 @@ def checkout(request):
         if form.is_valid():
 
             order = form.save(commit=False)
-            
-            farmer_id = request.session.get(
-                'farmer_id'
-            )
-            
-            if farmer_id:
-                order.farmer_id = farmer_id
 
+            order.farmer_id = request.session.get('farmer_id')
             order.total_amount = total
 
             order.save()
@@ -64,21 +53,16 @@ def checkout(request):
             'total': total
         }
     )
+
+
+@login_required_session
 def my_orders(request):
-    farmer_id = request.session.get(
-        'farmer_id'
-    )
-    
-    if not farmer_id:
-        
-        return redirect('login')
-    
+
+    farmer_id = request.session.get('farmer_id')
 
     orders = Order.objects.filter(
         farmer_id=farmer_id
-    ).order_by(
-        '-created_at'
-    )
+    ).order_by('-created_at')
 
     return render(
         request,
@@ -87,7 +71,3 @@ def my_orders(request):
             'orders': orders
         }
     )
-@login_required_session
-def checkout(request):
-
-    ...

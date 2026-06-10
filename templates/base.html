@@ -16,118 +16,143 @@
 </head>
 
 <body>
-
-<nav class="navbar navbar-expand-lg navbar-dark bg-success">
+<nav class="navbar navbar-expand-lg navbar-dark bg-success shadow-sm">
 
     <div class="container">
 
-    <a class="navbar-brand d-flex align-items-center" href="/"style="margin-right:200px;">
+        <!-- Logo -->
 
-        <img
-            src="{% static 'images/logo.jpeg' %}"
-            alt="Logo"
-            width="50"
-            height="50"
-            class="rounded-circle me-2">
+        <a class="navbar-brand d-flex align-items-center" href="/">
 
-       AgriTech
+            <img
+                src="{% static 'images/logo.jpeg' %}"
+                alt="Logo"
+                width="50"
+                height="50"
+                class="rounded-circle me-2">
 
-    </a>
+            <strong>AgriTech</strong>
 
-        <button
-            class="navbar-toggler"
-            type="button"
-            data-bs-toggle="collapse"
-            data-bs-target="#navbarNav">
+        </a>
 
-            <span class="navbar-toggler-icon"></span>
+        <!-- Right Side Menu -->
 
-        </button>
+        <ul class="navbar-nav ms-auto d-flex flex-row align-items-center">
 
-        <div
-            class="collapse navbar-collapse"
-            id="navbarNav">
+            <li class="nav-item me-3">
+                <a class="nav-link text-white" href="/">
+                    Home
+                </a>
+            </li>
 
-           <ul class="navbar-nav ms-auto"style="margin-left:30px;">
+            <li class="nav-item me-3">
+                <a class="nav-link text-white" href="/about/">
+                    About
+                </a>
+            </li>
 
-               <li class="nav-item">
-                   <a class="nav-link" href="/">Home</a>
-                </li>
+            <li class="nav-item me-3">
+                <a class="nav-link text-white" href="/contact/">
+                    Contact
+                </a>
+            </li>
 
-                <li class="nav-item">
-                    <a class="nav-link" href="/about/">About</a>
-                </li>
+            {% if request.session.farmer_id %}
 
-                <li class="nav-item">
-                    <a class="nav-link" href="/products/">Products</a>
-                </li>
+            <li class="nav-item me-3">
+                <a class="nav-link text-white" href="{% url 'dashboard' %}">
+                    Dashboard
+                </a>
+            </li>
 
-                <li class="nav-item">
-                    <a class="nav-link" href="/services/">Services</a>
-                </li>
+            <li class="nav-item me-3">
+                <a class="nav-link text-danger fw-bold" href="{% url 'logout' %}">
+                    Logout
+                </a>
+            </li>
 
-                <li class="nav-item">
-                    <a class="nav-link" href="/consultation/">Consultation</a>
-                </li>
+            {% else %}
 
-                <li class="nav-item">
-                    <a class="nav-link" href="/tractor-booking/">
-                       Machinery
-                    </a>
-                </li>
+            <li class="nav-item me-3">
+                <a class="nav-link text-white" href="{% url 'register' %}">
+                    Register
+                </a>
+            </li>
 
-                <li class="nav-item">
-                    <a class="nav-link" href="/farmer-support/">Farmer Support</a>
-                </li>
-                <li class="nav-item">
+            <li class="nav-item me-3">
+                <a class="nav-link text-white" href="{% url 'login' %}">
+                    Login
+                </a>
+            </li>
 
-                    <a class="nav-link" href="{% url 'cart' %}"> Cart</a>
+            {% endif %}
 
-                </li>
-                <li class="nav-item">
+            <!-- Hamburger Menu -->
 
-                     <a class="nav-link" href="{% url 'my_orders' %}"> My Orders</a>
+            <li class="nav-item dropdown">
 
-                </li>
+                <a class="nav-link text-white"
+                   href="#"
+                   role="button"
+                   data-bs-toggle="dropdown">
 
-                <li class="nav-item">
-                    <a class="nav-link" href="/contact/">Contact</a>
-                </li>
+                    <i class="bi bi-list fs-1"></i>
 
+                </a>
 
-               {% if request.session.farmer_id %}
+                <ul class="dropdown-menu dropdown-menu-end shadow-lg border-0 rounded-4 p-2">
 
-                <li class="nav-item">
-                    <a class="nav-link" href="{% url 'dashboard' %}">
-                        Dashboard
-                    </a>
-                </li>
+                    <li>
+                        <a class="dropdown-item rounded-3 py-2" href="/products/">
+                            🌾 Products
+                        </a>
+                    </li>
 
-                <li class="nav-item">
-                    <a class="nav-link text-danger" href="{% url 'logout' %}">
-                        Logout
-                    </a>
-                </li>
+                    <li>
+                        <a class="dropdown-item rounded-3 py-2" href="/services/">
+                            🛠 Services
+                        </a>
+                    </li>
 
-{% else %}
+                    <li>
+                        <a class="dropdown-item rounded-3 py-2" href="/consultation/">
+                            👨‍🌾 Consultation
+                        </a>
+                    </li>
 
-                <li class="nav-item">
-                    <a class="nav-link" href="{% url 'register' %}">
-                        Register
-                    </a>
-                </li>
+                    <li>
+                        <a class="dropdown-item rounded-3 py-2" href="/tractor-booking/">
+                            🚜 Machinery
+                        </a>
+                    </li>
 
-                <li class="nav-item">
-                    <a class="nav-link" href="{% url 'login' %}">
-                        Login
-                    </a>
-                </li>
+                    <li>
+                        <a class="dropdown-item rounded-3 py-2" href="/farmer-support/">
+                            🌱 Farmer Support
+                        </a>
+                    </li>
 
-{% endif %}
-               
+                    <li>
+                        <a class="dropdown-item rounded-3 py-2" href="{% url 'cart' %}">
+                            🛒 Cart
+                        </a>
+                    </li>
 
-            </ul>
-            </nav>
+                    <li>
+                        <a class="dropdown-item rounded-3 py-2" href="{% url 'my_orders' %}">
+                            📦 My Orders
+                        </a>
+                    </li>
+
+                </ul>
+
+            </li>
+
+        </ul>
+
+    </div>
+
+</nav>
 
 {% if messages %}
 

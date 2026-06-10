@@ -4,6 +4,7 @@ from accounts.models import Farmer
 
 class Order(models.Model):
     
+    
     farmer = models.ForeignKey(
         Farmer,
         on_delete=models.CASCADE,
