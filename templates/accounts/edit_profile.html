@@ -1,0 +1,209 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<div class="container mt-5">
+
+```
+<div class="row justify-content-center">
+
+    <div class="col-md-8">
+
+        <div class="card shadow-lg border-0 rounded-4">
+
+            <div class="card-header bg-success text-white d-flex justify-content-between align-items-center">
+
+                <h3 class="mb-0">
+                    My Profile
+                </h3>
+
+                <button
+                    type="button"
+                    id="editBtn"
+                    class="btn btn-light btn-sm">
+
+                    <i class="bi bi-pencil-fill"></i>
+                    Edit
+
+                </button>
+
+            </div>
+
+            <div class="card-body">
+
+                <form method="POST" enctype="multipart/form-data">
+
+                    {% csrf_token %}
+
+                    <!-- Profile Image -->
+
+                    <div class="text-center mb-4">
+
+                        {% if logged_in_farmer.profile_picture %}
+
+                            <img
+                                src="{{ logged_in_farmer.profile_picture.url }}"
+                                id="previewImage"
+                                width="160"
+                                height="160"
+                                class="rounded-circle shadow border border-3"
+                                style="object-fit:cover;">
+
+                        {% else %}
+
+                            <img
+                                src="https://cdn-icons-png.flaticon.com/512/3135/3135715.png"
+                                id="previewImage"
+                                width="160"
+                                height="160"
+                                class="rounded-circle shadow border border-3">
+
+                        {% endif %}
+
+                        <div class="mt-3">
+
+                            <label
+                                for="id_profile_picture"
+                                class="btn btn-outline-success">
+
+                                <i class="bi bi-camera-fill"></i>
+                                Change Profile Image
+
+                            </label>
+
+                            <input
+                                type="file"
+                                id="id_profile_picture"
+                                name="profile_picture"
+                                accept="image/*"
+                                style="display:none;">
+
+                        </div>
+
+                    </div>
+
+                    <!-- Name -->
+
+                    <div class="mb-3">
+
+                        <label class="form-label fw-bold">
+                            Name
+                        </label>
+
+                        {{ form.name }}
+
+                    </div>
+
+                    <!-- Email -->
+
+                    <div class="mb-3">
+
+                        <label class="form-label fw-bold">
+                            Email
+                        </label>
+
+                        {{ form.email }}
+
+                    </div>
+
+                    <!-- Phone -->
+
+                    <div class="mb-3">
+
+                        <label class="form-label fw-bold">
+                            Phone Number
+                        </label>
+
+                        {{ form.phone }}
+
+                    </div>
+
+                    <!-- Address -->
+
+                    <div class="mb-3">
+
+                        <label class="form-label fw-bold">
+                            Address
+                        </label>
+
+                        {{ form.address }}
+
+                    </div>
+
+                    <div class="mt-4">
+
+                        <button
+                            type="submit"
+                            id="saveBtn"
+                            class="btn btn-success"
+                            style="display:none;">
+
+                            <i class="bi bi-check-circle-fill"></i>
+                            Save Changes
+
+                        </button>
+
+                        <a
+                            href="{% url 'dashboard' %}"
+                            class="btn btn-secondary">
+
+                            <i class="bi bi-arrow-left"></i>
+                            Back
+
+                        </a>
+
+                    </div>
+
+                </form>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+```
+
+</div>
+
+<script>
+
+document.addEventListener("DOMContentLoaded", function () {
+
+    let fields = document.querySelectorAll(
+        "#id_name, #id_email, #id_phone, #id_address"
+    );
+
+    fields.forEach(function(field) {
+        field.disabled = true;
+    });
+
+    document.getElementById("editBtn").addEventListener("click", function () {
+
+        fields.forEach(function(field) {
+            field.disabled = false;
+        });
+
+        document.getElementById("saveBtn").style.display = "inline-block";
+
+    });
+
+});
+
+document.getElementById('id_profile_picture').addEventListener('change', function(e){
+
+    const file = e.target.files[0];
+
+    if(file){
+
+        document.getElementById('previewImage').src =
+            URL.createObjectURL(file);
+
+    }
+
+});
+
+</script>
+
+{% endblock %}

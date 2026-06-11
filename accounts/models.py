@@ -18,6 +18,12 @@ class Farmer(models.Model):
     password = models.CharField(
         max_length=255
     )
+    
+    profile_picture = models.ImageField(
+        upload_to='profile_pictures/',
+        blank=True,
+        null=True
+    )
 
     created_at = models.DateTimeField(
         auto_now_add=True

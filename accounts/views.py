@@ -8,6 +8,7 @@ from consultation.models import ConsultationRequest
 from machinery.models import TractorBooking
 from services.models import ServiceRequest
 from farmer_support.models import CropProblem
+from .forms import EditProfileForm
 
 
 def register(request):
@@ -63,6 +64,11 @@ def login_view(request):
                 )
 
                 request.session['farmer_id'] = farmer.id
+                request.session['farmer_name'] = farmer.name
+                if farmer.profile_picture:
+                    request.session['profile_picture'] = farmer.profile_picture.url
+                else:
+                    request.session['profile_picture'] = ''
 
                 return redirect(
                     'dashboard'
@@ -134,3 +140,49 @@ def logout_view(request):
     request.session.flush()
 
     return redirect('home')
+  
+    
+def edit_profile(request):
+
+    farmer_id = request.session.get('farmer_id')
+
+    if not farmer_id:
+        return redirect('login')
+
+    farmer = Farmer.objects.get(id=farmer_id)
+
+    if request.method == 'POST':
+
+        form = EditProfileForm(
+            request.POST,
+            request.FILES,
+            instance=farmer
+        )
+
+        if form.is_valid():
+
+            farmer = form.save()
+
+            # Update session data
+            request.session['farmer_name'] = farmer.name
+
+            if farmer.profile_picture:
+                request.session['profile_picture'] = farmer.profile_picture.url
+            else:
+                request.session['profile_picture'] = ''
+
+            return redirect('dashboard')
+
+    else:
+
+        form = EditProfileForm(
+            instance=farmer
+        )
+
+    return render(
+        request,
+        'accounts/edit_profile.html',
+        {
+            'form': form
+        }
+    )

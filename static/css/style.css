@@ -165,3 +165,21 @@ form select:focus {
     z-index: 1000;
 
 }
+/* Navbar Hover Effect */
+
+.navbar-nav .nav-link {
+    color: white !important;
+    padding: 8px 15px !important;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+}
+
+.navbar-nav .nav-link:hover {
+    background: white !important;
+    color: #198754 !important;
+}
+
+.navbar-nav .nav-link.active {
+    background: white !important;
+    color: #198754 !important;
+}

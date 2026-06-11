@@ -84,3 +84,39 @@ class FarmerRegistrationForm(forms.ModelForm):
             )
 
         return cleaned_data
+
+class EditProfileForm(forms.ModelForm):
+
+    class Meta:
+        model = Farmer
+
+        fields = [
+            'profile_picture',
+            'name',
+            'email',
+            'phone',
+            'address'
+        ]
+
+        widgets = {
+
+            'name': forms.TextInput(
+                attrs={'class': 'form-control'}
+            ),
+
+            'email': forms.EmailInput(
+                attrs={'class': 'form-control'}
+            ),
+
+            'phone': forms.TextInput(
+                attrs={'class': 'form-control'}
+            ),
+
+            'address': forms.Textarea(
+                attrs={
+                    'class': 'form-control',
+                    'rows': 3
+                }
+            ),
+
+        }
