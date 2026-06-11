@@ -5,7 +5,8 @@ from .views import (
     login_view,
     dashboard,
     logout_view,
-    edit_profile
+    edit_profile,
+    change_password
 )
 
 urlpatterns = [
@@ -37,5 +38,10 @@ urlpatterns = [
     'edit-profile/',
     edit_profile,
     name='edit_profile'
+    ),
+    path(
+    'change-password/',
+    change_password,
+    name='change_password'
     ),
 ]

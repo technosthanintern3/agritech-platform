@@ -142,6 +142,50 @@ def logout_view(request):
     return redirect('home')
   
     
+# def edit_profile(request):
+
+#     farmer_id = request.session.get('farmer_id')
+
+#     if not farmer_id:
+#         return redirect('login')
+
+#     farmer = Farmer.objects.get(id=farmer_id)
+
+#     if request.method == 'POST':
+
+#         form = EditProfileForm(
+#             request.POST,
+#             request.FILES,
+#             instance=farmer
+#         )
+
+#         if form.is_valid():
+
+#             farmer = form.save()
+
+#             # Update session data
+#             request.session['farmer_name'] = farmer.name
+
+#             if farmer.profile_picture:
+#                 request.session['profile_picture'] = farmer.profile_picture.url
+#             else:
+#                 request.session['profile_picture'] = ''
+
+#             return redirect('dashboard')
+
+#     else:
+
+#         form = EditProfileForm(
+#             instance=farmer
+#         )
+
+#     return render(
+#         request,
+#         'accounts/edit_profile.html',
+#         {
+#             'form': form
+#         }
+#     )
 def edit_profile(request):
 
     farmer_id = request.session.get('farmer_id')
@@ -153,6 +197,50 @@ def edit_profile(request):
 
     if request.method == 'POST':
 
+        # CHANGE PASSWORD SECTION
+        if request.POST.get('change_password'):
+
+            current_password = request.POST.get(
+                'current_password'
+            )
+
+            new_password = request.POST.get(
+                'new_password'
+            )
+
+            confirm_password = request.POST.get(
+                'confirm_password'
+            )
+
+            if current_password != farmer.password:
+
+                return render(
+                    request,
+                    'accounts/edit_profile.html',
+                    {
+                        'form': EditProfileForm(instance=farmer),
+                        'password_error': 'Current password is incorrect.'
+                    }
+                )
+
+            if new_password != confirm_password:
+
+                return render(
+                    request,
+                    'accounts/edit_profile.html',
+                    {
+                        'form': EditProfileForm(instance=farmer),
+                        'password_error': 'New passwords do not match.'
+                    }
+                )
+
+            farmer.password = new_password
+            farmer.save()
+
+            return redirect('login')
+
+        # PROFILE UPDATE SECTION
+
         form = EditProfileForm(
             request.POST,
             request.FILES,
@@ -163,7 +251,6 @@ def edit_profile(request):
 
             farmer = form.save()
 
-            # Update session data
             request.session['farmer_name'] = farmer.name
 
             if farmer.profile_picture:
@@ -172,6 +259,10 @@ def edit_profile(request):
                 request.session['profile_picture'] = ''
 
             return redirect('dashboard')
+
+        else:
+
+            print(form.errors)
 
     else:
 
@@ -184,5 +275,55 @@ def edit_profile(request):
         'accounts/edit_profile.html',
         {
             'form': form
+        }
+    )
+    
+def change_password(request):
+
+    farmer_id = request.session.get('farmer_id')
+
+    if not farmer_id:
+        return redirect('login')
+
+    farmer = Farmer.objects.get(id=farmer_id)
+
+    error = None
+
+    if request.method == 'POST':
+
+        current_password = request.POST.get(
+            'current_password'
+        )
+
+        new_password = request.POST.get(
+            'new_password'
+        )
+
+        confirm_password = request.POST.get(
+            'confirm_password'
+        )
+
+        if current_password != farmer.password:
+
+            error = "Current password is incorrect."
+
+        elif new_password != confirm_password:
+
+            error = "Passwords do not match."
+
+        else:
+
+            farmer.password = new_password
+            farmer.save()
+            # Logout useer after password change
+            request.session.flush()
+
+            return redirect('login')
+
+    return render(
+        request,
+        'accounts/change_password.html',
+        {
+            'error': error
         }
     )
