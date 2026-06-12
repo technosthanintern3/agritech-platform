@@ -1,4 +1,5 @@
 from django.shortcuts import render, redirect
+import re
 
 from .forms import FarmerRegistrationForm
 from .login_forms import LoginForm
@@ -306,7 +307,22 @@ def change_password(request):
         if current_password != farmer.password:
 
             error = "Current password is incorrect."
-
+            
+        elif len(new_password) < 8:
+            error = "Password must be at least 8 characters long."
+            
+        elif not re.search(r'[A-Z]', new_password):
+            error = "Password must contain at least one uppercase letter."
+            
+        elif not re.search(r'[a-z]', new_password):
+            error = "Password must contain at least one lowercase letter."
+            
+        elif not re.search(r'[0-9]', new_password):
+            error = "Password must contain at least one number."
+            
+        elif not re.search(r'[@$!%*?&#]', new_password):
+            error = "Password must contain at least one special character."
+         
         elif new_password != confirm_password:
 
             error = "Passwords do not match."

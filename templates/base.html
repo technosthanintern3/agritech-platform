@@ -28,19 +28,59 @@ href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.2/cropper.min.css">
         <!-- Logo -->
         <a class="navbar-brand d-flex align-items-center" href="/">
 
-            <img
-                src="{% static 'images/logo.jpeg' %}"
-                alt="Logo"
-                width="50"
-                height="50"
-                class="rounded-circle me-2">
+    {% if site_settings and site_settings.logo %}
 
-            <strong>AgriTech</strong>
+        <img
+            src="{{ site_settings.logo.url }}"
+            alt="Logo"
+            width="50"
+            height="50"
+            class="rounded-circle me-2"
+            style="object-fit:cover;">
 
-        </a>
+    {% else %}
 
-        <!-- Navbar Menu -->
-        <ul class="navbar-nav ms-auto d-flex flex-row align-items-center">
+        <img
+            src="{% static 'images/logo.jpeg' %}"
+            alt="Logo"
+            width="50"
+            height="50"
+            class="rounded-circle me-2">
+
+    {% endif %}
+
+    <strong>
+        {% if site_settings %}
+            {{ site_settings.site_name }}
+        {% else %}
+            AgriTech
+        {% endif %}
+    </strong>
+
+</a>
+
+<!-- Mobile Menu Button -->
+
+<!-- Mobile Menu Button -->
+
+<button
+    class="navbar-toggler"
+    type="button"
+    data-bs-toggle="collapse"
+    data-bs-target="#navbarContent"
+    aria-controls="navbarContent"
+    aria-expanded="false"
+    aria-label="Toggle navigation">
+
+    <span class="navbar-toggler-icon"></span>
+
+</button>
+
+<!-- Navbar Menu -->
+
+<div class="collapse navbar-collapse" id="navbarContent">
+
+    <ul class="navbar-nav ms-auto">
 
             <!-- Home -->
             <li class="nav-item me-3">
@@ -224,6 +264,7 @@ href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.2/cropper.min.css">
 
         </ul>
 
+    </div>
     </div>
 
 </nav>

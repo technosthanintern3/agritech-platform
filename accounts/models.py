@@ -31,3 +31,35 @@ class Farmer(models.Model):
 
     def __str__(self):
         return self.name
+    
+
+class SiteSettings(models.Model):
+
+    site_name = models.CharField(
+        max_length=100,
+        blank=True,
+        null=True
+    )
+
+    logo = models.ImageField(
+        upload_to='site_logo/',
+        blank=True,
+        null=True
+    )
+
+    hero_background = models.ImageField(
+        upload_to='hero_background/',
+        blank=True,
+        null=True
+    )
+    mobile_hero_background = models.ImageField(
+        upload_to='hero_background/mobile/',
+        blank=True,
+        null=True
+    )
+
+        
+
+    def __str__(self):
+
+        return self.site_name

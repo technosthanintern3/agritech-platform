@@ -2,13 +2,6 @@
 
     min-height: calc(100vh - 70px);
 
-    background:
-        linear-gradient(
-            rgba(0,0,0,0.5),
-            rgba(0,0,0,0.5)
-        ),
-        url('/static/images/hero-desktop.jpeg');
-
     background-size: cover;
     background-position: center center;
     background-repeat: no-repeat;
@@ -21,15 +14,130 @@
     color: white;
 
     padding: 20px;
+
+    position: relative;
+}
+
+.hero-section::before {
+
+    content: "";
+
+    position: absolute;
+
+    top: 0;
+    left: 0;
+
+    width: 100%;
+    height: 100%;
+
+    background: rgba(0, 0, 0, 0.45);
+
+    z-index: 1;
+}
+
+.hero-content {
+
+    position: relative;
+    z-index: 2;
+
+    max-width: 900px;
+    padding: 20px;
 }
 
 .hero-content h1 {
+
     font-size: 3.5rem;
     font-weight: bold;
 }
 
 .hero-content p {
+
     font-size: 1.3rem;
+}
+
+
+/* Tablet */
+
+@media (max-width: 992px) {
+
+    .hero-section {
+
+        min-height: 70vh;
+        background-position: center center;
+    }
+
+    .hero-content h1 {
+
+        font-size: 2.8rem;
+    }
+
+    .hero-content p {
+
+        font-size: 1.1rem;
+    }
+}
+
+
+/* Mobile */
+
+@media (max-width: 768px) {
+
+    .hero-section {
+
+        min-height: 65vh;
+
+        background-position: center top;
+
+        padding: 15px;
+    }
+
+    .hero-content h1 {
+
+        font-size: 2rem;
+    }
+
+    .hero-content p {
+
+        font-size: 1rem;
+    }
+
+    .hero-content .btn {
+
+        display: block;
+
+        width: 100%;
+
+        margin-bottom: 10px;
+    }
+}
+
+
+/* Small Mobile */
+
+@media (max-width: 480px) {
+
+    .hero-section {
+
+        min-height: 60vh;
+
+        background-position: center top;
+    }
+
+    .hero-content h1 {
+
+        font-size: 1.6rem;
+    }
+
+    .hero-content p {
+
+        font-size: 0.9rem;
+    }
+
+    .hero-content .btn {
+
+        width: 100%;
+        margin-bottom: 10px;
+    }
 }
 
 .service-card:hover,

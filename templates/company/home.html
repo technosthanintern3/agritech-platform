@@ -2,8 +2,11 @@
 
 {% block content %}
 
-<section class="hero-section">
-
+<section
+class="hero-section"
+data-desktop="{{ site_settings.hero_background.url }}"
+data-mobile="{{ site_settings.mobile_hero_background.url }}"
+>
     <div class="hero-content">
 
         <h1>
@@ -171,6 +174,55 @@
 
     </div>
 
-</section>
+    <script>
+
+function updateHeroImage() {
+
+    const hero =
+    document.querySelector(".hero-section");
+
+    if (!hero) return;
+
+    if (
+        window.innerWidth <= 768 &&
+        hero.dataset.mobile
+    ) {
+
+        hero.style.backgroundImage =
+        `linear-gradient(
+            rgba(0,0,0,0.45),
+            rgba(0,0,0,0.45)
+        ),
+        url('${hero.dataset.mobile}')`;
+
+    } else {
+
+        hero.style.backgroundImage =
+        `linear-gradient(
+            rgba(0,0,0,0.45),
+            rgba(0,0,0,0.45)
+        ),
+        url('${hero.dataset.desktop}')`;
+
+    }
+
+}
+
+updateHeroImage();
+
+window.addEventListener(
+    "resize",
+    updateHeroImage
+);
+
+</script>
+
+<h3 style="color:red;">
+Desktop: {{ site_settings.hero_background.url }}
+</h3>
+
+<h3 style="color:blue;">
+Mobile: {{ site_settings.mobile_hero_background.url }}
+</h3>
 
 {% endblock %}
