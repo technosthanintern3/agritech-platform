@@ -19,5 +19,21 @@ urlpatterns = [
     views.service_info,
     name='service_info'
     ),
+    
+    path(
+        'machinery-details/',
+        views.machinery_details,
+        name='machinery_details'
+    ),
+      path(
+        'farmer-support-details/',
+        views.farmer_support_details,
+        name='farmer_support_details'
+    ),
+      path(
+        'service/<slug:service_name>/',
+        views.service_info,
+        name='service_info'
+    ),
 
 ]

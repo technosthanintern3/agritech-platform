@@ -1,6 +1,15 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import (
+    render,
+    get_object_or_404
+)
+
 from .forms import TractorBookingForm
-from .models import TractorBooking, Machinery
+
+from .models import (
+    TractorBooking,
+    Machinery
+)
+
 from agritech.utils import login_required_session
 
 
@@ -15,13 +24,9 @@ def tractor_booking(request):
 
         if form.is_valid():
 
-            booking = form.save(
-                commit=False
-            )
+            booking = form.save(commit=False)
 
-            farmer_id = request.session.get(
-                'farmer_id'
-            )
+            farmer_id = request.session.get('farmer_id')
 
             if farmer_id:
                 booking.farmer_id = farmer_id
@@ -55,9 +60,7 @@ def tractor_booking(request):
 @login_required_session
 def my_bookings(request):
 
-    farmer_id = request.session.get(
-        'farmer_id'
-    )
+    farmer_id = request.session.get('farmer_id')
 
     bookings = TractorBooking.objects.filter(
         farmer_id=farmer_id
@@ -68,5 +71,21 @@ def my_bookings(request):
         'machinery/my_bookings.html',
         {
             'bookings': bookings
+        }
+    )
+
+
+def machinery_detail(request, id):
+
+    machine = get_object_or_404(
+        Machinery,
+        id=id
+    )
+
+    return render(
+        request,
+        'machinery/machinery_detail.html',
+        {
+            'machine': machine
         }
     )

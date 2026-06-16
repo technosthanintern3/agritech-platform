@@ -4,70 +4,82 @@
 
 <div class="container py-5">
 
-    <div class="card shadow-lg border-0">
+<div class="card shadow-lg border-0">
 
-        <div class="card-body p-5">
+    {% if service.image %}
 
-            <h1 class="text-success">
+    <img
+        src="{{ service.image.url }}"
+        class="card-img-top"
+        style="height:400px; object-fit:cover;">
 
-                {{ service.title }}
+    {% endif %}
 
-            </h1>
+    <div class="card-body p-5">
 
-            <hr>
+        <h1 class="text-success">
 
-            <p class="lead">
+            {{ service.title }}
 
-                {{ service.description }}
+        </h1>
 
-            </p>
+        <hr>
 
-            <h3 class="mt-4 text-primary">
+        <p class="lead">
 
-                Service Benefits
+            {{ service.full_description }}
 
-            </h3>
+        </p>
 
-            <ul class="list-group mb-4">
+        <h3 class="mt-4 text-primary">
 
-                {% for benefit in service.benefits %}
+            Service Benefits
 
-                <li class="list-group-item">
+        </h3>
 
-                    ✅ {{ benefit }}
+        <ul class="list-group mb-4">
 
-                </li>
+            {% for benefit in service.get_benefits_list %}
 
-                {% endfor %}
+            <li class="list-group-item">
 
-            </ul>
-            <div class="alert alert-success">
+                ✅ {{ benefit }}
 
-                <strong>
-                   Why Choose This Service?
-                </strong>
+            </li>
 
-                <br><br>
+            {% endfor %}
 
-                {{ service.why_choose }}
+        </ul>
 
-            </div>
+        <div class="alert alert-success">
 
-            <div class="text-center mt-4">
+            <strong>
 
-                <a
-                    href="{% url 'services' %}"
-                    class="btn btn-success btn-lg">
+                Why Choose This Service?
 
-                    Request Service
+            </strong>
 
-                </a>
+            <br><br>
 
-            </div>
+            {{ service.why_choose }}
+
+        </div>
+
+        <div class="text-center mt-4">
+
+            <a
+                href="{% url 'services' %}"
+                class="btn btn-success btn-lg">
+
+                Request Service
+
+            </a>
 
         </div>
 
     </div>
+
+</div>
 
 </div>
 
