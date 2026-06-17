@@ -1,0 +1,144 @@
+{% extends 'dashboard/base_admin.html' %}
+
+{% block content %}
+
+<div class="container-fluid">
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+
+<div>
+
+<h2 class="fw-bold">
+🌱 Crop Problem Center
+</h2>
+
+<p class="text-muted">
+Manage farmer crop issues and provide expert solutions
+</p>
+
+</div>
+
+</div>
+
+<div class="row">
+
+{% for problem in problems %}
+
+<div class="col-lg-6 mb-4">
+
+<div class="card border-0 shadow-sm h-100">
+
+<div class="card-header bg-white">
+
+<div class="d-flex justify-content-between">
+
+<div>
+
+<h5 class="fw-bold mb-1">
+{{ problem.crop_name }}
+</h5>
+
+<small class="text-muted">
+👨‍🌾 {{ problem.name }}
+</small>
+
+</div>
+
+<span class="badge bg-warning text-dark">
+New Issue
+</span>
+
+</div>
+
+</div>
+
+<div class="card-body">
+
+{% if problem.image %}
+
+<img
+src="{{ problem.image.url }}"
+class="img-fluid rounded mb-3"
+style="height:220px;width:100%;object-fit:cover;">
+
+{% endif %}
+
+<h6 class="fw-bold">
+Reported Problem
+</h6>
+
+<p class="text-muted">
+{{ problem.problem }}
+</p>
+
+<hr>
+
+<h6 class="fw-bold text-success">
+Expert Solution
+</h6>
+
+<form
+method="POST"
+action="{% url 'reply_crop_problem' problem.id %}">
+
+{% csrf_token %}
+
+<textarea
+name="reply"
+class="form-control"
+rows="4"
+placeholder="Write solution for farmer...">{% if problem.adminreply %}{{ problem.adminreply.reply }}{% endif %}</textarea>
+
+<button
+class="btn btn-success mt-3">
+
+💾 Save Solution
+
+</button>
+
+</form>
+
+</div>
+
+<div class="card-footer bg-white">
+
+<a
+href="{{ problem.image.url }}"
+target="_blank"
+class="btn btn-outline-primary btn-sm">
+
+🔍 View Full Image
+
+</a>
+
+{% if problem.adminreply %}
+
+<span class="badge bg-success float-end">
+
+✅ Replied
+
+</span>
+
+{% else %}
+
+<span class="badge bg-danger float-end">
+
+⏳ Waiting Reply
+
+</span>
+
+{% endif %}
+
+</div>
+
+</div>
+
+</div>
+
+{% endfor %}
+
+</div>
+
+</div>
+
+{% endblock %}

@@ -1,0 +1,73 @@
+{% extends 'dashboard/base_admin.html' %}
+
+{% block content %}
+
+<h2>
+🌱 Crop Problem Reply
+</h2>
+
+<div class="card shadow">
+
+<div class="card-body">
+
+<h4>
+{{ problem.crop_name }}
+</h4>
+
+<p>
+
+<strong>Farmer:</strong>
+{{ problem.name }}
+
+</p>
+
+<p>
+
+<strong>Problem:</strong>
+
+{{ problem.problem }}
+
+</p>
+
+<img
+src="{{ problem.image.url }}"
+width="300"
+class="img-thumbnail mb-3">
+
+<form method="POST">
+
+{% csrf_token %}
+
+<label class="form-label">
+
+Solution / Reply
+
+</label>
+
+<textarea
+name="reply"
+rows="6"
+class="form-control">
+
+{% if existing_reply %}
+{{ existing_reply.reply }}
+{% endif %}
+
+</textarea>
+
+<br>
+
+<button
+class="btn btn-success">
+
+Save Reply
+
+</button>
+
+</form>
+
+</div>
+
+</div>
+
+{% endblock %}

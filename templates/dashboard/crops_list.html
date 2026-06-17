@@ -1,0 +1,65 @@
+{% extends 'dashboard/base_admin.html' %}
+
+{% block content %}
+
+<div class="container-fluid">
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+
+        <h2 class="fw-bold">
+            🌾 Crop Management
+        </h2>
+
+        <a
+        href="{% url 'add_crop' %}"
+        class="btn btn-success">
+
+            ➕ Add Crop
+
+        </a>
+
+    </div>
+
+    <div class="card shadow border-0">
+
+        <div class="card-body">
+
+            <table class="table table-hover">
+
+                <thead class="table-dark">
+
+                    <tr>
+
+                        <th>ID</th>
+
+                        <th>Crop Name</th>
+
+                    </tr>
+
+                </thead>
+
+                <tbody>
+
+                {% for crop in crops %}
+
+                    <tr>
+
+                        <td>#{{ crop.id }}</td>
+
+                        <td>{{ crop.name }}</td>
+
+                    </tr>
+
+                {% endfor %}
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}

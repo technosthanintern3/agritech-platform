@@ -1,0 +1,100 @@
+{% extends 'dashboard/base_admin.html' %}
+
+{% block content %}
+
+<div class="container-fluid">
+
+<h2 class="mb-4">
+👨‍🌾 Farmer Details
+</h2>
+
+<div class="card shadow border-0">
+
+<div class="card-body">
+
+<h4>{{ farmer.name }}</h4>
+
+<hr>
+
+<p>
+<strong>Email:</strong>
+{{ farmer.email }}
+</p>
+
+<p>
+<strong>Phone:</strong>
+{{ farmer.phone }}
+</p>
+
+<p>
+<strong>Address:</strong>
+{{ farmer.address }}
+</p>
+
+</div>
+
+</div>
+
+<br>
+
+<div class="row">
+
+<div class="col-md-4">
+
+<div class="card shadow">
+
+<div class="card-body">
+
+<h5>Total Orders</h5>
+
+<h2>
+{{ orders.count }}
+</h2>
+
+</div>
+
+</div>
+
+</div>
+
+<div class="col-md-4">
+
+<div class="card shadow">
+
+<div class="card-body">
+
+<h5>Consultations</h5>
+
+<h2>
+{{ consultations.count }}
+</h2>
+
+</div>
+
+</div>
+
+</div>
+
+<div class="col-md-4">
+
+<div class="card shadow">
+
+<div class="card-body">
+
+<h5>Bookings</h5>
+
+<h2>
+{{ bookings.count }}
+</h2>
+
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+{% endblock %}

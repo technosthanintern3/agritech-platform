@@ -1,0 +1,237 @@
+{% extends 'dashboard/base_admin.html' %}
+
+{% block content %}
+
+<div class="row g-4">
+
+<div class="col-md-3">
+<div class="card stat-card p-4">
+
+<div class="d-flex justify-content-between">
+
+<div>
+<h6>Farmers</h6>
+<h2>{{ total_farmers }}</h2>
+</div>
+
+<div class="stat-icon text-success">
+👨‍🌾
+</div>
+
+</div>
+
+</div>
+</div>
+
+<div class="col-md-3">
+<div class="card stat-card p-4">
+
+<div class="d-flex justify-content-between">
+
+<div>
+<h6>Products</h6>
+<h2>{{ total_products }}</h2>
+</div>
+
+<div class="stat-icon text-primary">
+📦
+</div>
+
+</div>
+
+</div>
+</div>
+
+<div class="col-md-3">
+<div class="card stat-card p-4">
+
+<div class="d-flex justify-content-between">
+
+<div>
+<h6>Orders</h6>
+<h2>{{ total_orders }}</h2>
+</div>
+
+<div class="stat-icon text-warning">
+🛒
+</div>
+
+</div>
+
+</div>
+</div>
+
+<div class="col-md-3">
+<div class="card stat-card p-4">
+
+<div class="d-flex justify-content-between">
+
+<div>
+<h6>Machinery</h6>
+<h2>{{ total_machinery }}</h2>
+</div>
+
+<div class="stat-icon text-danger">
+🚜
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+
+<div class="row mt-4">
+
+<div class="col-md-6">
+
+<div class="table-card">
+
+<h5>Recent Farmers</h5>
+
+<table class="table">
+
+<tr>
+<th>Name</th>
+<th>Email</th>
+</tr>
+
+{% for farmer in recent_farmers %}
+
+<tr>
+<td>{{ farmer.name }}</td>
+<td>{{ farmer.email }}</td>
+</tr>
+
+{% endfor %}
+
+</table>
+
+</div>
+
+</div>
+
+<div class="col-md-6">
+
+<div class="table-card">
+
+<h5>Recent Orders</h5>
+
+<table class="table">
+
+<tr>
+<th>ID</th>
+<th>Name</th>
+<th>Status</th>
+</tr>
+
+{% for order in recent_orders %}
+
+<tr>
+
+<td>#{{ order.id }}</td>
+
+<td>{{ order.name }}</td>
+
+<td>
+<span class="badge bg-success">
+{{ order.status }}
+</span>
+</td>
+
+</tr>
+
+{% endfor %}
+
+</table>
+
+</div>
+
+</div>
+
+</div>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<div class="row mt-4">
+
+    <div class="col-md-5">
+
+        <div class="card shadow">
+
+            <div class="card-header">
+                <h6 class="mb-0">
+                    📈 Orders Analytics
+                </h6>
+            </div>
+
+            <div class="card-body">
+
+                <canvas
+                    id="ordersChart"
+                    height="180">
+                </canvas>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+<script>
+
+const ctx =
+document.getElementById(
+'ordersChart'
+);
+
+new Chart(ctx, {
+
+    type: 'doughnut',
+
+    data: {
+
+        labels: [
+            'Pending',
+            'Confirmed',
+            'Shipped',
+            'Delivered'
+        ],
+
+        datasets: [{
+
+            data: [
+
+                {{ pending_orders }},
+                {{ confirmed_orders }},
+                {{ shipped_orders }},
+                {{ delivered_orders }}
+
+            ]
+
+        }]
+
+    },
+
+    options: {
+
+        responsive: true,
+
+        plugins: {
+
+            legend: {
+
+                position: 'bottom'
+
+            }
+
+        }
+
+    }
+
+});
+
+</script>
+{% endblock %}

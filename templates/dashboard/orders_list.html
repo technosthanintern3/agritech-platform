@@ -1,0 +1,268 @@
+{% extends 'dashboard/base_admin.html' %}
+
+{% block content %}
+
+<div class="container-fluid">
+
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+
+    <h2 class="fw-bold">
+        🛒 Orders Management
+    </h2>
+
+</div>
+
+<!-- Stats Cards -->
+
+<div class="row g-4 mb-4">
+
+    <div class="col-md-3">
+
+        <div class="card shadow border-0">
+
+            <div class="card-body">
+
+                <h6 class="text-muted">
+                    Total Orders
+                </h6>
+
+                <h2 class="fw-bold">
+                    {{ orders.count }}
+                </h2>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <div class="col-md-3">
+
+        <div class="card shadow border-0">
+
+            <div class="card-body">
+
+                <h6 class="text-muted">
+                    Pending
+                </h6>
+
+                <h2 class="text-warning fw-bold">
+                    {{ pending_count }}
+                </h2>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <div class="col-md-3">
+
+        <div class="card shadow border-0">
+
+            <div class="card-body">
+
+                <h6 class="text-muted">
+                    Shipped
+                </h6>
+
+                <h2 class="text-primary fw-bold">
+                    {{ shipped_count }}
+                </h2>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <div class="col-md-3">
+
+        <div class="card shadow border-0">
+
+            <div class="card-body">
+
+                <h6 class="text-muted">
+                    Delivered
+                </h6>
+
+                <h2 class="text-success fw-bold">
+                    {{ delivered_count }}
+                </h2>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+<!-- Search -->
+
+<div class="card shadow border-0 mb-4">
+
+    <div class="card-body">
+
+        <input
+            type="text"
+            id="orderSearch"
+            class="form-control"
+            placeholder="Search Orders...">
+
+    </div>
+
+</div>
+
+<!-- Orders Table -->
+
+<div class="card shadow border-0">
+
+    <div class="card-body">
+
+        <div class="table-responsive">
+
+            <table
+                class="table table-hover align-middle"
+                id="ordersTable">
+
+                <thead class="table-dark">
+
+                    <tr>
+
+                        <th>ID</th>
+
+                        <th>Customer</th>
+
+                        <th>Email</th>
+
+                        <th>Phone</th>
+
+                        <th>Total</th>
+
+                        <th>Status</th>
+
+                        <th>Date</th>
+
+                    </tr>
+
+                </thead>
+
+                <tbody>
+
+                {% for order in orders %}
+
+                    <tr>
+
+                        <td>
+                            #{{ order.id }}
+                        </td>
+
+                        <td>
+                            {{ order.name }}
+                        </td>
+
+                        <td>
+                            {{ order.email }}
+                        </td>
+
+                        <td>
+                            {{ order.phone }}
+                        </td>
+
+                        <td class="fw-bold">
+                            ₹{{ order.total_amount }}
+                        </td>
+
+                        <td>
+
+                            <form
+                                method="POST"
+                                action="{% url 'update_order_status' order.id %}">
+
+                                {% csrf_token %}
+
+                                <select
+                                    name="status"
+                                    class="form-select form-select-sm"
+                                    onchange="this.form.submit()">
+
+                                    <option value="Pending"
+                                    {% if order.status == 'Pending' %}selected{% endif %}>
+                                        Pending
+                                    </option>
+
+                                    <option value="Confirmed"
+                                    {% if order.status == 'Confirmed' %}selected{% endif %}>
+                                        Confirmed
+                                    </option>
+
+                                    <option value="Shipped"
+                                    {% if order.status == 'Shipped' %}selected{% endif %}>
+                                        Shipped
+                                    </option>
+
+                                    <option value="Delivered"
+                                    {% if order.status == 'Delivered' %}selected{% endif %}>
+                                        Delivered
+                                    </option>
+
+                                </select>
+
+                            </form>
+
+                        </td>
+
+                        <td>
+                            {{ order.created_at|date:"d M Y" }}
+                        </td>
+
+                    </tr>
+
+                {% endfor %}
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </div>
+
+</div>
+
+</div>
+
+<script>
+
+document
+.getElementById("orderSearch")
+.addEventListener(
+    "keyup",
+    function(){
+
+        let value =
+        this.value.toLowerCase();
+
+        let rows =
+        document.querySelectorAll(
+            "#ordersTable tbody tr"
+        );
+
+        rows.forEach(function(row){
+
+            row.style.display =
+            row.innerText.toLowerCase()
+            .includes(value)
+            ? ""
+            : "none";
+
+        });
+
+    }
+);
+
+</script>
+
+{% endblock %}

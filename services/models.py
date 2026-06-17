@@ -4,6 +4,16 @@ from accounts.models import Farmer
 
 class ServiceRequest(models.Model):
 
+    STATUS_CHOICES = [
+
+        ('Pending', 'Pending'),
+        ('Approved', 'Approved'),
+        ('In Progress', 'In Progress'),
+        ('Completed', 'Completed'),
+        ('Rejected', 'Rejected'),
+
+    ]
+
     farmer = models.ForeignKey(
         Farmer,
         on_delete=models.CASCADE,
@@ -16,15 +26,21 @@ class ServiceRequest(models.Model):
         on_delete=models.CASCADE
     )
 
-    name = models.CharField(max_length=100)
+    name = models.CharField(
+        max_length=100
+    )
 
     email = models.EmailField()
 
-    phone = models.CharField(max_length=15)
+    phone = models.CharField(
+        max_length=15
+    )
 
     address = models.TextField()
 
-    crop_name = models.CharField(max_length=100)
+    crop_name = models.CharField(
+        max_length=100
+    )
 
     problem = models.TextField()
 
@@ -32,13 +48,19 @@ class ServiceRequest(models.Model):
         upload_to='service_requests/'
     )
 
+    status = models.CharField(
+        max_length=20,
+        choices=STATUS_CHOICES,
+        default='Pending'
+    )
+
     created_at = models.DateTimeField(
         auto_now_add=True
     )
 
     def __str__(self):
-        return self.name
-    
+        return f"{self.name} - {self.status}"
+
 
 class ServiceInfo(models.Model):
 

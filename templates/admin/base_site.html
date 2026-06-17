@@ -1,0 +1,50 @@
+{% extends "admin/base.html" %}
+{% load static %}
+
+{% block branding %}
+<h1 id="site-name">
+    <img src="{% static 'images/logo.jpeg' %}"
+         height="40"
+         style="margin-right:10px;">
+    AgroSthan Admin Panel
+</h1>
+{% endblock %}
+
+{% block extrastyle %}
+{{ block.super }}
+
+<style>
+
+:root{
+    --primary:#198754;
+}
+
+#header{
+    background:#198754 !important;
+}
+
+.module h2,
+.module caption{
+    background:#198754 !important;
+}
+
+.button,
+input[type=submit],
+input[type=button],
+.submit-row input{
+    background:#198754 !important;
+    border:none !important;
+}
+
+.dashboard .module table{
+    border-radius:12px;
+    overflow:hidden;
+}
+
+body{
+    background:#f4f6f9;
+}
+
+</style>
+
+{% endblock %}

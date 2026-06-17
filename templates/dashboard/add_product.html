@@ -1,0 +1,231 @@
+{% extends 'dashboard/base_admin.html' %}
+
+{% block content %}
+
+<div class="container">
+
+    <div class="card shadow border-0">
+
+        <div class="card-header bg-success text-white">
+
+            <h3 class="mb-0">
+                🌱 Add Product
+            </h3>
+
+        </div>
+
+        <div class="card-body">
+
+            <form
+            method="POST"
+            enctype="multipart/form-data">
+
+                {% csrf_token %}
+
+                <!-- Crop Field -->
+                <div class="mb-3">
+
+                    <label class="form-label fw-bold">
+                        Crop
+                    </label>
+
+                    <div class="row">
+
+                        <div class="col-md-10">
+
+                            {{ form.crop }}
+
+                        </div>
+
+                        <div class="col-md-2">
+
+                            <button
+                            type="button"
+                            class="btn btn-success w-100"
+                            data-bs-toggle="modal"
+                            data-bs-target="#cropModal">
+
+                                ➕
+
+                            </button>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+                <!-- Other Fields -->
+                <div class="mb-3">
+                    <label>Name</label>
+                    {{ form.name }}
+                </div>
+
+                <div class="mb-3">
+                    <label>Image</label>
+                    {{ form.image }}
+                </div>
+
+                <div class="mb-3">
+                    <label>Soil Type</label>
+                    {{ form.soil_type }}
+                </div>
+
+                <div class="mb-3">
+                    <label>Season</label>
+                    {{ form.season }}
+                </div>
+
+                <div class="mb-3">
+                    <label>Water Requirement</label>
+                    {{ form.water_requirement }}
+                </div>
+
+                <div class="mb-3">
+                    <label>Description</label>
+                    {{ form.description }}
+                </div>
+
+                <div class="mb-3">
+                    <label>Price</label>
+                    {{ form.price }}
+                </div>
+
+                <button
+                type="submit"
+                class="btn btn-success">
+
+                    Save Product
+
+                </button>
+
+                <a
+                href="{% url 'products_list' %}"
+                class="btn btn-secondary">
+
+                    Cancel
+
+                </a>
+
+            </form>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- Crop Modal -->
+
+<div
+class="modal fade"
+id="cropModal">
+
+    <div class="modal-dialog">
+
+        <div class="modal-content">
+
+            <div class="modal-header">
+
+                <h5>
+                    🌾 Add New Crop
+                </h5>
+
+                <button
+                type="button"
+                class="btn-close"
+                data-bs-dismiss="modal">
+                </button>
+
+            </div>
+
+            <div class="modal-body">
+
+                <input
+                type="text"
+                id="crop_name"
+                class="form-control"
+                placeholder="Enter Crop Name">
+
+            </div>
+
+            <div class="modal-footer">
+
+                <button
+                type="button"
+                class="btn btn-success"
+                onclick="addCrop()">
+
+                    Save Crop
+
+                </button>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<script>
+
+function addCrop(){
+
+    let cropName =
+    document.getElementById(
+        "crop_name"
+    ).value;
+
+    fetch(
+        "/dashboard/crops/add/ajax/",
+        {
+
+            method:"POST",
+
+            headers:{
+                "X-CSRFToken":"{{ csrf_token }}"
+            },
+
+            body:new URLSearchParams({
+                crop_name:cropName
+            })
+
+        }
+
+    )
+
+    .then(response => response.json())
+
+    .then(data => {
+
+        let select =
+        document.getElementById(
+            "id_crop"
+        );
+
+        let option =
+        new Option(
+            data.name,
+            data.id,
+            true,
+            true
+        );
+
+        select.add(option);
+
+        bootstrap.Modal.getInstance(
+            document.getElementById(
+                "cropModal"
+            )
+        ).hide();
+
+    });
+
+}
+
+</script>
+
+{% endblock %}

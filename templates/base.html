@@ -103,6 +103,12 @@ href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.2/cropper.min.css">
                 </a>
             </li>
 
+            <li class="nav-item me-3">
+                <a class="nav-link text-white" href="{% url 'admin_dashboard' %}">
+                    Admin Dashboard
+                </a>
+            </li>
+
             {% if request.session.farmer_id %}
 
                 <!-- Cart -->
@@ -301,7 +307,7 @@ href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.2/cropper.min.css">
 <!-- Footer -->
 <footer class="bg-dark text-white text-center p-3 mt-5">
 
-    © 2026 AgroSthan Platform
+   © 2026 {{ site_settings.site_name }}
 
 </footer>
 

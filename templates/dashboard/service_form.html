@@ -1,0 +1,81 @@
+{% extends 'dashboard/base_admin.html' %}
+
+{% block content %}
+
+<div class="card shadow">
+
+<div class="card-body">
+
+<h3>
+
+{% if service %}
+
+Edit Service
+
+{% else %}
+
+Add Service
+
+{% endif %}
+
+</h3>
+
+<form
+method="POST"
+enctype="multipart/form-data">
+
+{% csrf_token %}
+
+<input
+type="text"
+name="title"
+placeholder="Title"
+class="form-control mb-3"
+value="{{ service.title|default:'' }}">
+
+<input
+type="text"
+name="slug"
+placeholder="Slug"
+class="form-control mb-3"
+value="{{ service.slug|default:'' }}">
+
+<textarea
+name="short_description"
+class="form-control mb-3"
+placeholder="Short Description">{{ service.short_description }}</textarea>
+
+<textarea
+name="full_description"
+class="form-control mb-3"
+placeholder="Full Description">{{ service.full_description }}</textarea>
+
+<textarea
+name="benefits"
+class="form-control mb-3"
+placeholder="Benefits">{{ service.benefits }}</textarea>
+
+<textarea
+name="why_choose"
+class="form-control mb-3"
+placeholder="Why Choose">{{ service.why_choose }}</textarea>
+
+<input
+type="file"
+name="image"
+class="form-control mb-3">
+
+<button
+class="btn btn-success">
+
+Save Service
+
+</button>
+
+</form>
+
+</div>
+
+</div>
+
+{% endblock %}

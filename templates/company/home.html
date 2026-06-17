@@ -4,8 +4,14 @@
 
 <section
 class="hero-section"
+
+{% if site_settings.hero_background %}
 data-desktop="{{ site_settings.hero_background.url }}"
+{% endif %}
+
+{% if site_settings.mobile_hero_background %}
 data-mobile="{{ site_settings.mobile_hero_background.url }}"
+{% endif %}
 >
     <div class="hero-content">
 
@@ -174,35 +180,36 @@ data-mobile="{{ site_settings.mobile_hero_background.url }}"
 
     </div>
 
-    <script>
+   <script>
 
 function updateHeroImage() {
 
-    const hero =
-    document.querySelector(".hero-section");
+    const hero = document.querySelector(".hero-section");
 
     if (!hero) return;
 
-    if (
-        window.innerWidth <= 768 &&
-        hero.dataset.mobile
-    ) {
+    const desktopImg = hero.dataset.desktop || "";
+    const mobileImg = hero.dataset.mobile || "";
+
+    if (window.innerWidth <= 768 && mobileImg) {
 
         hero.style.backgroundImage =
         `linear-gradient(
             rgba(0,0,0,0.45),
             rgba(0,0,0,0.45)
         ),
-        url('${hero.dataset.mobile}')`;
+        url('${mobileImg}')`;
 
-    } else {
+    }
+
+    else if (desktopImg) {
 
         hero.style.backgroundImage =
         `linear-gradient(
             rgba(0,0,0,0.45),
             rgba(0,0,0,0.45)
         ),
-        url('${hero.dataset.desktop}')`;
+        url('${desktopImg}')`;
 
     }
 

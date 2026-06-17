@@ -1,0 +1,139 @@
+{% extends 'dashboard/base_admin.html' %}
+
+{% block content %}
+
+<div class="container-fluid">
+
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+
+    <h2 class="fw-bold">
+        👨‍🌾 Farmers Management
+    </h2>
+
+</div>
+
+<div class="card shadow border-0 mb-4">
+
+    <div class="card-body">
+
+        <input
+            type="text"
+            id="farmerSearch"
+            class="form-control"
+            placeholder="Search Farmer...">
+
+    </div>
+
+</div>
+
+<div class="card shadow border-0">
+
+    <div class="card-body">
+
+        <div class="table-responsive">
+
+            <table
+                class="table table-hover align-middle"
+                id="farmersTable">
+
+                <thead class="table-dark">
+
+                    <tr>
+
+                        <th>ID</th>
+                        <th>Name</th>
+                        <th>Email</th>
+                        <th>Phone</th>
+                        <th>Village</th>
+                        <th>Actions</th>
+
+                    </tr>
+
+                </thead>
+
+                <tbody>
+
+                {% for farmer in farmers %}
+
+                    <tr>
+
+                        <td>
+                            #{{ farmer.id }}
+                        </td>
+
+                        <td>
+                            {{ farmer.name }}
+                        </td>
+
+                        <td>
+                            {{ farmer.email }}
+                        </td>
+
+                        <td>
+                            {{ farmer.phone }}
+                        </td>
+
+                        <td>
+                            {{ farmer.address }}
+                        </td>
+
+                        <td>
+
+                            <a
+                                href="{% url 'farmer_details' farmer.id %}"
+                                class="btn btn-sm btn-primary">
+
+                                View
+
+                            </a>
+
+                        </td>
+
+                    </tr>
+
+                {% endfor %}
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </div>
+
+</div>
+
+</div>
+
+<script>
+
+document
+.getElementById("farmerSearch")
+.addEventListener(
+"keyup",
+function(){
+
+let value =
+this.value.toLowerCase();
+
+let rows =
+document.querySelectorAll(
+"#farmersTable tbody tr"
+);
+
+rows.forEach(function(row){
+
+row.style.display =
+row.innerText.toLowerCase()
+.includes(value)
+? ""
+: "none";
+
+});
+
+});
+
+</script>
+
+{% endblock %}

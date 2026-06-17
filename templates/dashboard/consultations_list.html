@@ -1,0 +1,121 @@
+{% extends 'dashboard/base_admin.html' %}
+
+{% block content %}
+
+<h2 class="mb-4">
+📞 Consultation Management
+</h2>
+
+<div class="card shadow">
+
+<div class="card-body">
+
+<table class="table table-hover">
+
+<thead class="table-dark">
+
+<tr>
+
+<th>Name</th>
+<th>Phone</th>
+<th>Date</th>
+<th>Status</th>
+<th>Admin Note</th>
+
+</tr>
+
+</thead>
+
+<tbody>
+
+{% for consultation in consultations %}
+
+<tr>
+
+<td>
+{{ consultation.name }}
+</td>
+
+<td>
+{{ consultation.phone }}
+</td>
+
+<td>
+{{ consultation.preferred_date }}
+</td>
+
+<td>
+
+<form
+method="POST"
+action="{% url 'update_consultation_status' consultation.id %}">
+
+{% csrf_token %}
+
+<select
+name="status"
+class="form-select form-select-sm">
+
+<option value="Pending"
+{% if consultation.status == "Pending" %}
+selected
+{% endif %}>
+Pending
+</option>
+
+<option value="Scheduled"
+{% if consultation.status == "Scheduled" %}
+selected
+{% endif %}>
+Scheduled
+</option>
+
+<option value="Completed"
+{% if consultation.status == "Completed" %}
+selected
+{% endif %}>
+Completed
+</option>
+
+<option value="Cancelled"
+{% if consultation.status == "Cancelled" %}
+selected
+{% endif %}>
+Cancelled
+</option>
+
+</select>
+
+</td>
+
+<td>
+
+<textarea
+name="admin_note"
+class="form-control"
+rows="2">{{ consultation.admin_note }}</textarea>
+
+<button
+class="btn btn-success btn-sm mt-2">
+
+Save
+
+</button>
+
+</form>
+
+</td>
+
+</tr>
+
+{% endfor %}
+
+</tbody>
+
+</table>
+
+</div>
+
+</div>
+
+{% endblock %}

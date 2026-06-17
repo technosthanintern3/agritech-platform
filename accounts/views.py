@@ -1,3 +1,4 @@
+from django.contrib import messages
 from django.shortcuts import render, redirect
 import re
 
@@ -26,9 +27,12 @@ def register(request):
 
             form.save()
 
-            success = True
+            messages.success(
+                request,
+                'Registration successful. Please log in to continue.'
+            )
 
-            form = FarmerRegistrationForm()
+            return redirect('home')
 
     else:
 
@@ -71,9 +75,7 @@ def login_view(request):
                 else:
                     request.session['profile_picture'] = ''
 
-                return redirect(
-                    'dashboard'
-                )
+                return redirect('dashboard')
 
             except Farmer.DoesNotExist:
 
