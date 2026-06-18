@@ -1,0 +1,55 @@
+{% extends 'dashboard/base_admin.html' %}
+
+{% block content %}
+<h2 class="mb-4">Doctors Management</h2>
+
+<form class="row g-2 mb-4" method="get">
+    <div class="col-md-4"><input type="text" name="q" class="form-control" placeholder="Search doctors" value="{{ search_query }}"></div>
+    <div class="col-md-3">
+        <select name="status" class="form-select">
+            <option value="">All</option>
+            <option value="pending" {% if status_filter == 'pending' %}selected{% endif %}>Pending</option>
+            <option value="approved" {% if status_filter == 'approved' %}selected{% endif %}>Approved</option>
+        </select>
+    </div>
+    <div class="col-md-2"><button class="btn btn-success w-100">Filter</button></div>
+</form>
+
+<div class="card shadow">
+<div class="card-body table-responsive">
+<table class="table align-middle">
+<thead class="table-dark">
+<tr>
+<th>Name</th><th>Email</th><th>Phone</th><th>Aadhaar</th><th>PAN</th><th>Docs</th><th>Registered</th><th>Status</th><th>Online</th><th>Actions</th>
+</tr>
+</thead>
+<tbody>
+{% for doctor in doctors %}
+<tr>
+<td>{{ doctor.full_name }}</td>
+<td>{{ doctor.email }}</td>
+<td>{{ doctor.phone }}</td>
+<td>{{ doctor.aadhaar_number }}</td>
+<td>{{ doctor.pan_number }}</td>
+<td>
+    <a href="{{ doctor.identity_photo_upload.url }}" target="_blank">Identity</a>
+    {% if doctor.profile_photo %} | <a href="{{ doctor.profile_photo.url }}" target="_blank">Profile</a>{% endif %}
+</td>
+<td>{{ doctor.registration_date|date:'d M Y' }}</td>
+<td><span class="badge bg-{% if doctor.is_approved %}success{% else %}warning text-dark{% endif %}">{% if doctor.is_approved %}Approved{% else %}Pending{% endif %}</span></td>
+<td><span class="badge bg-{% if doctor.is_online %}success{% else %}secondary{% endif %}">{% if doctor.is_online %}Online{% else %}Offline{% endif %}</span></td>
+<td>
+    <form method="post" action="{% url 'doctor_action' doctor.id 'approve' %}" class="d-inline">{% csrf_token %}<button class="btn btn-sm btn-success">Approve</button></form>
+    <form method="post" action="{% url 'doctor_action' doctor.id 'reject' %}" class="d-inline">{% csrf_token %}<button class="btn btn-sm btn-danger">Reject</button></form>
+    <form method="post" action="{% url 'doctor_action' doctor.id 'activate' %}" class="d-inline">{% csrf_token %}<button class="btn btn-sm btn-primary">Activate</button></form>
+    <form method="post" action="{% url 'doctor_action' doctor.id 'deactivate' %}" class="d-inline">{% csrf_token %}<button class="btn btn-sm btn-secondary">Deactivate</button></form>
+</td>
+</tr>
+{% empty %}
+<tr><td colspan="10" class="text-center py-4">No doctors found.</td></tr>
+{% endfor %}
+</tbody>
+</table>
+</div>
+</div>
+{% endblock %}

@@ -2,45 +2,70 @@
 
 {% block content %}
 
-<section
-class="hero-section"
+<section class="hero-section">
 
-{% if site_settings.hero_background %}
-data-desktop="{{ site_settings.hero_background.url }}"
+{% if site_settings.hero_video %}
+
+<video
+autoplay
+muted
+loop
+playsinline
+class="hero-video">
+
+    <source
+    src="{{ site_settings.hero_video.url }}"
+    type="video/mp4">
+
+</video>
+
+{% elif site_settings.hero_background %}
+
+<div
+style="
+position:absolute;
+top:0;
+left:0;
+width:100%;
+height:100%;
+background:url('{{ site_settings.hero_background.url }}');
+background-size:cover;
+background-position:center;
+z-index:1;
+">
+</div>
+
 {% endif %}
 
-{% if site_settings.mobile_hero_background %}
-data-mobile="{{ site_settings.mobile_hero_background.url }}"
-{% endif %}
->
-    <div class="hero-content">
+<div class="hero-overlay"></div>
 
-        <h1>
-            Empowering Indian Farmers
-        </h1>
+<div class="hero-content">
 
-        <p>
-            Quality Seeds • Expert Advice • Modern Farming Solutions
-        </p>
+    <h1>
+        Empowering Indian Farmers
+    </h1>
 
-        <a
-            href="/products/"
-            class="btn btn-success btn-lg">
+    <p>
+        Quality Seeds • Expert Advice • Modern Farming Solutions
+    </p>
 
-            Explore Products
+    <a
+        href="/products/"
+        class="btn btn-success btn-lg">
 
-        </a>
+        Explore Products
 
-        <a
-            href="/services/"
-            class="btn btn-warning btn-lg">
+    </a>
 
-            Our Services
+    <a
+        href="/services/"
+        class="btn btn-warning btn-lg">
 
-        </a>
+        Our Services
 
-    </div>
+    </a>
 
+</div>
 </section>
 
 <section class="container py-5 mt-5">
@@ -159,27 +184,55 @@ data-mobile="{{ site_settings.mobile_hero_background.url }}"
     <div class="row text-center">
 
         <div class="col-md-3">
-            <h1>🌾</h1>
-            <h5>Quality Seeds</h5>
+            <h1>{{ site_settings.why_icon_1 }}</h1>
+            <h5>{{ site_settings.why_title_1 }}</h5>
         </div>
 
         <div class="col-md-3">
-            <h1>👨‍🌾</h1>
-            <h5>Expert Guidance</h5>
+            <h1>{{ site_settings.why_icon_2 }}</h1>
+            <h5>{{ site_settings.why_title_2 }}</h5>
         </div>
 
         <div class="col-md-3">
-            <h1>🚜</h1>
-            <h5>Modern Machinery</h5>
+            <h1>{{ site_settings.why_icon_3 }}</h1>
+            <h5>{{ site_settings.why_title_3 }}</h5>
         </div>
 
         <div class="col-md-3">
-            <h1>📞</h1>
-            <h5>24/7 Support</h5>
+            <h1>{{ site_settings.why_icon_4 }}</h1>
+            <h5>{{ site_settings.why_title_4 }}</h5>
         </div>
 
     </div>
 
+</section>
+
+<footer class="bg-dark text-white py-5 mt-5">
+
+    <div class="container text-center">
+
+        {% if site_settings.logo %}
+            <img
+                src="{{ site_settings.logo.url }}"
+                height="70"
+                class="mb-3">
+        {% endif %}
+
+        <h4>
+            {{ site_settings.site_name }}
+        </h4>
+
+        <p>
+            {{ site_settings.footer_text }}
+        </p>
+
+        <p class="mb-0">
+            © {{ site_settings.site_name }}
+        </p>
+
+    </div>
+
+</footer>
    <script>
 
 function updateHeroImage() {

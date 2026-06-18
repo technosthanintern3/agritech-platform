@@ -1,14 +1,16 @@
 from django.db import models
 from accounts.models import Farmer
+from accounts.models import Doctor, Consultant
 
 class ConsultationRequest(models.Model):
 
     STATUS_CHOICES = [
 
         ('Pending', 'Pending'),
+        ('In Progress', 'In Progress'),
+        ('Completed', 'Completed'),
         ('Approved', 'Approved'),
         ('Rejected', 'Rejected'),
-        ('Completed', 'Completed'),
 
     ]
 
@@ -17,6 +19,22 @@ class ConsultationRequest(models.Model):
         on_delete=models.CASCADE,
         null=True,
         blank=True
+    )
+
+    assigned_doctor = models.ForeignKey(
+        Doctor,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='consultation_requests'
+    )
+
+    assigned_consultant = models.ForeignKey(
+        Consultant,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='consultation_requests'
     )
 
     name = models.CharField(max_length=100)
@@ -30,6 +48,10 @@ class ConsultationRequest(models.Model):
     preferred_date = models.DateField()
 
     message = models.TextField()
+
+    doctor_reply = models.TextField(blank=True, null=True)
+
+    consultant_reply = models.TextField(blank=True, null=True)
 
     status = models.CharField(
         max_length=20,

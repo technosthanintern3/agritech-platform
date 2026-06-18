@@ -1,0 +1,35 @@
+{% extends 'doctor/base_doctor.html' %}
+
+{% block content %}
+<div class="card card-panel p-4">
+    <h4 class="mb-4">Consultation Request #{{ consultation.id }}</h4>
+    <div class="row g-4">
+        <div class="col-md-6">
+            <p><strong>Farmer:</strong> {{ consultation.name }}</p>
+            <p><strong>Email:</strong> {{ consultation.email }}</p>
+            <p><strong>Phone:</strong> {{ consultation.phone }}</p>
+            <p><strong>Preferred Date:</strong> {{ consultation.preferred_date }}</p>
+            <p><strong>Message:</strong> {{ consultation.message }}</p>
+        </div>
+        <div class="col-md-6">
+            <form method="post">
+                {% csrf_token %}
+                <div class="mb-3">
+                    <label class="form-label">Status</label>
+                    <select name="status" class="form-select">
+                        <option value="Pending" {% if consultation.status == 'Pending' %}selected{% endif %}>Pending</option>
+                        <option value="In Progress" {% if consultation.status == 'In Progress' %}selected{% endif %}>In Progress</option>
+                        <option value="Completed" {% if consultation.status == 'Completed' %}selected{% endif %}>Completed</option>
+                    </select>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Reply</label>
+                    <textarea name="reply" class="form-control" rows="6">{{ consultation.doctor_reply }}</textarea>
+                </div>
+                <button class="btn btn-success">Save Changes</button>
+                <a href="{% url 'doctor_dashboard' %}" class="btn btn-outline-secondary">Back</a>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

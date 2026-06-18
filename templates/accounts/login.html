@@ -13,9 +13,7 @@
                 <div class="card-body">
 
                     <h1 class="text-center mb-4">
-
-                        User Login
-
+                        Login
                     </h1>
 
                     {% if error %}
@@ -89,6 +87,11 @@
 
                         </a>
 
+                    </p>
+
+                    <p class="text-center mt-2">
+                        Not sure which registration to use?
+                        <a href="{% url 'choose_role' %}">Choose your role</a>
                     </p>
 
                 </div>

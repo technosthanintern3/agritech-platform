@@ -22,3 +22,36 @@ def login_required_session(view_func):
         )
 
     return wrapper
+
+
+def session_role_required(*allowed_roles):
+
+    def decorator(view_func):
+
+        def wrapper(request, *args, **kwargs):
+
+            user_role = request.session.get('user_role')
+
+            if user_role not in allowed_roles:
+
+                messages.warning(
+                    request,
+                    'Access denied.'
+                )
+
+                return redirect('home')
+
+            return view_func(
+                request,
+                *args,
+                **kwargs
+            )
+
+        return wrapper
+
+    return decorator
+
+
+doctor_required = session_role_required('doctor')
+consultant_required = session_role_required('consultant')
+farmer_required = session_role_required('farmer')

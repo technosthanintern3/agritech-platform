@@ -39,13 +39,16 @@
                 {{ service.short_description }}
             </p>
 
-            <a
-                href="{% url 'service_info' service.slug %}"
-                class="btn btn-primary mt-auto">
-
-                View Details
-
-            </a>
+         {% if service.slug %}
+<a href="{% url 'service_info' service.slug %}"
+   class="btn btn-primary mt-auto">
+    View Details
+</a>
+{% else %}
+<button class="btn btn-secondary mt-auto" disabled>
+    No Details
+</button>
+{% endif %}
 
         </div>
 

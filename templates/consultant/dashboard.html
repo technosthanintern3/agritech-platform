@@ -1,0 +1,67 @@
+{% extends 'consultant/base_consultant.html' %}
+
+{% block content %}
+<div class="row g-4 mb-4">
+    <div class="col-md-3"><div class="card stat-card p-3"><h6>Total Requests</h6><h2>{{ total_requests }}</h2></div></div>
+    <div class="col-md-3"><div class="card stat-card p-3"><h6>Pending</h6><h2>{{ pending_requests }}</h2></div></div>
+    <div class="col-md-3"><div class="card stat-card p-3"><h6>Completed</h6><h2>{{ completed_requests }}</h2></div></div>
+    <div class="col-md-3"><div class="card stat-card p-3"><h6>Active Farmers</h6><h2>{{ active_farmers }}</h2></div></div>
+</div>
+
+<div class="row g-4">
+    <div class="col-lg-4">
+        <div class="card card-panel p-4">
+            <h5 class="mb-3">Profile</h5>
+            <div class="text-center mb-3">
+                {% if consultant.profile_photo %}
+                    <img src="{{ consultant.profile_photo.url }}" class="rounded-circle" width="110" height="110" style="object-fit:cover;">
+                {% else %}
+                    <div class="rounded-circle bg-light d-inline-flex align-items-center justify-content-center" style="width:110px;height:110px;">💼</div>
+                {% endif %}
+            </div>
+            <p class="mb-1"><strong>Name:</strong> {{ consultant.full_name }}</p>
+            <p class="mb-1"><strong>Email:</strong> {{ consultant.email }}</p>
+            <p class="mb-1"><strong>Phone:</strong> {{ consultant.phone }}</p>
+            <p class="mb-0"><strong>Last Login:</strong> {{ consultant.last_login_time|default:'Never' }}</p>
+        </div>
+    </div>
+
+    <div class="col-lg-8">
+        <div class="card card-panel p-4">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h5 class="mb-0">Recent Consultation Requests</h5>
+                <form class="d-flex gap-2" method="get">
+                    <input type="text" name="q" value="{{ search_query }}" class="form-control form-control-sm" placeholder="Search">
+                    <select name="status" class="form-select form-select-sm">
+                        <option value="">All</option>
+                        <option value="Pending" {% if status_filter == 'Pending' %}selected{% endif %}>Pending</option>
+                        <option value="In Progress" {% if status_filter == 'In Progress' %}selected{% endif %}>In Progress</option>
+                        <option value="Completed" {% if status_filter == 'Completed' %}selected{% endif %}>Completed</option>
+                    </select>
+                    <button class="btn btn-primary btn-sm">Filter</button>
+                </form>
+            </div>
+            <div class="table-responsive">
+                <table class="table align-middle">
+                    <thead>
+                        <tr><th>Farmer</th><th>Phone</th><th>Status</th><th>Date</th><th></th></tr>
+                    </thead>
+                    <tbody>
+                        {% for request in requests %}
+                        <tr>
+                            <td>{{ request.name }}</td>
+                            <td>{{ request.phone }}</td>
+                            <td><span class="badge bg-{% if request.status == 'Completed' %}success{% elif request.status == 'In Progress' %}primary{% else %}warning text-dark{% endif %}">{{ request.status }}</span></td>
+                            <td>{{ request.created_at|date:'d M Y' }}</td>
+                            <td><a class="btn btn-outline-primary btn-sm" href="{% url 'consultant_consultation_detail' request.id %}">Open</a></td>
+                        </tr>
+                        {% empty %}
+                        <tr><td colspan="5" class="text-center text-muted py-4">No requests found.</td></tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

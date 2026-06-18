@@ -1,0 +1,31 @@
+{% extends 'dashboard/base_admin.html' %}
+
+{% block content %}
+
+<div class="card shadow">
+
+<div class="card-header bg-dark text-white">
+
+<h3>Footer Settings</h3>
+
+</div>
+
+<div class="card-body">
+
+<form method="POST">
+
+{% csrf_token %}
+
+{{ form.as_p }}
+
+<button class="btn btn-success">
+Save Footer
+</button>
+
+</form>
+
+</div>
+
+</div>
+
+{% endblock %}

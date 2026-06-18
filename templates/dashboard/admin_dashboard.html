@@ -4,81 +4,131 @@
 
 <div class="row g-4">
 
-<div class="col-md-3">
-<div class="card stat-card p-4">
+    <div class="col-md-3">
+        <a href="{% url 'farmers_list' %}" class="dashboard-card-link text-decoration-none">
+            <div class="card stat-card p-4">
 
-<div class="d-flex justify-content-between">
+                <div class="d-flex justify-content-between">
 
-<div>
-<h6>Farmers</h6>
-<h2>{{ total_farmers }}</h2>
-</div>
+                    <div>
+                        <h6>Farmers</h6>
+                        <h2>{{ total_farmers }}</h2>
+                    </div>
 
-<div class="stat-icon text-success">
-👨‍🌾
-</div>
+                    <div class="stat-icon text-success">
+                        👨‍🌾
+                    </div>
 
-</div>
+                </div>
 
-</div>
-</div>
+            </div>
+        </a>
+    </div>
 
-<div class="col-md-3">
-<div class="card stat-card p-4">
+    <div class="col-md-3">
+        <a href="{% url 'products_list' %}" class="dashboard-card-link text-decoration-none">
+            <div class="card stat-card p-4">
 
-<div class="d-flex justify-content-between">
+                <div class="d-flex justify-content-between">
 
-<div>
-<h6>Products</h6>
-<h2>{{ total_products }}</h2>
-</div>
+                    <div>
+                        <h6>Products</h6>
+                        <h2>{{ total_products }}</h2>
+                    </div>
 
-<div class="stat-icon text-primary">
-📦
-</div>
+                    <div class="stat-icon text-primary">
+                        📦
+                    </div>
 
-</div>
+                </div>
 
-</div>
-</div>
+            </div>
+        </a>
+    </div>
 
-<div class="col-md-3">
-<div class="card stat-card p-4">
+    <div class="col-md-3">
+        <a href="{% url 'orders_list' %}" class="dashboard-card-link text-decoration-none">
+            <div class="card stat-card p-4">
 
-<div class="d-flex justify-content-between">
+                <div class="d-flex justify-content-between">
 
-<div>
-<h6>Orders</h6>
-<h2>{{ total_orders }}</h2>
-</div>
+                    <div>
+                        <h6>Orders</h6>
+                        <h2>{{ total_orders }}</h2>
+                    </div>
 
-<div class="stat-icon text-warning">
-🛒
-</div>
+                    <div class="stat-icon text-warning">
+                        🛒
+                    </div>
 
-</div>
+                </div>
 
-</div>
-</div>
+            </div>
+        </a>
+    </div>
 
-<div class="col-md-3">
-<div class="card stat-card p-4">
+    <div class="col-md-3">
+        <a href="{% url 'machinery_list' %}" class="dashboard-card-link text-decoration-none">
+            <div class="card stat-card p-4">
 
-<div class="d-flex justify-content-between">
+                <div class="d-flex justify-content-between">
 
-<div>
-<h6>Machinery</h6>
-<h2>{{ total_machinery }}</h2>
-</div>
+                    <div>
+                        <h6>Machinery</h6>
+                        <h2>{{ total_machinery }}</h2>
+                    </div>
 
-<div class="stat-icon text-danger">
-🚜
-</div>
+                    <div class="stat-icon text-danger">
+                        🚜
+                    </div>
 
-</div>
+                </div>
 
-</div>
-</div>
+            </div>
+        </a>
+    </div>
+
+    <div class="col-md-3 mt-4">
+        <a href="{% url 'doctors_management' %}" class="dashboard-card-link text-decoration-none">
+            <div class="card stat-card p-4">
+
+                <div class="d-flex justify-content-between">
+
+                    <div>
+                        <h6>Doctors</h6>
+                        <h2>{{ total_doctors }}</h2>
+                    </div>
+
+                    <div class="stat-icon text-success">
+                        🩺
+                    </div>
+
+                </div>
+
+            </div>
+        </a>
+    </div>
+
+    <div class="col-md-3 mt-4">
+        <a href="{% url 'consultant_management' %}" class="dashboard-card-link text-decoration-none">
+            <div class="card stat-card p-4">
+
+                <div class="d-flex justify-content-between">
+
+                    <div>
+                        <h6>Consultants</h6>
+                        <h2>{{ total_consultants }}</h2>
+                    </div>
+
+                    <div class="stat-icon text-primary">
+                        💼
+                    </div>
+
+                </div>
+
+            </div>
+        </a>
+    </div>
 
 </div>
 

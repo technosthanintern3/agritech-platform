@@ -1,5 +1,5 @@
-from .models import Farmer
-from .models import SiteSettings
+from .models import Farmer, SiteSettings
+
 
 def logged_in_farmer(request):
 
@@ -16,7 +16,8 @@ def logged_in_farmer(request):
     return {
         'logged_in_farmer': farmer
     }
-    
+
+
 def site_settings(request):
 
     return {

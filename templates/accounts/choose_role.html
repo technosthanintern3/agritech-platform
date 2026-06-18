@@ -1,0 +1,49 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="text-center mb-5">
+        <h1 class="fw-bold">Choose Your Role</h1>
+        <p class="text-muted">Select how you want to continue on AgroSthan.</p>
+    </div>
+
+    <div class="row g-4 justify-content-center">
+        <div class="col-md-3">
+            <a href="{% url 'register' %}" class="text-decoration-none">
+                <div class="card shadow-sm h-100 border-0 text-center p-4">
+                    <div class="display-4 mb-3">👨‍🌾</div>
+                    <h4>Farmer / User</h4>
+                    <p class="text-muted mb-0">Register as a farmer to browse products and services.</p>
+                </div>
+            </a>
+        </div>
+        <div class="col-md-3">
+            <a href="{% url 'doctor_register' %}" class="text-decoration-none">
+                <div class="card shadow-sm h-100 border-0 text-center p-4">
+                    <div class="display-4 mb-3">🩺</div>
+                    <h4>Doctor</h4>
+                    <p class="text-muted mb-0">Create a doctor account for consultation management.</p>
+                </div>
+            </a>
+        </div>
+        <div class="col-md-3">
+            <a href="{% url 'consultant_register' %}" class="text-decoration-none">
+                <div class="card shadow-sm h-100 border-0 text-center p-4">
+                    <div class="display-4 mb-3">💼</div>
+                    <h4>Consultant</h4>
+                    <p class="text-muted mb-0">Create a consultant account for assigned requests.</p>
+                </div>
+            </a>
+        </div>
+        <div class="col-md-3">
+            <a href="{% url 'admin_login' %}" class="text-decoration-none">
+                <div class="card shadow-sm h-100 border-0 text-center p-4">
+                    <div class="display-4 mb-3">🔐</div>
+                    <h4>Admin</h4>
+                    <p class="text-muted mb-0">Go directly to the admin login page.</p>
+                </div>
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}

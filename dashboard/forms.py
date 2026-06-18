@@ -1,6 +1,13 @@
 from django import forms
 from products.models import SeedVariety
 from machinery.models import Machinery
+from accounts.models import (
+    SiteSettings,
+    WhyChooseUs,
+    FooterSettings
+)
+from django import forms
+
 
 class ProductForm(forms.ModelForm):
     class Meta:
@@ -44,3 +51,35 @@ class MachineryForm(forms.ModelForm):
             )
 
         }
+        
+class SiteSettingsForm(forms.ModelForm):
+
+    class Meta:
+
+        model = SiteSettings
+
+        fields = [
+            "site_name",
+            "logo",
+            "hero_background",
+            "mobile_hero_background",
+            "hero_video",
+        ]
+class WhyChooseUsForm(forms.ModelForm):
+
+    class Meta:
+
+        model = WhyChooseUs
+
+        fields = [
+            "icon",
+            "title"
+        ]
+        
+class FooterSettingsForm(forms.ModelForm):
+
+    class Meta:
+
+        model = FooterSettings
+
+        fields = "__all__"

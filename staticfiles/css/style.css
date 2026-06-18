@@ -1,28 +1,57 @@
 .hero-section {
+.hero-section{
+    position:relative;
+    min-height:calc(100vh - 70px);
+    overflow:hidden;
 
-    min-height: calc(100vh - 70px);
+    display:flex;
+    align-items:center;
+    justify-content:center;
 
-    background:
-        linear-gradient(
-            rgba(0,0,0,0.5),
-            rgba(0,0,0,0.5)
-        ),
-        url('/static/images/hero-desktop.jpeg');
-
-    background-size: cover;
-    background-position: center center;
-    background-repeat: no-repeat;
-
-    display: flex;
-    align-items: center;
-    justify-content: center;
-
-    text-align: center;
-    color: white;
-
-    padding: 20px;
+    text-align:center;
+    color:white;
+    padding:20px;
 }
 
+.hero-video{
+    position:absolute;
+    top:0;
+    left:0;
+
+    width:100%;
+    height:100%;
+
+    object-fit:cover;
+
+    z-index:1;
+}
+
+.hero-overlay{
+    position:absolute;
+    top:0;
+    left:0;
+
+    width:100%;
+    height:100%;
+
+    background:rgba(0,0,0,.5);
+
+    z-index:2;
+}
+
+.hero-content{
+    position:relative;
+    z-index:3;
+}
+
+.hero-content h1{
+    font-size:3.5rem;
+    font-weight:bold;
+}
+
+.hero-content p{
+    font-size:1.3rem;
+}
 .hero-content h1 {
     font-size: 3.5rem;
     font-weight: bold;

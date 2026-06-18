@@ -1,9 +1,12 @@
 from django.urls import path
 
 from .views import (
+    choose_role,
     register,
     login_view,
     dashboard,
+    doctor_register,
+    consultant_register,
     logout_view,
     edit_profile,
     change_password
@@ -12,9 +15,27 @@ from .views import (
 urlpatterns = [
 
     path(
+        'choose-role/',
+        choose_role,
+        name='choose_role'
+    ),
+
+    path(
         'register/',
         register,
         name='register'
+    ),
+
+    path(
+        'doctor-register/',
+        doctor_register,
+        name='doctor_register'
+    ),
+
+    path(
+        'consultant-register/',
+        consultant_register,
+        name='consultant_register'
     ),
 
     path(

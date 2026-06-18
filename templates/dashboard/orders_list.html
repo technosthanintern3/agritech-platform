@@ -12,89 +12,102 @@
     </h2>
 
 </div>
-
+{% if selected_status %}
+<div class="alert alert-info">
+    Showing {{ selected_status }} Orders
+</div>
+{% endif %}
 <!-- Stats Cards -->
 
 <div class="row g-4 mb-4">
 
     <div class="col-md-3">
+        <a href="{% url 'orders_list' %}" class="text-decoration-none">
+            <div class="card shadow border-0 h-100">
 
-        <div class="card shadow border-0">
+                <div class="card-body text-center">
 
-            <div class="card-body">
+                    <h6 class="text-muted">
+                        Total Orders
+                    </h6>
 
-                <h6 class="text-muted">
-                    Total Orders
-                </h6>
+                    <h2 class="fw-bold text-dark">
+                        {{ orders.count }}
+                    </h2>
 
-                <h2 class="fw-bold">
-                    {{ orders.count }}
-                </h2>
+                </div>
 
             </div>
-
-        </div>
-
+        </a>
     </div>
 
     <div class="col-md-3">
+        <a href="{% url 'orders_list' %}?status=Pending"
+           class="text-decoration-none">
 
-        <div class="card shadow border-0">
+            <div class="card shadow border-0 h-100">
 
-            <div class="card-body">
+                <div class="card-body text-center">
 
-                <h6 class="text-muted">
-                    Pending
-                </h6>
+                    <h6 class="text-muted">
+                        Pending
+                    </h6>
 
-                <h2 class="text-warning fw-bold">
-                    {{ pending_count }}
-                </h2>
+                    <h2 class="text-warning fw-bold">
+                        {{ pending_count }}
+                    </h2>
+
+                </div>
 
             </div>
 
-        </div>
-
+        </a>
     </div>
 
     <div class="col-md-3">
+        <a href="{% url 'orders_list' %}?status=Shipped"
+           class="text-decoration-none">
 
-        <div class="card shadow border-0">
+            <div class="card shadow border-0 h-100">
 
-            <div class="card-body">
+                <div class="card-body text-center">
 
-                <h6 class="text-muted">
-                    Shipped
-                </h6>
+                    <h6 class="text-muted">
+                        Shipped
+                    </h6>
 
-                <h2 class="text-primary fw-bold">
-                    {{ shipped_count }}
-                </h2>
+                    <h2 class="text-primary fw-bold">
+                        {{ shipped_count }}
+                    </h2>
+
+                </div>
 
             </div>
 
-        </div>
-
+        </a>
     </div>
 
     <div class="col-md-3">
+        <a href="{% url 'orders_list' %}?status=Delivered"
+           class="text-decoration-none">
 
-        <div class="card shadow border-0">
+            <div class="card shadow border-0 h-100">
 
-            <div class="card-body">
+                <div class="card-body text-center">
 
-                <h6 class="text-muted">
-                    Delivered
-                </h6>
+                    <h6 class="text-muted">
+                        Delivered
+                    </h6>
 
-                <h2 class="text-success fw-bold">
-                    {{ delivered_count }}
-                </h2>
+                    <h2 class="text-success fw-bold">
+                        {{ delivered_count }}
+                    </h2>
+
+                </div>
 
             </div>
 
-        </div>
-
+        </a>
     </div>
 
 </div>

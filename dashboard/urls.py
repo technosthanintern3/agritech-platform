@@ -140,5 +140,51 @@ urlpatterns = [
         name="add_crop_ajax"
     ),
     
+    path(
+        "site-settings/",
+        views.site_settings,
+        name="site_settings"
+    ),
+    
+    path(
+        "why-choose-us/",
+        views.why_choose_list,
+        name="why_choose_list"
+    ),
+    path(
+        "why-choose-us/add/",
+        views.add_why_choose,
+        name="add_why_choose"
+    ),
+    
+    path(
+        "footer-settings/",
+        views.footer_settings,
+        name="footer_settings"
+    ),
+
+    path(
+        'doctors/',
+        views.admin_required(views.doctors_management),
+        name='doctors_management'
+    ),
+
+    path(
+        'doctors/<int:pk>/<str:action>/',
+        views.admin_required(views.doctor_action),
+        name='doctor_action'
+    ),
+
+    path(
+        'consultants/',
+        views.admin_required(views.consultant_management),
+        name='consultant_management'
+    ),
+
+    path(
+        'consultants/<int:pk>/<str:action>/',
+        views.admin_required(views.consultant_action),
+        name='consultant_action'
+    ),
 
 ]

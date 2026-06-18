@@ -5,7 +5,7 @@ from django.contrib.auth import login, logout
 from django.contrib.auth.forms import AuthenticationForm
 from django.shortcuts import render
 from django.shortcuts import get_object_or_404, redirect
-from accounts.models import Farmer
+from accounts.models import Farmer, Doctor, Consultant
 from products.models import SeedVariety
 from dashboard.forms import ProductForm
 from machinery.models import Machinery, TractorBooking
@@ -19,9 +19,22 @@ from farmer_support.models import (
     AdminReply
 )
 from django.db.models import Count
+from django.db.models import Q
 from services.models import ServiceRequest
 from products.models import Crop
 from django.http import JsonResponse
+from company.models import SiteSettings
+from accounts.models import (
+    SiteSettings,
+    WhyChooseUs,
+    FooterSettings
+)
+
+from dashboard.forms import (
+    SiteSettingsForm,
+    WhyChooseUsForm,
+    FooterSettingsForm
+)
 
 
 def admin_required(view_func):
@@ -119,6 +132,8 @@ def admin_dashboard(request):
 
     context = {
         "total_farmers": Farmer.objects.count(),
+        "total_doctors": Doctor.objects.count(),
+        "total_consultants": Consultant.objects.count(),
         "total_products": SeedVariety.objects.count(),
         "total_orders": Order.objects.count(),
         "total_machinery": Machinery.objects.count(),
@@ -412,36 +427,6 @@ def update_order_status(request, pk):
         "orders_list"
     )
     
-def orders_list(request):
-
-    orders = Order.objects.all()
-
-    context = {
-
-        "orders": orders,
-
-        "pending_count":
-        Order.objects.filter(
-            status="Pending"
-        ).count(),
-
-        "shipped_count":
-        Order.objects.filter(
-            status="Shipped"
-        ).count(),
-
-        "delivered_count":
-        Order.objects.filter(
-            status="Delivered"
-        ).count(),
-
-    }
-
-    return render(
-        request,
-        "dashboard/orders_list.html",
-        context
-    )
 def farmer_details(request, pk):
 
     farmer = get_object_or_404(
@@ -728,3 +713,232 @@ def add_crop_ajax(request):
     return JsonResponse({
         "error": True
     })
+def site_settings(request):
+
+    settings_obj, created = SiteSettings.objects.get_or_create(id=1)
+
+    if request.method == "POST":
+
+        form = SiteSettingsForm(
+            request.POST,
+            request.FILES,
+            instance=settings_obj
+        )
+
+        if form.is_valid():
+
+            form.save()
+
+            return redirect("site_settings")
+
+    else:
+
+        form = SiteSettingsForm(
+            instance=settings_obj
+        )
+
+    return render(
+        request,
+        "dashboard/site_settings.html",
+        {"form": form}
+    )
+def why_choose_list(request):
+
+    items = WhyChooseUs.objects.all()
+
+    return render(
+        request,
+        "dashboard/why_choose_list.html",
+        {"items": items}
+    )
+def add_why_choose(request):
+
+    form = WhyChooseUsForm(
+        request.POST or None
+    )
+
+    if form.is_valid():
+
+        form.save()
+
+        return redirect("why_choose_list")
+
+    return render(
+        request,
+        "dashboard/add_why_choose.html",
+        {"form": form}
+    )
+def footer_settings(request):
+
+    footer_obj, created = FooterSettings.objects.get_or_create(id=1)
+
+    if request.method == "POST":
+
+        form = FooterSettingsForm(
+            request.POST,
+            instance=footer_obj
+        )
+
+        if form.is_valid():
+
+            form.save()
+
+            return redirect("footer_settings")
+
+    else:
+
+        form = FooterSettingsForm(
+            instance=footer_obj
+        )
+
+    return render(
+        request,
+        "dashboard/footer_settings.html",
+        {"form": form}
+    )
+    
+def orders_list(request):
+
+    status = request.GET.get("status")
+
+    orders = Order.objects.all().order_by("-id")
+
+    if status:
+        orders = orders.filter(status=status)
+
+    context = {
+
+        "orders": orders,
+
+        "selected_status": status,
+
+        "pending_count":
+        Order.objects.filter(
+            status="Pending"
+        ).count(),
+
+        "shipped_count":
+        Order.objects.filter(
+            status="Shipped"
+        ).count(),
+
+        "delivered_count":
+        Order.objects.filter(
+            status="Delivered"
+        ).count(),
+
+    }
+
+    return render(
+        request,
+        "dashboard/orders_list.html",
+        context
+    )
+
+
+def doctors_management(request):
+
+    search_query = request.GET.get('q', '')
+    status_filter = request.GET.get('status', '')
+
+    doctors = Doctor.objects.all().order_by('-registration_date')
+
+    if search_query:
+        doctors = doctors.filter(
+            Q(full_name__icontains=search_query) |
+            Q(email__icontains=search_query) |
+            Q(phone__icontains=search_query)
+        )
+
+    if status_filter == 'approved':
+        doctors = doctors.filter(is_approved=True)
+    elif status_filter == 'pending':
+        doctors = doctors.filter(is_approved=False)
+
+    return render(
+        request,
+        'dashboard/doctors_management.html',
+        {
+            'doctors': doctors,
+            'search_query': search_query,
+            'status_filter': status_filter,
+        }
+    )
+
+
+def doctor_action(request, pk, action):
+
+    doctor = get_object_or_404(Doctor, pk=pk)
+
+    if action == 'approve':
+        doctor.is_approved = True
+        doctor.is_active_status = True
+        messages.success(request, 'Doctor approved successfully.')
+    elif action == 'reject':
+        doctor.is_approved = False
+        doctor.is_active_status = False
+        messages.success(request, 'Doctor rejected successfully.')
+    elif action == 'activate':
+        doctor.is_active_status = True
+        messages.success(request, 'Doctor activated successfully.')
+    elif action == 'deactivate':
+        doctor.is_active_status = False
+        messages.success(request, 'Doctor deactivated successfully.')
+
+    doctor.save()
+
+    return redirect('doctors_management')
+
+
+def consultant_management(request):
+
+    search_query = request.GET.get('q', '')
+    status_filter = request.GET.get('status', '')
+
+    consultants = Consultant.objects.all().order_by('-registration_date')
+
+    if search_query:
+        consultants = consultants.filter(
+            Q(full_name__icontains=search_query) |
+            Q(email__icontains=search_query) |
+            Q(phone__icontains=search_query)
+        )
+
+    if status_filter == 'approved':
+        consultants = consultants.filter(is_approved=True)
+    elif status_filter == 'pending':
+        consultants = consultants.filter(is_approved=False)
+
+    return render(
+        request,
+        'dashboard/consultants_management.html',
+        {
+            'consultants': consultants,
+            'search_query': search_query,
+            'status_filter': status_filter,
+        }
+    )
+
+
+def consultant_action(request, pk, action):
+
+    consultant = get_object_or_404(Consultant, pk=pk)
+
+    if action == 'approve':
+        consultant.is_approved = True
+        consultant.is_active_status = True
+        messages.success(request, 'Consultant approved successfully.')
+    elif action == 'reject':
+        consultant.is_approved = False
+        consultant.is_active_status = False
+        messages.success(request, 'Consultant rejected successfully.')
+    elif action == 'activate':
+        consultant.is_active_status = True
+        messages.success(request, 'Consultant activated successfully.')
+    elif action == 'deactivate':
+        consultant.is_active_status = False
+        messages.success(request, 'Consultant deactivated successfully.')
+
+    consultant.save()
+
+    return redirect('consultant_management')
