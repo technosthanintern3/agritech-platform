@@ -1,108 +1,63 @@
 {% extends 'base.html' %}
 
 {% block content %}
-
 <div class="container py-5">
-
     <div class="row justify-content-center">
-
-        <div class="col-md-6">
-
-            <div class="card shadow">
-
-                <div class="card-body">
-
-                    <h1 class="text-center mb-4">
-                        Login
-                    </h1>
-
-                    {% if error %}
-
-                    <div class="alert alert-danger">
-
-                        {{ error }}
-
+        <div class="col-md-6 col-lg-5">
+            <div class="card shadow border-0 login-card">
+                <div class="card-body p-4 p-md-5">
+                    <div class="text-center mb-4">
+                        <div class="mb-3 display-6">🔐</div>
+                        <h1 class="h3 mb-2 fw-bold">Sign in to your account</h1>
+                        <p class="text-muted mb-0">Enter your email and password. We will detect your account type automatically.</p>
                     </div>
 
+                    {% if error %}
+                        <div class="alert alert-danger">
+                            {{ error }}
+                        </div>
                     {% endif %}
 
-                    <form method="POST">
+                    <form method="POST" class="login-form">
+                        {% csrf_token %}
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">Email</label>
+                            {{ form.email }}
+                        </div>
 
-    {% csrf_token %}
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">Password</label>
+                            <div class="password-field-group password-field-wrapper">
+                                {{ form.password }}
+                                <button type="button" class="password-toggle-btn" onclick="togglePassword()" aria-label="Toggle password visibility" aria-pressed="false">
+                                    <i class="bi bi-eye-fill password-toggle"></i>
+                                </button>
+                            </div>
+                        </div>
 
-    <div class="mb-3">
+                        <button type="submit" class="btn btn-success btn-lg w-100 login-submit">Login</button>
+                    </form>
 
-        <label>Email</label>
+                    <hr class="my-4">
 
-        {{ form.email }}
-
-    </div>
-
-   <div class="mb-3 position-relative">
-
-    <label class="form-label">
-        Password
-    </label>
-
-    {{ form.password }}
-
-    <i
-        class="bi bi-eye-fill password-toggle"
-        onclick="togglePassword()">
-    </i>
-
-</div>
-
-    <div class="d-flex gap-2">
-
-        <button
-            type="submit"
-            class="btn btn-success">
-
-            Login
-
-        </button>
-{% comment %} 
-        <a
-            href="{% url 'register' %}"
-            class="btn btn-outline-primary">
-
-            Register
-
-        </a> {% endcomment %}
-
-    </div>
-
-</form>
-
-                    <hr>
-
-                    <p class="text-center mt-3">
-
-                        Don't have an account?
-
-                        <a href="{% url 'register' %}">
-
-                            Register Here
-
-                        </a>
-
+                    <p class="text-center mb-0">
+                        Need an account? <a href="{% url 'register' %}">Register here</a>
                     </p>
-
-                    <p class="text-center mt-2">
-                        Not sure which registration to use?
-                        <a href="{% url 'choose_role' %}">Choose your role</a>
-                    </p>
-
                 </div>
-
             </div>
-
         </div>
-
     </div>
-
 </div>
+
+<style>
+.login-card {
+    border-radius: 24px;
+}
+.login-submit {
+    border-radius: 14px;
+    box-shadow: 0 10px 25px rgba(25, 135, 84, .18);
+}
+</style>
 <script>
 
 function togglePassword() {
@@ -112,6 +67,9 @@ function togglePassword() {
 
     const eyeIcon =
         document.querySelector(".password-toggle");
+
+    const toggleButton =
+        document.querySelector(".password-toggle-btn");
 
     if (passwordField.type === "password") {
 
@@ -124,6 +82,9 @@ function togglePassword() {
         eyeIcon.classList.add(
             "bi-eye-slash-fill"
         );
+
+        toggleButton.setAttribute('aria-label', 'Hide password');
+        toggleButton.setAttribute('aria-pressed', 'true');
 
     }
 
@@ -138,6 +99,9 @@ function togglePassword() {
         eyeIcon.classList.add(
             "bi-eye-fill"
         );
+
+        toggleButton.setAttribute('aria-label', 'Show password');
+        toggleButton.setAttribute('aria-pressed', 'false');
 
     }
 

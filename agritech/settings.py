@@ -22,6 +22,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django.contrib.humanize',
 
     'company',
     'products',
@@ -58,8 +59,13 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'accounts.context_processors.current_account',
                 'accounts.context_processors.logged_in_farmer',
+                'accounts.context_processors.logged_in_doctor',
+                'accounts.context_processors.logged_in_consultant',
                 'accounts.context_processors.site_settings',
+                'accounts.context_processors.footer_settings',
+                'accounts.context_processors.role_page_settings',
                 'dashboard.context_processors.admin_notifications',
             ],
         },
@@ -144,3 +150,16 @@ MEDIA_ROOT = BASE_DIR / 'media'
 LOGIN_URL = 'login'
 LOGIN_REDIRECT_URL = 'home'
 LOGOUT_REDIRECT_URL = 'home'
+
+ADMIN_SECRET_CODE = os.getenv('ADMIN_SECRET_CODE', 'AGROSTHAN2026')
+
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+
+EMAIL_HOST_USER = 'technosthan.intern.3@gmail.com'
+EMAIL_HOST_PASSWORD = 'vysq dlnc irof grmb'
+
+DEFAULT_FROM_EMAIL = EMAIL_HOST_USER

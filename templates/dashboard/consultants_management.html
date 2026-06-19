@@ -1,55 +1,79 @@
 {% extends 'dashboard/base_admin.html' %}
+{% load humanize %}
 
 {% block content %}
-<h2 class="mb-4">Consultants Management</h2>
-
-<form class="row g-2 mb-4" method="get">
-    <div class="col-md-4"><input type="text" name="q" class="form-control" placeholder="Search consultants" value="{{ search_query }}"></div>
-    <div class="col-md-3">
-        <select name="status" class="form-select">
-            <option value="">All</option>
-            <option value="pending" {% if status_filter == 'pending' %}selected{% endif %}>Pending</option>
-            <option value="approved" {% if status_filter == 'approved' %}selected{% endif %}>Approved</option>
-        </select>
+<div class="card shadow-sm">
+    <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+        <h3 class="mb-0">Consultants Management</h3>
+        <span class="badge bg-light text-primary">{{ consultants|length }} Consultants</span>
     </div>
-    <div class="col-md-2"><button class="btn btn-primary w-100">Filter</button></div>
-</form>
+    <div class="card-body">
+        <form class="row g-2 mb-4" method="get">
+            <div class="col-md-4">
+                <input type="text" name="q" class="form-control" placeholder="Search consultants" value="{{ search_query }}">
+            </div>
+            <div class="col-md-3">
+                <select name="status" class="form-select">
+                    <option value="">All Approval</option>
+                    <option value="pending" {% if status_filter == 'pending' %}selected{% endif %}>Pending</option>
+                    <option value="approved" {% if status_filter == 'approved' %}selected{% endif %}>Approved</option>
+                </select>
+            </div>
+            <div class="col-md-3">
+                <select name="availability" class="form-select">
+                    <option value="">All Availability</option>
+                    <option value="online" {% if availability_filter == 'online' %}selected{% endif %}>Online</option>
+                    <option value="offline" {% if availability_filter == 'offline' %}selected{% endif %}>Offline</option>
+                </select>
+            </div>
+            <div class="col-md-2">
+                <button class="btn btn-primary w-100">Filter</button>
+            </div>
+        </form>
 
-<div class="card shadow">
-<div class="card-body table-responsive">
-<table class="table align-middle">
-<thead class="table-dark">
-<tr>
-<th>Name</th><th>Email</th><th>Phone</th><th>Aadhaar</th><th>PAN</th><th>Docs</th><th>Registered</th><th>Status</th><th>Online</th><th>Actions</th>
-</tr>
-</thead>
-<tbody>
-{% for consultant in consultants %}
-<tr>
-<td>{{ consultant.full_name }}</td>
-<td>{{ consultant.email }}</td>
-<td>{{ consultant.phone }}</td>
-<td>{{ consultant.aadhaar_number }}</td>
-<td>{{ consultant.pan_number }}</td>
-<td>
-    <a href="{{ consultant.identity_photo_upload.url }}" target="_blank">Identity</a>
-    {% if consultant.profile_photo %} | <a href="{{ consultant.profile_photo.url }}" target="_blank">Profile</a>{% endif %}
-</td>
-<td>{{ consultant.registration_date|date:'d M Y' }}</td>
-<td><span class="badge bg-{% if consultant.is_approved %}success{% else %}warning text-dark{% endif %}">{% if consultant.is_approved %}Approved{% else %}Pending{% endif %}</span></td>
-<td><span class="badge bg-{% if consultant.is_online %}success{% else %}secondary{% endif %}">{% if consultant.is_online %}Online{% else %}Offline{% endif %}</span></td>
-<td>
-    <form method="post" action="{% url 'consultant_action' consultant.id 'approve' %}" class="d-inline">{% csrf_token %}<button class="btn btn-sm btn-success">Approve</button></form>
-    <form method="post" action="{% url 'consultant_action' consultant.id 'reject' %}" class="d-inline">{% csrf_token %}<button class="btn btn-sm btn-danger">Reject</button></form>
-    <form method="post" action="{% url 'consultant_action' consultant.id 'activate' %}" class="d-inline">{% csrf_token %}<button class="btn btn-sm btn-primary">Activate</button></form>
-    <form method="post" action="{% url 'consultant_action' consultant.id 'deactivate' %}" class="d-inline">{% csrf_token %}<button class="btn btn-sm btn-secondary">Deactivate</button></form>
-</td>
-</tr>
-{% empty %}
-<tr><td colspan="10" class="text-center py-4">No consultants found.</td></tr>
-{% endfor %}
-</tbody>
-</table>
-</div>
+        <div class="table-responsive">
+            <table class="table align-middle table-hover">
+                <thead class="table-dark">
+                    <tr>
+                        <th>Name</th>
+                        <th>Email</th>
+                        <th>Phone</th>
+                        <th>Status</th>
+                        <th>Approval</th>
+                        <th>Last Seen</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for consultant in consultants %}
+                    <tr>
+                        <td>{{ consultant.full_name }}</td>
+                        <td>{{ consultant.email }}</td>
+                        <td>{{ consultant.phone }}</td>
+                        <td>
+                            <span class="badge {% if consultant.is_online %}bg-success{% else %}bg-danger{% endif %}">
+                                {% if consultant.is_online %}Online{% else %}Offline{% endif %}
+                            </span>
+                        </td>
+                        <td>
+                            <span class="badge {% if consultant.is_approved %}bg-success{% else %}bg-warning text-dark{% endif %}">
+                                {% if consultant.is_approved %}Approved{% else %}Pending{% endif %}
+                            </span>
+                        </td>
+                        <td>{% if consultant.last_seen %}{{ consultant.last_seen|naturaltime }}{% else %}Never{% endif %}</td>
+                        <td class="text-nowrap">
+                            <form method="post" action="{% url 'consultant_action' consultant.id 'approve' %}" class="d-inline">{% csrf_token %}<button class="btn btn-sm btn-success">Approve</button></form>
+                            <form method="post" action="{% url 'consultant_action' consultant.id 'reject' %}" class="d-inline">{% csrf_token %}<button class="btn btn-sm btn-danger">Reject</button></form>
+                            <form method="post" action="{% url 'consultant_action' consultant.id 'activate' %}" class="d-inline">{% csrf_token %}<button class="btn btn-sm btn-primary">Activate</button></form>
+                            <form method="post" action="{% url 'consultant_action' consultant.id 'deactivate' %}" class="d-inline">{% csrf_token %}<button class="btn btn-sm btn-secondary">Deactivate</button></form>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr><td colspan="7" class="text-center py-4 text-muted">No consultants found.</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
 </div>
 {% endblock %}

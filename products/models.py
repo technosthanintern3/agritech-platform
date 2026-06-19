@@ -1,4 +1,7 @@
 from django.db import models
+from django.core.validators import MinValueValidator, MaxValueValidator
+
+from accounts.models import Farmer
 
 
 class Crop(models.Model):
@@ -43,35 +46,33 @@ class SeedVariety(models.Model):
 
     def __str__(self):
         return self.name
+
+
 class Review(models.Model):
 
     product = models.ForeignKey(
         SeedVariety,
-        on_delete=models.CASCADE
+        on_delete=models.CASCADE,
+        related_name='reviews'
     )
-
-    name = models.CharField(
-        max_length=100
+    farmer = models.ForeignKey(
+        Farmer,
+        on_delete=models.SET_NULL,
+        blank=True,
+        null=True,
+        related_name='product_reviews'
     )
-
-    from django.core.validators import(
-        MinValueValidator,
-        MaxValueValidator
-    )
-    
+    name = models.CharField(max_length=100)
     rating = models.IntegerField(
-        validators=[
-            MinValueValidator(1),
-            MaxValueValidator(5)
-        ]
+        validators=[MinValueValidator(1), MaxValueValidator(5)]
     )
+    review_text = models.TextField()
+    created_at = models.DateTimeField(auto_now_add=True)
+    is_approved = models.BooleanField(default=True)
+    is_hidden = models.BooleanField(default=False)
 
-    comment = models.TextField()
-
-    created_at = models.DateTimeField(
-        auto_now_add=True
-    )
+    class Meta:
+        ordering = ['-created_at']
 
     def __str__(self):
-
-        return self.name
+        return f'{self.name} - {self.product.name}'

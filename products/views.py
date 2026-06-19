@@ -1,9 +1,9 @@
 from django.shortcuts import render, get_object_or_404, redirect
-from django.db.models import Q
+from django.db.models import Q, Avg
 from .models import SeedVariety, Review
 from .forms import ReviewForm
-from django.db.models import Q, Avg
 from agritech.utils import login_required_session
+from accounts.models import Farmer
 
 
 def products(request):
@@ -48,15 +48,21 @@ def product_detail(request, id):
         id=id
     )
 
-    reviews = Review.objects.filter(
-        product=seed
-    ).order_by(
-        '-created_at'
-    )
-    
-    average_rating = reviews.aggregate(
-        Avg('rating')
-    )['rating__avg']
+    public_reviews = Review.objects.filter(
+        product=seed,
+        is_approved=True,
+        is_hidden=False,
+    ).select_related('farmer').order_by('-created_at')
+
+    average_rating = public_reviews.aggregate(Avg('rating'))['rating__avg']
+
+    rating_breakdown = [
+        (5, public_reviews.filter(rating=5).count()),
+        (4, public_reviews.filter(rating=4).count()),
+        (3, public_reviews.filter(rating=3).count()),
+        (2, public_reviews.filter(rating=2).count()),
+        (1, public_reviews.filter(rating=1).count()),
+    ]
 
     # IMPORTANT: Always create form first
     form = ReviewForm()
@@ -72,13 +78,14 @@ def product_detail(request, id):
             )
 
             review.product = seed
+            farmer_id = request.session.get('farmer_id')
+
+            if farmer_id:
+                review.farmer = Farmer.objects.filter(id=farmer_id).first()
 
             review.save()
 
-            return redirect(
-                'product_detail',
-                id=seed.id
-            )
+            return redirect('product_detail', id=seed.id)
 
     cart = request.session.get(
         'cart',
@@ -90,10 +97,12 @@ def product_detail(request, id):
         'products/product_detail.html',
         {
             'seed': seed,
-            'reviews': reviews,
+            'reviews': public_reviews,
             'form': form,
             'cart': cart,
-            'average_rating': average_rating
+            'average_rating': average_rating,
+            'rating_breakdown': rating_breakdown,
+            'total_reviews': public_reviews.count(),
         }
     )
 

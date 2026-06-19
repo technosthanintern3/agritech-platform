@@ -31,11 +31,56 @@ urlpatterns = [
         views.admin_required(views.farmer_details),
         name="farmer_details"
     ),
+    path(
+        "farmer/<int:pk>/orders/",
+        views.admin_required(views.farmer_orders),
+        name="farmer_orders"
+    ),
+    path(
+        "farmer/<int:pk>/consultations/",
+        views.admin_required(views.farmer_consultations),
+        name="farmer_consultations"
+    ),
+    path(
+        "farmer/<int:pk>/bookings/",
+        views.admin_required(views.farmer_bookings),
+        name="farmer_bookings"
+    ),
 
     path(
         'products/',
         views.admin_required(views.products_list),
         name='products_list'
+    ),
+    path(
+        'products/reviews/',
+        views.admin_required(views.product_reviews_management),
+        name='product_reviews_management'
+    ),
+    path(
+        'reviews/',
+        views.admin_required(views.product_reviews_management),
+        name='reviews_management'
+    ),
+    path(
+        'reviews/analytics/',
+        views.admin_required(views.product_reviews_analytics),
+        name='product_reviews_analytics'
+    ),
+    path(
+        'products/reviews/<int:pk>/<str:action>/',
+        views.admin_required(views.product_review_action),
+        name='product_review_action'
+    ),
+    path(
+        'identity-change-requests/',
+        views.admin_required(views.identity_change_requests),
+        name='identity_change_requests'
+    ),
+    path(
+        'identity-change-requests/<int:pk>/<str:action>/',
+        views.admin_required(views.identity_change_request_action),
+        name='identity_change_request_action'
     ),
     path(
         "products/add/",
@@ -161,6 +206,27 @@ urlpatterns = [
         "footer-settings/",
         views.footer_settings,
         name="footer_settings"
+    ),
+
+    path(
+        "role-page-settings/",
+        views.admin_required(views.role_page_settings),
+        name="role_page_settings"
+    ),
+    path(
+        "role-page-settings/add/",
+        views.admin_required(views.role_page_settings),
+        name="add_role_page_settings"
+    ),
+    path(
+        "role-page-settings/edit/<int:pk>/",
+        views.admin_required(views.role_page_settings),
+        name="edit_role_page_settings"
+    ),
+    path(
+        "role-page-settings/delete/<int:pk>/",
+        views.admin_required(views.role_page_settings_delete),
+        name="delete_role_page_settings"
     ),
 
     path(

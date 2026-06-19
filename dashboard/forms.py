@@ -4,7 +4,8 @@ from machinery.models import Machinery
 from accounts.models import (
     SiteSettings,
     WhyChooseUs,
-    FooterSettings
+    FooterSettings,
+    RolePageSettings
 )
 from django import forms
 
@@ -83,3 +84,32 @@ class FooterSettingsForm(forms.ModelForm):
         model = FooterSettings
 
         fields = "__all__"
+
+
+class RolePageSettingsForm(forms.ModelForm):
+
+    class Meta:
+
+        model = RolePageSettings
+
+        fields = [
+            'role_name',
+            'slug',
+            'farmer_title',
+            'farmer_description',
+            'farmer_icon',
+            'doctor_title',
+            'doctor_description',
+            'doctor_icon',
+            'consultant_title',
+            'consultant_description',
+            'consultant_icon',
+        ]
+
+        widgets = {
+            'role_name': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Role name'}),
+            'slug': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'role-name'}),
+            'farmer_description': forms.Textarea(attrs={'rows': 3}),
+            'doctor_description': forms.Textarea(attrs={'rows': 3}),
+            'consultant_description': forms.Textarea(attrs={'rows': 3}),
+        }

@@ -11,11 +11,11 @@
             <div class="card shadow p-4">
 
                 <h2 class="text-center mb-4">
-                    User Registration
+                    {{ role_label }} Registration
                 </h2>
 
                 <p class="text-center text-muted mb-4">
-                    Are you a doctor or consultant? Use the role selection page to register in the correct portal.
+                    Complete the form and verify the OTP sent to your email and mobile number.
                 </p>
 
                 {% if form.errors %}
@@ -86,7 +86,7 @@
 
                     </div>
 
-                    <div class="mb-3 position-relative">
+                    <div class="mb-3 password-field-group">
 
                         <label class="form-label">
                             Password
@@ -94,14 +94,13 @@
 
                         {{ form.password }}
 
-                        <i
-                            class="bi bi-eye-fill password-toggle"
-                            onclick="togglePassword('id_password', this)">
-                        </i>
+                        <button type="button" class="password-toggle-btn" onclick="togglePassword('id_password', this)" aria-label="Toggle password visibility" aria-pressed="false">
+                            <i class="bi bi-eye-fill password-toggle"></i>
+                        </button>
 
                     </div>
 
-                    <div class="mb-3 position-relative">
+                    <div class="mb-3 password-field-group">
 
                         <label class="form-label">
                             Confirm Password
@@ -109,10 +108,9 @@
 
                         {{ form.confirm_password }}
 
-                        <i
-                            class="bi bi-eye-fill password-toggle"
-                            onclick="togglePassword('id_confirm_password', this)">
-                        </i>
+                        <button type="button" class="password-toggle-btn" onclick="togglePassword('id_confirm_password', this)" aria-label="Toggle confirm password visibility" aria-pressed="false">
+                            <i class="bi bi-eye-fill password-toggle"></i>
+                        </button>
 
                     </div>
 
@@ -134,38 +132,14 @@
 
 </div>
 
-<style>
-
-.password-toggle {
-
-    position: absolute;
-
-    right: 15px;
-
-    top: 47px;
-
-    cursor: pointer;
-
-    color: #6c757d;
-
-    z-index: 10;
-
-}
-
-.password-toggle:hover {
-
-    color: #198754;
-
-}
-
-</style>
-
 <script>
 
 function togglePassword(fieldId, icon) {
 
     let field =
         document.getElementById(fieldId);
+
+    const button = icon.closest('.password-toggle-btn');
 
     if (field.type === "password") {
 
@@ -179,6 +153,11 @@ function togglePassword(fieldId, icon) {
             "bi-eye-slash-fill"
         );
 
+        if (button) {
+            button.setAttribute('aria-label', 'Hide password');
+            button.setAttribute('aria-pressed', 'true');
+        }
+
     } else {
 
         field.type = "password";
@@ -190,6 +169,11 @@ function togglePassword(fieldId, icon) {
         icon.classList.add(
             "bi-eye-fill"
         );
+
+        if (button) {
+            button.setAttribute('aria-label', 'Show password');
+            button.setAttribute('aria-pressed', 'false');
+        }
 
     }
 

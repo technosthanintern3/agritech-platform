@@ -109,6 +109,57 @@ body{
     background:#166534;
 }
 
+.profile-dropdown .dropdown-toggle {
+    border: 1px solid rgba(15, 23, 42, .12);
+    border-radius: 999px;
+    padding: .45rem .75rem;
+    transition: transform .2s ease, box-shadow .2s ease;
+}
+
+.profile-dropdown .dropdown-toggle:hover,
+.profile-dropdown .dropdown-toggle:focus {
+    transform: translateY(-1px);
+    box-shadow: 0 10px 24px rgba(0,0,0,.12);
+}
+
+.profile-pill {
+    min-width: 230px;
+}
+
+.profile-avatar {
+    width: 42px;
+    height: 42px;
+    object-fit: cover;
+    border: 2px solid rgba(15,23,42,.12);
+}
+
+.profile-menu {
+    min-width: 260px;
+    border: 0;
+    border-radius: 18px;
+    box-shadow: 0 16px 40px rgba(0,0,0,.16);
+    overflow: hidden;
+}
+
+.profile-menu.show {
+    animation: dropdownFade .18s ease;
+}
+
+.profile-menu .dropdown-item {
+    border-radius: 12px;
+    margin: .15rem .5rem;
+    padding: .7rem .9rem;
+}
+
+.profile-menu .dropdown-item:hover {
+    background: rgba(25,135,84,.08);
+}
+
+@keyframes dropdownFade {
+    from { opacity: 0; transform: translateY(6px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
 
 </style>
 
@@ -138,6 +189,11 @@ body{
     Footer Settings
 </a>
 
+<a href="{% url 'role_page_settings' %}">
+    <i class="bi bi-ui-checks-grid"></i>
+    Role Page Settings
+</a>
+
 <a href="{% url 'doctors_management' %}">
     <i class="bi bi-person-badge-fill"></i>
     Doctors Management
@@ -154,6 +210,18 @@ body{
 
 <a href="{% url 'products_list' %}">
     <i class="bi bi-box-seam"></i> Products
+</a>
+
+<a href="{% url 'product_reviews_management' %}">
+    <i class="bi bi-star-half"></i> Product Reviews Management
+</a>
+
+<a href="{% url 'product_reviews_analytics' %}">
+    <i class="bi bi-graph-up"></i> Review Analytics
+</a>
+
+<a href="{% url 'identity_change_requests' %}">
+    <i class="bi bi-passport"></i> Identity Change Requests
 </a>
 
 <a href="{% url 'machinery_list' %}">
@@ -183,105 +251,62 @@ body{
 </div>
 
 <div class="main">
-<div class="topbar d-flex justify-content-between align-items-center">
+    <div class="topbar d-flex justify-content-between align-items-center flex-wrap gap-3">
+        <h3 class="mb-0">
+            AgroSthan Control Panel
+        </h3>
 
-    <h3 class="mb-0">
-        AgroSthan Control Panel
-    </h3>
+        <div class="d-flex align-items-center gap-3 flex-wrap justify-content-end">
+            <a href="/" target="_blank" class="btn btn-outline-success">
+                🏠 Visit Website
+            </a>
 
-    <div>
+            <div class="dropdown">
+                <button class="btn btn-light position-relative" data-bs-toggle="dropdown">
+                    🔔
+                    <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                        {{ pending_orders|default:0|add:pending_services|default:0 }}
+                    </span>
+                </button>
 
-        <a
-        href="/"
-        target="_blank"
-        class="btn btn-outline-success">
+                <ul class="dropdown-menu dropdown-menu-end shadow">
+                    <li class="dropdown-header">Notifications</li>
+                    <li><a class="dropdown-item">🛒 {{ pending_orders }} Pending Orders</a></li>
+                    <li><a class="dropdown-item">🌾 {{ pending_services }} Pending Services</a></li>
+                    <li><a class="dropdown-item">📞 {{ consultations }} Consultations</a></li>
+                    <li><a class="dropdown-item">⚠ {{ crop_problems }} Crop Problems</a></li>
+                </ul>
+            </div>
 
-            🏠 Visit Website
-
-        </a>
-
+            <div class="dropdown">
+                <button class="btn btn-light border dropdown-toggle d-flex align-items-center gap-2 profile-pill profile-dropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                    {% if current_user_photo %}
+                        <img src="{{ current_user_photo }}" class="rounded-circle profile-avatar" alt="Admin photo">
+                    {% else %}
+                        <span class="rounded-circle bg-success text-white d-inline-flex align-items-center justify-content-center profile-avatar">🛡️</span>
+                    {% endif %}
+                    <span class="text-start">
+                        <span class="d-block fw-semibold">{{ current_user_name|default:'Admin' }}</span>
+                        <small class="text-muted">Admin</small>
+                    </span>
+                </button>
+                <ul class="dropdown-menu dropdown-menu-end profile-menu shadow border-0 p-2">
+                    <li class="px-3 py-2">
+                        <div class="small text-muted">Admin Profile</div>
+                        <div class="fw-semibold">{{ current_user_name|default:'Admin' }}</div>
+                    </li>
+                    <li><a class="dropdown-item" href="{% url 'admin_dashboard' %}"><i class="bi bi-speedometer2 me-2"></i>Dashboard</a></li>
+                    <li><a class="dropdown-item" href="/"><i class="bi bi-house me-2"></i>Website/Home</a></li>
+                    <li><hr class="dropdown-divider"></li>
+                    <li><a class="dropdown-item text-danger" href="{% url 'admin_logout' %}"><i class="bi bi-box-arrow-right me-2"></i>Logout</a></li>
+                </ul>
+            </div>
+        </div>
     </div>
 
-</div>
-<div class="dropdown">
+    {% block content %}{% endblock %}
 
-<button
-class="btn btn-light position-relative"
-data-bs-toggle="dropdown">
-
-🔔
-
-<span
-class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
-
-{{ pending_orders|default:0|add:pending_services|default:0 }}
-
-</span>
-
-</button>
-
-<ul class="dropdown-menu dropdown-menu-end shadow">
-
-<li class="dropdown-header">
-
-Notifications
-
-</li>
-
-<li>
-
-<a class="dropdown-item">
-
-🛒
-{{ pending_orders }}
-Pending Orders
-
-</a>
-
-</li>
-
-<li>
-
-<a class="dropdown-item">
-
-🌾
-{{ pending_services }}
-Pending Services
-
-</a>
-
-</li>
-
-<li>
-
-<a class="dropdown-item">
-
-📞
-{{ consultations }}
-Consultations
-
-</a>
-
-</li>
-
-<li>
-
-<a class="dropdown-item">
-
-⚠
-{{ crop_problems }}
-Crop Problems
-
-</a>
-
-</li>
-
-</ul>
-
-</div>
-{% block content %}
-{% endblock %}
-
+    {% include 'includes/global_footer.html' %}
 
 </div>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>

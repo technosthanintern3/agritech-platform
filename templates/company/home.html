@@ -207,32 +207,7 @@ z-index:1;
 
 </section>
 
-<footer class="bg-dark text-white py-5 mt-5">
-
-    <div class="container text-center">
-
-        {% if site_settings.logo %}
-            <img
-                src="{{ site_settings.logo.url }}"
-                height="70"
-                class="mb-3">
-        {% endif %}
-
-        <h4>
-            {{ site_settings.site_name }}
-        </h4>
-
-        <p>
-            {{ site_settings.footer_text }}
-        </p>
-
-        <p class="mb-0">
-            © {{ site_settings.site_name }}
-        </p>
-
-    </div>
-
-</footer>
+{% include 'includes/global_footer.html' %}
    <script>
 
 function updateHeroImage() {

@@ -1,0 +1,115 @@
+{% extends 'dashboard/base_admin.html' %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row g-4">
+        <div class="col-lg-5">
+            <div class="card border-0 shadow-sm rounded-4 h-100">
+                <div class="card-header bg-success text-white py-3 px-4">
+                    <h3 class="mb-0 fs-4">{% if editing_setting %}Edit Role Page Setting{% else %}Create Role Page Setting{% endif %}</h3>
+                </div>
+                <div class="card-body p-4">
+                    <form method="POST" class="row g-3">
+                        {% csrf_token %}
+                        <div class="col-12">
+                            <label class="form-label fw-semibold">Role Name</label>
+                            {{ form.role_name }}
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label fw-semibold">Slug</label>
+                            {{ form.slug }}
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label fw-semibold">Farmer Title</label>
+                            {{ form.farmer_title }}
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label fw-semibold">Farmer Description</label>
+                            {{ form.farmer_description }}
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label fw-semibold">Farmer Icon</label>
+                            {{ form.farmer_icon }}
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label fw-semibold">Doctor Title</label>
+                            {{ form.doctor_title }}
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label fw-semibold">Doctor Description</label>
+                            {{ form.doctor_description }}
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label fw-semibold">Doctor Icon</label>
+                            {{ form.doctor_icon }}
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label fw-semibold">Consultant Title</label>
+                            {{ form.consultant_title }}
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label fw-semibold">Consultant Description</label>
+                            {{ form.consultant_description }}
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label fw-semibold">Consultant Icon</label>
+                            {{ form.consultant_icon }}
+                        </div>
+                        <div class="col-12 d-flex gap-2 flex-wrap">
+                            <button class="btn btn-success">Save Settings</button>
+                            {% if editing_setting %}
+                                <a class="btn btn-outline-secondary" href="{% url 'role_page_settings' %}">Cancel</a>
+                            {% endif %}
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-7">
+            <div class="card border-0 shadow-sm rounded-4 h-100">
+                <div class="card-header bg-white border-0 py-3 px-4 d-flex justify-content-between align-items-center flex-wrap gap-2">
+                    <div>
+                        <h4 class="mb-1">Existing Role Settings</h4>
+                        <div class="small text-muted">Create, edit, or delete role-specific landing page copy.</div>
+                    </div>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle mb-0">
+                            <thead class="table-dark">
+                                <tr>
+                                    <th>Role</th>
+                                    <th>Slug</th>
+                                    <th>Updated</th>
+                                    <th class="text-end">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for setting in settings_list %}
+                                    <tr>
+                                        <td class="fw-semibold">{{ setting.role_name }}</td>
+                                        <td>{{ setting.slug }}</td>
+                                        <td>{{ setting.updated_at|date:'M d, Y' }}</td>
+                                        <td class="text-end text-nowrap">
+                                            <a href="{% url 'edit_role_page_settings' setting.pk %}" class="btn btn-sm btn-outline-success">Edit</a>
+                                            <form method="post" action="{% url 'delete_role_page_settings' setting.pk %}" class="d-inline" onsubmit="return confirm('Delete this role setting?');">
+                                                {% csrf_token %}
+                                                <button class="btn btn-sm btn-outline-danger">Delete</button>
+                                            </form>
+                                        </td>
+                                    </tr>
+                                {% empty %}
+                                    <tr>
+                                        <td colspan="4" class="text-center text-muted py-4">No role page settings have been created yet.</td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -12,6 +12,11 @@
     </h2>
 
 </div>
+{% if farmer %}
+<div class="alert alert-info">
+    Showing orders for <strong>{{ farmer.name }}</strong>
+</div>
+{% endif %}
 {% if selected_status %}
 <div class="alert alert-info">
     Showing {{ selected_status }} Orders

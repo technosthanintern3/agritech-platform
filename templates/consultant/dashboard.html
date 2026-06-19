@@ -2,14 +2,60 @@
 
 {% block content %}
 <div class="row g-4 mb-4">
-    <div class="col-md-3"><div class="card stat-card p-3"><h6>Total Requests</h6><h2>{{ total_requests }}</h2></div></div>
-    <div class="col-md-3"><div class="card stat-card p-3"><h6>Pending</h6><h2>{{ pending_requests }}</h2></div></div>
-    <div class="col-md-3"><div class="card stat-card p-3"><h6>Completed</h6><h2>{{ completed_requests }}</h2></div></div>
-    <div class="col-md-3"><div class="card stat-card p-3"><h6>Active Farmers</h6><h2>{{ active_farmers }}</h2></div></div>
+    <div class="col-md-3">
+        <a href="?filter=all{% if search_query %}&q={{ search_query|urlencode }}{% endif %}" class="text-decoration-none">
+            <div class="card stat-card p-3 {% if active_filter == 'all' %}border border-primary border-3{% endif %}">
+                <h6 class="mb-1">Total Requests</h6>
+                <h2 class="mb-0">{{ total_requests }}</h2>
+            </div>
+        </a>
+    </div>
+    <div class="col-md-3">
+        <a href="?filter=pending{% if search_query %}&q={{ search_query|urlencode }}{% endif %}" class="text-decoration-none">
+            <div class="card stat-card p-3 {% if active_filter == 'pending' %}border border-primary border-3{% endif %}">
+                <h6 class="mb-1">Pending</h6>
+                <h2 class="mb-0">{{ pending_requests }}</h2>
+            </div>
+        </a>
+    </div>
+    <div class="col-md-3">
+        <a href="?filter=completed{% if search_query %}&q={{ search_query|urlencode }}{% endif %}" class="text-decoration-none">
+            <div class="card stat-card p-3 {% if active_filter == 'completed' %}border border-primary border-3{% endif %}">
+                <h6 class="mb-1">Completed</h6>
+                <h2 class="mb-0">{{ completed_requests }}</h2>
+            </div>
+        </a>
+    </div>
+    <div class="col-md-3">
+        <a href="?filter=farmers{% if search_query %}&q={{ search_query|urlencode }}{% endif %}" class="text-decoration-none">
+            <div class="card stat-card p-3 {% if active_filter == 'farmers' %}border border-primary border-3{% endif %}">
+                <h6 class="mb-1">Active Farmers</h6>
+                <h2 class="mb-0">{{ active_farmers }}</h2>
+            </div>
+        </a>
+    </div>
+</div>
+
+<div class="card card-panel p-4 mb-4">
+    <div class="d-flex flex-wrap justify-content-between align-items-center gap-3">
+        <div>
+            <h5 class="mb-1">Current Status</h5>
+            <span class="badge {% if consultant.is_online %}bg-success{% else %}bg-danger{% endif %}">
+                {% if consultant.is_online %}Online{% else %}Offline{% endif %}
+            </span>
+        </div>
+        <form method="post" action="{% url 'consultant_status_toggle' %}">
+            {% csrf_token %}
+            <input type="hidden" name="is_online" value="{% if consultant.is_online %}false{% else %}true{% endif %}">
+            <button type="submit" class="btn {% if consultant.is_online %}btn-outline-danger{% else %}btn-primary{% endif %}">
+                {% if consultant.is_online %}Go Offline{% else %}Go Online{% endif %}
+            </button>
+        </form>
+    </div>
 </div>
 
 <div class="row g-4">
-    <div class="col-lg-4">
+    <div class="col-lg-4" id="profile">
         <div class="card card-panel p-4">
             <h5 class="mb-3">Profile</h5>
             <div class="text-center mb-3">
@@ -28,17 +74,15 @@
 
     <div class="col-lg-8">
         <div class="card card-panel p-4">
-            <div class="d-flex justify-content-between align-items-center mb-3">
-                <h5 class="mb-0">Recent Consultation Requests</h5>
+            <div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-3">
+                <div>
+                    <h5 class="mb-0">Recent Consultation Requests</h5>
+                    <div class="small text-muted">Current filter: {{ active_filter|title }}</div>
+                </div>
                 <form class="d-flex gap-2" method="get">
-                    <input type="text" name="q" value="{{ search_query }}" class="form-control form-control-sm" placeholder="Search">
-                    <select name="status" class="form-select form-select-sm">
-                        <option value="">All</option>
-                        <option value="Pending" {% if status_filter == 'Pending' %}selected{% endif %}>Pending</option>
-                        <option value="In Progress" {% if status_filter == 'In Progress' %}selected{% endif %}>In Progress</option>
-                        <option value="Completed" {% if status_filter == 'Completed' %}selected{% endif %}>Completed</option>
-                    </select>
-                    <button class="btn btn-primary btn-sm">Filter</button>
+                    <input type="hidden" name="filter" value="{{ active_filter }}">
+                    <input type="text" name="q" value="{{ search_query }}" class="form-control form-control-sm" placeholder="Search farmer, email, or phone">
+                    <button class="btn btn-primary btn-sm">Search</button>
                 </form>
             </div>
             <div class="table-responsive">

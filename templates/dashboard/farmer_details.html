@@ -1,100 +1,62 @@
 {% extends 'dashboard/base_admin.html' %}
 
 {% block content %}
-
 <div class="container-fluid">
+    <div class="d-flex justify-content-between align-items-center flex-wrap gap-3 mb-4">
+        <div>
+            <h2 class="fw-bold mb-1">👨‍🌾 Farmer Details</h2>
+            <p class="text-muted mb-0">Click a card to open the filtered admin list for this farmer.</p>
+        </div>
+        <a href="{% url 'farmers_list' %}" class="btn btn-outline-secondary">Back to Farmers</a>
+    </div>
 
-<h2 class="mb-4">
-👨‍🌾 Farmer Details
-</h2>
+    <div class="card shadow border-0 mb-4">
+        <div class="card-body">
+            <div class="row g-3 align-items-center">
+                <div class="col-md-8">
+                    <h4 class="mb-2">{{ farmer.name }}</h4>
+                    <p class="mb-1"><strong>Email:</strong> {{ farmer.email }}</p>
+                    <p class="mb-1"><strong>Phone:</strong> {{ farmer.phone }}</p>
+                    <p class="mb-0"><strong>Address:</strong> {{ farmer.address }}</p>
+                </div>
+                <div class="col-md-4 text-md-end">
+                    <span class="badge bg-success fs-6">Farmer ID #{{ farmer.id }}</span>
+                </div>
+            </div>
+        </div>
+    </div>
 
-<div class="card shadow border-0">
-
-<div class="card-body">
-
-<h4>{{ farmer.name }}</h4>
-
-<hr>
-
-<p>
-<strong>Email:</strong>
-{{ farmer.email }}
-</p>
-
-<p>
-<strong>Phone:</strong>
-{{ farmer.phone }}
-</p>
-
-<p>
-<strong>Address:</strong>
-{{ farmer.address }}
-</p>
-
+    <div class="row g-4">
+        <div class="col-md-4">
+            <a href="{% url 'farmer_orders' farmer.id %}" class="text-decoration-none">
+                <div class="card shadow border-0 h-100 stat-card">
+                    <div class="card-body text-center py-4">
+                        <h6 class="text-muted mb-2">Total Orders</h6>
+                        <h2 class="fw-bold text-dark mb-0">{{ orders.count }}</h2>
+                    </div>
+                </div>
+            </a>
+        </div>
+        <div class="col-md-4">
+            <a href="{% url 'farmer_consultations' farmer.id %}" class="text-decoration-none">
+                <div class="card shadow border-0 h-100 stat-card">
+                    <div class="card-body text-center py-4">
+                        <h6 class="text-muted mb-2">Consultations</h6>
+                        <h2 class="fw-bold text-primary mb-0">{{ consultations.count }}</h2>
+                    </div>
+                </div>
+            </a>
+        </div>
+        <div class="col-md-4">
+            <a href="{% url 'farmer_bookings' farmer.id %}" class="text-decoration-none">
+                <div class="card shadow border-0 h-100 stat-card">
+                    <div class="card-body text-center py-4">
+                        <h6 class="text-muted mb-2">Bookings</h6>
+                        <h2 class="fw-bold text-success mb-0">{{ bookings.count }}</h2>
+                    </div>
+                </div>
+            </a>
+        </div>
+    </div>
 </div>
-
-</div>
-
-<br>
-
-<div class="row">
-
-<div class="col-md-4">
-
-<div class="card shadow">
-
-<div class="card-body">
-
-<h5>Total Orders</h5>
-
-<h2>
-{{ orders.count }}
-</h2>
-
-</div>
-
-</div>
-
-</div>
-
-<div class="col-md-4">
-
-<div class="card shadow">
-
-<div class="card-body">
-
-<h5>Consultations</h5>
-
-<h2>
-{{ consultations.count }}
-</h2>
-
-</div>
-
-</div>
-
-</div>
-
-<div class="col-md-4">
-
-<div class="card shadow">
-
-<div class="card-body">
-
-<h5>Bookings</h5>
-
-<h2>
-{{ bookings.count }}
-</h2>
-
-</div>
-
-</div>
-
-</div>
-
-</div>
-
-</div>
-
 {% endblock %}

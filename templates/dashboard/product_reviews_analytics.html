@@ -1,0 +1,59 @@
+{% extends 'dashboard/base_admin.html' %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="d-flex justify-content-between align-items-center flex-wrap gap-3 mb-4">
+        <div>
+            <h3 class="mb-1">Rating Analytics</h3>
+            <p class="text-muted mb-0">Review performance across visible reviews.</p>
+        </div>
+        <a href="{% url 'product_reviews_management' %}" class="btn btn-outline-success">Back to Reviews</a>
+    </div>
+
+    <div class="row g-4 mb-4">
+        <div class="col-md-3"><div class="card stat-card p-4 h-100"><h6>Total Reviews</h6><h2>{{ total_reviews }}</h2></div></div>
+        <div class="col-md-3"><div class="card stat-card p-4 h-100"><h6>Visible Reviews</h6><h2>{{ visible_reviews }}</h2></div></div>
+        <div class="col-md-3"><div class="card stat-card p-4 h-100"><h6>Hidden Reviews</h6><h2>{{ hidden_reviews }}</h2></div></div>
+        <div class="col-md-3"><div class="card stat-card p-4 h-100"><h6>Average Rating</h6><h2>{% if average_rating %}{{ average_rating|floatformat:1 }}{% else %}0{% endif %}</h2></div></div>
+    </div>
+
+    <div class="row g-4">
+        <div class="col-lg-6">
+            <div class="table-card h-100">
+                <h5>Rating Breakdown</h5>
+                <table class="table table-sm align-middle mb-0">
+                    <tbody>
+                    {% for item in rating_breakdown %}
+                        <tr>
+                            <td class="fw-semibold">{{ item.rating }} star</td>
+                            <td class="text-end">{{ item.count }}</td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div class="col-lg-6">
+            <div class="table-card h-100">
+                <h5>Top Products</h5>
+                <table class="table table-sm align-middle mb-0">
+                    <thead>
+                        <tr><th>Product</th><th>Reviews</th><th>Avg</th></tr>
+                    </thead>
+                    <tbody>
+                    {% for row in product_summary %}
+                        <tr>
+                            <td>{{ row.product__name }}</td>
+                            <td>{{ row.total }}</td>
+                            <td>{{ row.average|floatformat:1 }}</td>
+                        </tr>
+                    {% empty %}
+                        <tr><td colspan="3" class="text-muted text-center py-3">No visible reviews yet.</td></tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

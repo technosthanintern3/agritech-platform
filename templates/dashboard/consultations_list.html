@@ -6,6 +6,12 @@
 📞 Consultation Management
 </h2>
 
+{% if farmer %}
+<div class="alert alert-info">
+	Showing consultations for <strong>{{ farmer.name }}</strong>
+</div>
+{% endif %}
+
 <div class="card shadow">
 
 <div class="card-body">

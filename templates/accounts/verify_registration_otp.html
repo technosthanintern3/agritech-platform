@@ -1,0 +1,49 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-6 col-xl-5">
+            <div class="card shadow border-0 rounded-4">
+                <div class="card-body p-4 p-md-5">
+                    <div class="text-center mb-4">
+                        <div class="display-6 mb-2">📨</div>
+                        <h2 class="fw-bold mb-2">Verify {{ token.get_role_display }} Registration</h2>
+                        <p class="text-muted mb-0">Enter the email and mobile OTP sent to your contact details.</p>
+                    </div>
+
+                    {% if expired %}
+                        <div class="alert alert-warning">This OTP has expired. Please resend a fresh OTP.</div>
+                    {% endif %}
+
+                    {% if form.non_field_errors %}
+                        <div class="alert alert-danger">
+                            {% for error in form.non_field_errors %}
+                                <div>{{ error }}</div>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+
+                    <form method="post" class="row g-3">
+                        {% csrf_token %}
+                        <div class="col-12">
+                            <label class="form-label fw-semibold">Email OTP</label>
+                            {{ form.email_otp }}
+                            {% for error in form.email_otp.errors %}<div class="text-danger small mt-1">{{ error }}</div>{% endfor %}
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label fw-semibold">Mobile OTP</label>
+                            {{ form.phone_otp }}
+                            {% for error in form.phone_otp.errors %}<div class="text-danger small mt-1">{{ error }}</div>{% endfor %}
+                        </div>
+                        <div class="col-12 d-grid gap-2">
+                            <button class="btn btn-success btn-lg" type="submit">Verify & Continue</button>
+                            <button class="btn btn-outline-secondary" type="submit" formnovalidate formaction="{% url 'resend_registration_otp' token.token %}" formmethod="post">Resend OTP</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

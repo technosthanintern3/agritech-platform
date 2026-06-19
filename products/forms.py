@@ -11,7 +11,7 @@ class ReviewForm(forms.ModelForm):
         fields = [
             'name',
             'rating',
-            'comment'
+            'review_text'
         ]
 
         widgets = {
@@ -26,7 +26,7 @@ class ReviewForm(forms.ModelForm):
                 ]
             ),
 
-            'comment': forms.Textarea(
+            'review_text': forms.Textarea(
                 attrs={
                     'rows': 4
                 }

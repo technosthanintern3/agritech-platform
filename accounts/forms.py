@@ -43,7 +43,7 @@ class CommonLoginForm(forms.Form):
         widget=forms.EmailInput(
             attrs={
                 'class': 'form-control',
-                'placeholder': 'Enter Email'
+                'placeholder': 'Enter your email'
             }
         )
     )
@@ -52,10 +52,20 @@ class CommonLoginForm(forms.Form):
         widget=forms.PasswordInput(
             attrs={
                 'class': 'form-control',
-                'placeholder': 'Enter Password',
-                'id': 'id_password'
+                'placeholder': 'Enter your password',
+                'autocomplete': 'current-password',
             }
         )
+    )
+
+
+class AvailabilityStatusForm(forms.Form):
+    """Validate explicit availability updates from staff dashboards."""
+
+    is_online = forms.TypedChoiceField(
+        choices=((True, 'Online'), (False, 'Offline')),
+        coerce=lambda value: value == 'True',
+        widget=forms.HiddenInput,
     )
 
 
@@ -245,6 +255,53 @@ class ConsultantRegistrationForm(forms.ModelForm):
         return cleaned_data
 
 
+class AdminRegistrationForm(forms.Form):
+
+    full_name = forms.CharField(
+        widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Enter Full Name'})
+    )
+    email = forms.EmailField(
+        widget=forms.EmailInput(attrs={'class': 'form-control', 'placeholder': 'Enter Email'})
+    )
+    phone_number = forms.CharField(
+        widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Enter Phone Number'})
+    )
+    password = forms.CharField(
+        widget=forms.PasswordInput(attrs={'class': 'form-control', 'placeholder': 'Enter Password'})
+    )
+    confirm_password = forms.CharField(
+        widget=forms.PasswordInput(attrs={'class': 'form-control', 'placeholder': 'Confirm Password'})
+    )
+    admin_code = forms.CharField(
+        widget=forms.PasswordInput(attrs={'class': 'form-control', 'placeholder': 'Enter Admin Code'})
+    )
+
+    def clean_password(self):
+        password = self.cleaned_data.get('password')
+        validate_password_strength(password)
+        return password
+
+    def clean(self):
+        cleaned_data = super().clean()
+        if cleaned_data.get('password') != cleaned_data.get('confirm_password'):
+            raise forms.ValidationError('Passwords do not match.')
+        return cleaned_data
+
+
+class OTPVerificationForm(forms.Form):
+
+    email_otp = forms.CharField(
+        min_length=6,
+        max_length=6,
+        widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Enter Email OTP'})
+    )
+    phone_otp = forms.CharField(
+        min_length=6,
+        max_length=6,
+        widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Enter Mobile OTP'})
+    )
+
+
 class EditProfileForm(forms.ModelForm):
 
     class Meta:
@@ -286,4 +343,84 @@ class EditProfileForm(forms.ModelForm):
                 }
             ),
 
+        }
+
+
+class DoctorProfileForm(forms.ModelForm):
+
+    password = forms.CharField(
+        required=False,
+        widget=forms.PasswordInput(
+            attrs={
+                'class': 'form-control',
+                'placeholder': 'Leave blank to keep current password'
+            }
+        )
+    )
+
+    identity_photo_upload = forms.FileField(
+        required=False,
+        widget=forms.ClearableFileInput(attrs={'class': 'form-control'})
+    )
+
+    class Meta:
+
+        model = Doctor
+
+        fields = [
+            'full_name',
+            'email',
+            'profile_photo',
+            'password',
+            'aadhaar_number',
+            'pan_number',
+            'identity_photo_upload',
+        ]
+
+        widgets = {
+            'full_name': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Enter your name'}),
+            'email': forms.EmailInput(attrs={'class': 'form-control', 'placeholder': 'Enter your email'}),
+            'profile_photo': forms.ClearableFileInput(attrs={'class': 'form-control'}),
+            'aadhaar_number': forms.TextInput(attrs={'class': 'form-control'}),
+            'pan_number': forms.TextInput(attrs={'class': 'form-control'}),
+        }
+
+
+class ConsultantProfileForm(forms.ModelForm):
+
+    password = forms.CharField(
+        required=False,
+        widget=forms.PasswordInput(
+            attrs={
+                'class': 'form-control',
+                'placeholder': 'Leave blank to keep current password'
+            }
+        )
+    )
+
+    identity_photo_upload = forms.FileField(
+        required=False,
+        widget=forms.ClearableFileInput(attrs={'class': 'form-control'})
+    )
+
+    class Meta:
+
+        model = Consultant
+
+        fields = [
+            'full_name',
+            'email',
+            'profile_photo',
+            'password',
+            'aadhaar_number',
+            'pan_number',
+            'identity_photo_upload',
+        ]
+
+        widgets = {
+            'full_name': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Enter your name'}),
+            'email': forms.EmailInput(attrs={'class': 'form-control', 'placeholder': 'Enter your email'}),
+            'profile_photo': forms.ClearableFileInput(attrs={'class': 'form-control'}),
+            'aadhaar_number': forms.TextInput(attrs={'class': 'form-control'}),
+            'pan_number': forms.TextInput(attrs={'class': 'form-control'}),
         }

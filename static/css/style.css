@@ -316,23 +316,137 @@ form select:focus {
     z-index: 1000;
 
 }
+
+.password-field-group {
+
+    position: relative;
+
+}
+
+.password-field-group .form-control {
+
+    min-height: 52px;
+    border-radius: 14px;
+    padding-right: 3rem;
+
+}
+
+.password-toggle-btn {
+
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 2rem;
+    height: 2rem;
+    border: 0;
+    background: transparent;
+    color: #6c757d;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    z-index: 5;
+
+}
+
+.password-toggle-btn:hover,
+.password-toggle-btn:focus {
+
+    color: #198754;
+
+}
+
 /* Navbar Hover Effect */
 
 .navbar-nav .nav-link {
     color: white !important;
     padding: 8px 15px !important;
-    border-radius: 8px;
-    transition: all 0.3s ease;
+    border-radius: 999px;
+    transition: all 0.25s ease;
 }
 
-.navbar-nav .nav-link:hover {
-    background: white !important;
-    color: #198754 !important;
+.navbar-nav .nav-link:hover,
+.navbar-nav .nav-link:focus {
+    background: rgba(255, 255, 255, 0.14) !important;
+    color: white !important;
+    transform: translateY(-1px);
 }
 
 .navbar-nav .nav-link.active {
     background: white !important;
     color: #198754 !important;
+}
+
+.profile-dropdown .dropdown-toggle {
+
+    border: 1px solid rgba(255,255,255,.18);
+    border-radius: 999px;
+    padding: .45rem .75rem;
+    transition: transform .2s ease, box-shadow .2s ease;
+
+}
+
+.profile-dropdown .dropdown-toggle:hover,
+.profile-dropdown .dropdown-toggle:focus {
+
+    transform: translateY(-1px);
+    box-shadow: 0 10px 24px rgba(0,0,0,.15);
+
+}
+
+.profile-avatar {
+
+    width: 38px;
+    height: 38px;
+    object-fit: cover;
+    border: 2px solid rgba(255,255,255,.85);
+
+}
+
+.profile-menu {
+
+    min-width: 280px;
+    border: 0;
+    border-radius: 18px;
+    box-shadow: 0 16px 40px rgba(0,0,0,.16);
+    overflow: hidden;
+
+}
+
+.profile-menu.show {
+
+    animation: dropdownFade .18s ease;
+
+}
+
+.profile-menu .dropdown-item {
+
+    border-radius: 12px;
+    margin: 0.15rem 0.5rem;
+    padding: .7rem .9rem;
+
+}
+
+.profile-menu .dropdown-item:hover {
+
+    background: rgba(25,135,84,.08);
+
+}
+
+@keyframes dropdownFade {
+
+    from {
+        opacity: 0;
+        transform: translateY(6px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+
+}
 
 .dashboard-card-link{
     text-decoration:none;
