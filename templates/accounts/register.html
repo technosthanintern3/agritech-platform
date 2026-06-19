@@ -94,7 +94,7 @@
 
                         {{ form.password }}
 
-                        <button type="button" class="password-toggle-btn" onclick="togglePassword('id_password', this)" aria-label="Toggle password visibility" aria-pressed="false">
+                        <button type="button" class="password-toggle-btn" onclick="togglePasswordVisibility('id_password', this)" aria-label="Toggle password visibility" aria-pressed="false">
                             <i class="bi bi-eye-fill password-toggle"></i>
                         </button>
 
@@ -108,7 +108,7 @@
 
                         {{ form.confirm_password }}
 
-                        <button type="button" class="password-toggle-btn" onclick="togglePassword('id_confirm_password', this)" aria-label="Toggle confirm password visibility" aria-pressed="false">
+                        <button type="button" class="password-toggle-btn" onclick="togglePasswordVisibility('id_confirm_password', this)" aria-label="Toggle confirm password visibility" aria-pressed="false">
                             <i class="bi bi-eye-fill password-toggle"></i>
                         </button>
 
@@ -131,55 +131,6 @@
     </div>
 
 </div>
-
-<script>
-
-function togglePassword(fieldId, icon) {
-
-    let field =
-        document.getElementById(fieldId);
-
-    const button = icon.closest('.password-toggle-btn');
-
-    if (field.type === "password") {
-
-        field.type = "text";
-
-        icon.classList.remove(
-            "bi-eye-fill"
-        );
-
-        icon.classList.add(
-            "bi-eye-slash-fill"
-        );
-
-        if (button) {
-            button.setAttribute('aria-label', 'Hide password');
-            button.setAttribute('aria-pressed', 'true');
-        }
-
-    } else {
-
-        field.type = "password";
-
-        icon.classList.remove(
-            "bi-eye-slash-fill"
-        );
-
-        icon.classList.add(
-            "bi-eye-fill"
-        );
-
-        if (button) {
-            button.setAttribute('aria-label', 'Show password');
-            button.setAttribute('aria-pressed', 'false');
-        }
-
-    }
-
-}
-
-</script>
 
 {% endblock %}
 

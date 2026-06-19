@@ -27,6 +27,11 @@ urlpatterns = [
         name='farmers_list'
     ),
     path(
+        'farmers/<int:pk>/delete/',
+        views.delete_farmer,
+        name='delete_farmer'
+    ),
+    path(
         "farmer/<int:pk>/",
         views.admin_required(views.farmer_details),
         name="farmer_details"
@@ -234,6 +239,11 @@ urlpatterns = [
         views.admin_required(views.doctors_management),
         name='doctors_management'
     ),
+    path(
+        'doctors/<int:pk>/delete/',
+        views.delete_doctor,
+        name='delete_doctor'
+    ),
 
     path(
         'doctors/<int:pk>/<str:action>/',
@@ -245,6 +255,11 @@ urlpatterns = [
         'consultants/',
         views.admin_required(views.consultant_management),
         name='consultant_management'
+    ),
+    path(
+        'consultants/<int:pk>/delete/',
+        views.delete_consultant,
+        name='delete_consultant'
     ),
 
     path(

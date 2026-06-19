@@ -1123,6 +1123,63 @@ def consultant_action(request, pk, action):
     return redirect('consultant_management')
 
 
+@admin_required
+def delete_farmer(request, pk):
+
+    farmer = get_object_or_404(Farmer, pk=pk)
+
+    if request.method != 'POST':
+        return redirect('farmers_list')
+
+    farmer_id = farmer.id
+    farmer.delete()
+
+    if request.session.get('farmer_id') == farmer_id:
+        for session_key in ('farmer_id', 'farmer_name', 'profile_picture', 'user_role'):
+            request.session.pop(session_key, None)
+
+    messages.success(request, 'Farmer deleted permanently.')
+    return redirect('farmers_list')
+
+
+@admin_required
+def delete_doctor(request, pk):
+
+    doctor = get_object_or_404(Doctor, pk=pk)
+
+    if request.method != 'POST':
+        return redirect('doctors_management')
+
+    doctor_id = doctor.id
+    doctor.delete()
+
+    if request.session.get('doctor_id') == doctor_id:
+        for session_key in ('doctor_id', 'doctor_name', 'doctor_photo', 'user_role'):
+            request.session.pop(session_key, None)
+
+    messages.success(request, 'Doctor deleted permanently.')
+    return redirect('doctors_management')
+
+
+@admin_required
+def delete_consultant(request, pk):
+
+    consultant = get_object_or_404(Consultant, pk=pk)
+
+    if request.method != 'POST':
+        return redirect('consultant_management')
+
+    consultant_id = consultant.id
+    consultant.delete()
+
+    if request.session.get('consultant_id') == consultant_id:
+        for session_key in ('consultant_id', 'consultant_name', 'consultant_photo', 'user_role'):
+            request.session.pop(session_key, None)
+
+    messages.success(request, 'Consultant deleted permanently.')
+    return redirect('consultant_management')
+
+
 def product_reviews_management(request):
 
     search_query = request.GET.get('q', '')

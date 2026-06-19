@@ -25,14 +25,12 @@
                             {{ form.email }}
                         </div>
 
-                        <div class="mb-3">
+                        <div class="mb-3 password-field-group">
                             <label class="form-label fw-semibold">Password</label>
-                            <div class="password-field-group password-field-wrapper">
-                                {{ form.password }}
-                                <button type="button" class="password-toggle-btn" onclick="togglePassword()" aria-label="Toggle password visibility" aria-pressed="false">
-                                    <i class="bi bi-eye-fill password-toggle"></i>
-                                </button>
-                            </div>
+                            {{ form.password }}
+                            <button type="button" class="password-toggle-btn" onclick="togglePasswordVisibility('id_password', this)" aria-label="Toggle password visibility" aria-pressed="false">
+                                <i class="bi bi-eye-fill password-toggle"></i>
+                            </button>
                         </div>
 
                         <button type="submit" class="btn btn-success btn-lg w-100 login-submit">Login</button>
@@ -58,55 +56,4 @@
     box-shadow: 0 10px 25px rgba(25, 135, 84, .18);
 }
 </style>
-<script>
-
-function togglePassword() {
-
-    const passwordField =
-        document.getElementById("id_password");
-
-    const eyeIcon =
-        document.querySelector(".password-toggle");
-
-    const toggleButton =
-        document.querySelector(".password-toggle-btn");
-
-    if (passwordField.type === "password") {
-
-        passwordField.type = "text";
-
-        eyeIcon.classList.remove(
-            "bi-eye-fill"
-        );
-
-        eyeIcon.classList.add(
-            "bi-eye-slash-fill"
-        );
-
-        toggleButton.setAttribute('aria-label', 'Hide password');
-        toggleButton.setAttribute('aria-pressed', 'true');
-
-    }
-
-    else {
-
-        passwordField.type = "password";
-
-        eyeIcon.classList.remove(
-            "bi-eye-slash-fill"
-        );
-
-        eyeIcon.classList.add(
-            "bi-eye-fill"
-        );
-
-        toggleButton.setAttribute('aria-label', 'Show password');
-        toggleButton.setAttribute('aria-pressed', 'false');
-
-    }
-
-}
-
-</script>
-
 {% endblock %}

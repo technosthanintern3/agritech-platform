@@ -29,8 +29,20 @@
                     <div class="mb-3">{{ form.pan_number.label_tag }}{{ form.pan_number }}</div>
                     <div class="mb-3">{{ form.identity_photo_upload.label_tag }}{{ form.identity_photo_upload }}</div>
                     <div class="mb-3">{{ form.profile_photo.label_tag }}{{ form.profile_photo }}</div>
-                    <div class="mb-3">{{ form.password.label_tag }}{{ form.password }}</div>
-                    <div class="mb-4">{{ form.confirm_password.label_tag }}{{ form.confirm_password }}</div>
+                    <div class="mb-3 password-field-group">
+                        {{ form.password.label_tag }}
+                        {{ form.password }}
+                        <button type="button" class="password-toggle-btn" onclick="togglePasswordVisibility('id_password', this)" aria-label="Toggle password visibility" aria-pressed="false">
+                            <i class="bi bi-eye-fill password-toggle"></i>
+                        </button>
+                    </div>
+                    <div class="mb-4 password-field-group">
+                        {{ form.confirm_password.label_tag }}
+                        {{ form.confirm_password }}
+                        <button type="button" class="password-toggle-btn" onclick="togglePasswordVisibility('id_confirm_password', this)" aria-label="Toggle confirm password visibility" aria-pressed="false">
+                            <i class="bi bi-eye-fill password-toggle"></i>
+                        </button>
+                    </div>
                     <button class="btn btn-primary w-100" type="submit">Register as Consultant</button>
                 </form>
             </div>

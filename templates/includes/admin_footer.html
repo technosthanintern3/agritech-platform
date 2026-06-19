@@ -1,0 +1,53 @@
+<footer class="admin-footer mt-4">
+    <div class="px-4 py-4">
+        <div class="row g-4 align-items-start">
+            <div class="col-lg-3 col-md-6">
+                <div class="text-uppercase text-white-50 small mb-2">AgriTech Admin Panel</div>
+                <div class="fw-semibold fs-5 text-white">AgriTech Admin Panel</div>
+                <div class="text-white-50 small mt-2">Version 1.0.0</div>
+                <div class="text-white-50 small">© AgroSthan 2026. All Rights Reserved.</div>
+            </div>
+
+            <div class="col-lg-6 col-md-12 text-lg-center">
+                <div class="text-uppercase text-white-50 small mb-2">Quick Links</div>
+                <div class="d-flex flex-wrap gap-2 justify-content-lg-center admin-footer-links">
+                    <a href="{% url 'admin_dashboard' %}">Dashboard</a>
+                    <a href="{% url 'farmers_list' %}">Farmers</a>
+                    <a href="{% url 'products_list' %}">Products</a>
+                    <a href="{% url 'orders_list' %}">Orders</a>
+                    <a href="{% url 'machinery_list' %}">Machinery</a>
+                    <a href="{% url 'consultations_list' %}">Consultations</a>
+                </div>
+            </div>
+
+            <div class="col-lg-3 col-md-6 text-lg-end">
+                <div class="text-uppercase text-white-50 small mb-2">Contact & Status</div>
+                <div class="text-white small"><i class="bi bi-envelope me-2"></i>{{ footer_settings.email|default:'support@agrosthan.com' }}</div>
+                <div class="text-white small mt-1"><i class="bi bi-life-preserver me-2"></i>Support</div>
+                <div class="text-white small mt-1"><i class="bi bi-check-circle-fill text-success me-2"></i>System Status: Operational</div>
+            </div>
+        </div>
+    </div>
+</footer>
+
+<style>
+.admin-footer {
+    background: linear-gradient(180deg, #0b1220 0%, #060b14 100%);
+    border-top: 1px solid rgba(255,255,255,.08);
+    border-radius: 20px;
+}
+.admin-footer-links a {
+    color: rgba(255,255,255,.78);
+    text-decoration: none;
+    font-size: .92rem;
+    padding: .25rem .5rem;
+    border-radius: 999px;
+    background: rgba(255,255,255,.05);
+    transition: background .2s ease, color .2s ease, transform .2s ease;
+}
+.admin-footer-links a:hover {
+    color: #fff;
+    background: rgba(255,255,255,.12);
+    transform: translateY(-1px);
+}
+</style>

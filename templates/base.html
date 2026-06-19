@@ -16,47 +16,6 @@
           href="{% static 'css/style.css' %}">
           <link rel="stylesheet"
 href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.2/cropper.min.css">
-    <style>
-    body {
-        padding-top: 92px;
-    }
-    .main-navbar {
-        backdrop-filter: blur(12px);
-        z-index: 1040;
-    }
-    .profile-dropdown .dropdown-toggle {
-        border: 1px solid rgba(255,255,255,.18);
-        border-radius: 999px;
-        padding: .45rem .75rem;
-        transition: transform .2s ease, box-shadow .2s ease;
-    }
-    .profile-dropdown .dropdown-toggle:hover,
-    .profile-dropdown .dropdown-toggle:focus {
-        transform: translateY(-1px);
-        box-shadow: 0 10px 24px rgba(0,0,0,.15);
-    }
-    .profile-avatar {
-        width: 38px;
-        height: 38px;
-        object-fit: cover;
-        border: 2px solid rgba(255,255,255,.85);
-    }
-    .profile-menu {
-        min-width: 280px;
-        border: 0;
-        border-radius: 18px;
-        box-shadow: 0 16px 40px rgba(0,0,0,.16);
-        overflow: hidden;
-    }
-    .profile-menu .dropdown-item {
-        border-radius: 12px;
-        margin: 0.15rem 0.5rem;
-        padding: .7rem .9rem;
-    }
-    .profile-menu .dropdown-item:hover {
-        background: rgba(25,135,84,.08);
-    }
-    .nav-link.nav-soft {
         border-radius: 999px;
         padding: .5rem .9rem !important;
         transition: background .2s ease, transform .2s ease;
@@ -346,6 +305,30 @@ href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.2/cropper.min.css">
 {% endblock %}
 
 {% include 'includes/global_footer.html' %}
+
+<script>
+function togglePasswordVisibility(fieldId, button) {
+    const field = document.getElementById(fieldId);
+    if (!field) {
+        return;
+    }
+
+    const icon = button ? button.querySelector('.password-toggle') : null;
+    const isHidden = field.type === 'password';
+
+    field.type = isHidden ? 'text' : 'password';
+
+    if (icon) {
+        icon.classList.toggle('bi-eye-fill', !isHidden);
+        icon.classList.toggle('bi-eye-slash-fill', isHidden);
+    }
+
+    if (button) {
+        button.setAttribute('aria-label', isHidden ? 'Hide password' : 'Show password');
+        button.setAttribute('aria-pressed', isHidden ? 'true' : 'false');
+    }
+}
+</script>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.2/cropper.min.js"></script>

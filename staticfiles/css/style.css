@@ -179,18 +179,39 @@ form select:focus {
     }
 
 }
-.password-toggle {
+.password-field-group{
+    position: relative;
+}
 
+.password-field-group input{
+    padding-right: 45px !important;
+}
+
+.password-toggle-btn{
     position: absolute;
-
     right: 15px;
 
-    top: 48px;
+    /* label ki wajah se niche shift karna padega */
+    top: 73%;
+
+    transform: translateY(-50%);
+
+    border: none;
+    background: transparent;
 
     cursor: pointer;
 
-    color: #6c757d;
+    padding: 0;
 
-    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 
+    z-index: 10;
 }
+
+.password-toggle-btn i{
+    font-size: 18px;
+    color: #6c757d;
+}
+

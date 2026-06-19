@@ -162,6 +162,13 @@ def choose_role(request):
 
 def _set_farmer_session(request, farmer):
 
+    for session_key in (
+        'doctor_id', 'doctor_name', 'doctor_photo',
+        'consultant_id', 'consultant_name', 'consultant_photo',
+        'admin_id', 'admin_name', 'account_id', 'account_name', 'account_photo', 'account_role'
+    ):
+        request.session.pop(session_key, None)
+
     request.session['user_role'] = 'farmer'
     request.session['farmer_id'] = farmer.id
     request.session['farmer_name'] = farmer.name
@@ -171,6 +178,13 @@ def _set_farmer_session(request, farmer):
 
 
 def _set_doctor_session(request, doctor):
+
+    for session_key in (
+        'farmer_id', 'farmer_name', 'profile_picture',
+        'consultant_id', 'consultant_name', 'consultant_photo',
+        'admin_id', 'admin_name', 'account_id', 'account_name', 'account_photo', 'account_role'
+    ):
+        request.session.pop(session_key, None)
 
     doctor.is_active_status = True
     doctor.is_online = True
@@ -190,6 +204,13 @@ def _set_doctor_session(request, doctor):
 
 def _set_consultant_session(request, consultant):
 
+    for session_key in (
+        'farmer_id', 'farmer_name', 'profile_picture',
+        'doctor_id', 'doctor_name', 'doctor_photo',
+        'admin_id', 'admin_name', 'account_id', 'account_name', 'account_photo', 'account_role'
+    ):
+        request.session.pop(session_key, None)
+
     consultant.is_active_status = True
     consultant.is_online = True
     consultant.last_seen = timezone.now()
@@ -207,6 +228,14 @@ def _set_consultant_session(request, consultant):
 
 
 def _set_admin_session(request, user):
+
+    for session_key in (
+        'farmer_id', 'farmer_name', 'profile_picture',
+        'doctor_id', 'doctor_name', 'doctor_photo',
+        'consultant_id', 'consultant_name', 'consultant_photo',
+        'account_id', 'account_name', 'account_photo', 'account_role'
+    ):
+        request.session.pop(session_key, None)
 
     request.session['user_role'] = 'admin'
     request.session['account_role'] = 'admin'
@@ -287,6 +316,14 @@ def _account_photo_url(account):
 
 
 def _set_account_session(request, role_slug, account):
+
+    for session_key in (
+        'farmer_id', 'farmer_name', 'profile_picture',
+        'doctor_id', 'doctor_name', 'doctor_photo',
+        'consultant_id', 'consultant_name', 'consultant_photo',
+        'admin_id', 'admin_name', 'account_id', 'account_name', 'account_photo', 'account_role'
+    ):
+        request.session.pop(session_key, None)
 
     display_name = _display_name_for_account(account)
     photo_url = _account_photo_url(account)

@@ -47,9 +47,12 @@
                     <label class="form-label fw-semibold">Profile Photo</label>
                     {{ form.profile_photo }}
                 </div>
-                <div class="col-md-6">
+                <div class="col-md-6 password-field-group">
                     <label class="form-label fw-semibold">Password</label>
                     {{ form.password }}
+                    <button type="button" class="password-toggle-btn" onclick="togglePasswordVisibility('id_password', this)" aria-label="Toggle password visibility" aria-pressed="false">
+                        <i class="bi bi-eye-fill password-toggle"></i>
+                    </button>
                 </div>
                 <div class="col-12"><hr class="my-2"></div>
                 <div class="col-md-4">
