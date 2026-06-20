@@ -307,7 +307,13 @@ form select:focus {
 
 }
 
-.password-field-group .form-control {
+.password-input-wrapper {
+
+    position: relative;
+
+}
+
+.password-input-wrapper .form-control {
 
     min-height: 52px;
     border-radius: 14px;
@@ -319,7 +325,7 @@ form select:focus {
 
     position: absolute;
     right: 12px;
-    top: calc(50% + .8rem);
+    top: 50%;
     transform: translateY(-50%);
     width: 2rem;
     height: 2rem;

@@ -63,10 +63,12 @@
 
                     <div class="mb-3 password-field-group">
                         <label class="form-label">Password</label>
-                        {{ form.password }}
-                        <button type="button" class="password-toggle-btn" onclick="togglePasswordVisibility('id_password', this)" aria-label="Toggle password visibility" aria-pressed="false">
-                            <i class="bi bi-eye-fill password-toggle"></i>
-                        </button>
+                        <div class="password-input-wrapper">
+                            {{ form.password }}
+                            <button type="button" class="password-toggle-btn" onclick="togglePasswordVisibility('id_password', this)" aria-label="Toggle password visibility" aria-pressed="false">
+                                <i class="bi bi-eye-fill password-toggle"></i>
+                            </button>
+                        </div>
                         {% if form.password.errors %}
                             <div class="text-danger small mt-1">{{ form.password.errors|striptags }}</div>
                         {% endif %}

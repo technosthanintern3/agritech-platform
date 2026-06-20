@@ -54,17 +54,21 @@
                         {% endfor %}
                         <div class="col-md-6 password-field-group">
                             <label class="form-label fw-semibold">Password</label>
-                            {{ form.password }}
-                            <button type="button" class="password-toggle-btn" onclick="togglePasswordVisibility('id_password', this)" aria-label="Toggle password visibility" aria-pressed="false">
-                                <i class="bi bi-eye-fill password-toggle"></i>
-                            </button>
+                            <div class="password-input-wrapper">
+                                {{ form.password }}
+                                <button type="button" class="password-toggle-btn" onclick="togglePasswordVisibility('id_password', this)" aria-label="Toggle password visibility" aria-pressed="false">
+                                    <i class="bi bi-eye-fill password-toggle"></i>
+                                </button>
+                            </div>
                         </div>
                         <div class="col-md-6 password-field-group">
                             <label class="form-label fw-semibold">Confirm Password</label>
-                            {{ form.confirm_password }}
-                            <button type="button" class="password-toggle-btn" onclick="togglePasswordVisibility('id_confirm_password', this)" aria-label="Toggle confirm password visibility" aria-pressed="false">
-                                <i class="bi bi-eye-fill password-toggle"></i>
-                            </button>
+                            <div class="password-input-wrapper">
+                                {{ form.confirm_password }}
+                                <button type="button" class="password-toggle-btn" onclick="togglePasswordVisibility('id_confirm_password', this)" aria-label="Toggle confirm password visibility" aria-pressed="false">
+                                    <i class="bi bi-eye-fill password-toggle"></i>
+                                </button>
+                            </div>
                         </div>
                         <div class="col-12 d-grid">
                             <button class="btn btn-dark btn-lg">Continue</button>

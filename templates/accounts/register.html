@@ -92,11 +92,13 @@
                             Password
                         </label>
 
-                        {{ form.password }}
+                        <div class="password-input-wrapper">
+                            {{ form.password }}
 
-                        <button type="button" class="password-toggle-btn" onclick="togglePasswordVisibility('id_password', this)" aria-label="Toggle password visibility" aria-pressed="false">
-                            <i class="bi bi-eye-fill password-toggle"></i>
-                        </button>
+                            <button type="button" class="password-toggle-btn" onclick="togglePasswordVisibility('id_password', this)" aria-label="Toggle password visibility" aria-pressed="false">
+                                <i class="bi bi-eye-fill password-toggle"></i>
+                            </button>
+                        </div>
 
                     </div>
 
@@ -106,11 +108,13 @@
                             Confirm Password
                         </label>
 
-                        {{ form.confirm_password }}
+                        <div class="password-input-wrapper">
+                            {{ form.confirm_password }}
 
-                        <button type="button" class="password-toggle-btn" onclick="togglePasswordVisibility('id_confirm_password', this)" aria-label="Toggle confirm password visibility" aria-pressed="false">
-                            <i class="bi bi-eye-fill password-toggle"></i>
-                        </button>
+                            <button type="button" class="password-toggle-btn" onclick="togglePasswordVisibility('id_confirm_password', this)" aria-label="Toggle confirm password visibility" aria-pressed="false">
+                                <i class="bi bi-eye-fill password-toggle"></i>
+                            </button>
+                        </div>
 
                     </div>
 

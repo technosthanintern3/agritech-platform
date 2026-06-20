@@ -51,24 +51,30 @@
                 {% csrf_token %}
                 <div class="col-md-4 password-field-group">
                     <label class="form-label fw-semibold">Current Password</label>
-                    {{ password_form.current_password }}
-                    <button type="button" class="password-toggle-btn" onclick="togglePasswordVisibility('id_current_password', this)" aria-label="Toggle current password visibility" aria-pressed="false">
-                        <i class="bi bi-eye-fill password-toggle"></i>
-                    </button>
+                    <div class="password-input-wrapper">
+                        {{ password_form.current_password }}
+                        <button type="button" class="password-toggle-btn" onclick="togglePasswordVisibility('id_current_password', this)" aria-label="Toggle current password visibility" aria-pressed="false">
+                            <i class="bi bi-eye-fill password-toggle"></i>
+                        </button>
+                    </div>
                 </div>
                 <div class="col-md-4 password-field-group">
                     <label class="form-label fw-semibold">New Password</label>
-                    {{ password_form.new_password }}
-                    <button type="button" class="password-toggle-btn" onclick="togglePasswordVisibility('id_new_password', this)" aria-label="Toggle new password visibility" aria-pressed="false">
-                        <i class="bi bi-eye-fill password-toggle"></i>
-                    </button>
+                    <div class="password-input-wrapper">
+                        {{ password_form.new_password }}
+                        <button type="button" class="password-toggle-btn" onclick="togglePasswordVisibility('id_new_password', this)" aria-label="Toggle new password visibility" aria-pressed="false">
+                            <i class="bi bi-eye-fill password-toggle"></i>
+                        </button>
+                    </div>
                 </div>
                 <div class="col-md-4 password-field-group">
                     <label class="form-label fw-semibold">Confirm New Password</label>
-                    {{ password_form.confirm_password }}
-                    <button type="button" class="password-toggle-btn" onclick="togglePasswordVisibility('id_confirm_password', this)" aria-label="Toggle confirm password visibility" aria-pressed="false">
-                        <i class="bi bi-eye-fill password-toggle"></i>
-                    </button>
+                    <div class="password-input-wrapper">
+                        {{ password_form.confirm_password }}
+                        <button type="button" class="password-toggle-btn" onclick="togglePasswordVisibility('id_confirm_password', this)" aria-label="Toggle confirm password visibility" aria-pressed="false">
+                            <i class="bi bi-eye-fill password-toggle"></i>
+                        </button>
+                    </div>
                 </div>
                 <div class="col-12 d-flex gap-2">
                     <button class="btn btn-success px-4" type="submit" name="change_password" value="1">Update Password</button>
@@ -83,7 +89,10 @@
 .password-field-group {
     position: relative;
 }
-.password-field-group .form-control {
+.password-input-wrapper {
+    position: relative;
+}
+.password-input-wrapper .form-control {
     min-height: 52px;
     border-radius: 14px;
     padding-right: 3rem;
@@ -91,7 +100,7 @@
 .password-toggle-btn {
     position: absolute;
     right: 12px;
-    top: calc(50% + .8rem);
+    top: 50%;
     transform: translateY(-50%);
     width: 2rem;
     height: 2rem;

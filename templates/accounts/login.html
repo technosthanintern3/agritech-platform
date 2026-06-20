@@ -32,10 +32,12 @@
 
                         <div class="mb-3 password-field-group">
                             <label class="form-label fw-semibold">Password</label>
-                            {{ form.password }}
-                            <button type="button" class="password-toggle-btn" onclick="togglePasswordVisibility('id_password', this)" aria-label="Toggle password visibility" aria-pressed="false">
-                                <i class="bi bi-eye-fill password-toggle"></i>
-                            </button>
+                            <div class="password-input-wrapper">
+                                {{ form.password }}
+                                <button type="button" class="password-toggle-btn" onclick="togglePasswordVisibility('id_password', this)" aria-label="Toggle password visibility" aria-pressed="false">
+                                    <i class="bi bi-eye-fill password-toggle"></i>
+                                </button>
+                            </div>
                         </div>
 
                         <div class="d-flex justify-content-end mb-3">
