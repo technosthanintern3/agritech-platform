@@ -14,16 +14,49 @@
 
     <link rel="stylesheet"
           href="{% static 'css/style.css' %}">
-          <link rel="stylesheet"
-href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.2/cropper.min.css">
-        border-radius: 999px;
-        padding: .5rem .9rem !important;
-        transition: background .2s ease, transform .2s ease;
-    }
-    .nav-link.nav-soft:hover {
-        background: rgba(255,255,255,.12);
-        transform: translateY(-1px);
-    }
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.2/cropper.min.css">
+    <style>
+        body {
+            padding-top: 76px;
+            background: #f6f8f3;
+            color: #17352a;
+        }
+        .main-navbar {
+            background: linear-gradient(135deg, #198754, #116141) !important;
+        }
+        .navbar-brand strong,
+        .profile-dropdown .fw-semibold {
+            max-width: 180px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        .nav-link.nav-soft {
+            border-radius: 999px;
+            padding: .5rem .9rem !important;
+            transition: background .2s ease, transform .2s ease;
+        }
+        .nav-link.nav-soft:hover,
+        .nav-link.nav-soft:focus {
+            background: rgba(255,255,255,.12);
+            transform: translateY(-1px);
+        }
+        .profile-avatar {
+            flex: 0 0 auto;
+        }
+        @media (max-width: 991.98px) {
+            body {
+                padding-top: 70px;
+            }
+            .navbar-nav {
+                padding-top: .75rem;
+                align-items: stretch !important;
+            }
+            .profile-dropdown .dropdown-toggle {
+                justify-content: flex-start;
+            }
+        }
     </style>
 </head>
 

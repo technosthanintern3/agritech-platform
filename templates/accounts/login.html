@@ -9,7 +9,7 @@
                     <div class="text-center mb-4">
                         <div class="mb-3 display-6">🔐</div>
                         <h1 class="h3 mb-2 fw-bold">Sign in to your account</h1>
-                        <p class="text-muted mb-0">Enter your email and password. We will detect your account type automatically.</p>
+                        <p class="text-muted mb-0">Choose your account type, then enter the matching email and password.</p>
                     </div>
 
                     {% if error %}
@@ -21,6 +21,11 @@
                     <form method="POST" class="login-form">
                         {% csrf_token %}
                         <div class="mb-3">
+                            <label class="form-label fw-semibold">Account Type</label>
+                            {{ form.role }}
+                        </div>
+
+                        <div class="mb-3">
                             <label class="form-label fw-semibold">Email</label>
                             {{ form.email }}
                         </div>
@@ -31,6 +36,10 @@
                             <button type="button" class="password-toggle-btn" onclick="togglePasswordVisibility('id_password', this)" aria-label="Toggle password visibility" aria-pressed="false">
                                 <i class="bi bi-eye-fill password-toggle"></i>
                             </button>
+                        </div>
+
+                        <div class="d-flex justify-content-end mb-3">
+                            <a href="{% url 'forgot_password' %}" class="small text-decoration-none">Forgot Password?</a>
                         </div>
 
                         <button type="submit" class="btn btn-success btn-lg w-100 login-submit">Login</button>

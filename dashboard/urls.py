@@ -20,6 +20,76 @@ urlpatterns = [
         views.admin_required(views.admin_dashboard),
         name='admin_dashboard'
     ),
+    path(
+        'profile/',
+        views.admin_profile,
+        name='admin_profile'
+    ),
+    path(
+        'admins/',
+        views.admins_management,
+        name='admins_management'
+    ),
+    path(
+        'access-codes/',
+        views.access_code_management,
+        name='access_code_management'
+    ),
+    path(
+        'admins/create/',
+        views.admin_create,
+        name='admin_create'
+    ),
+    path(
+        'admins/<int:pk>/',
+        views.admin_detail,
+        name='admin_detail'
+    ),
+    path(
+        'admins/<int:pk>/edit/',
+        views.admin_edit,
+        name='admin_edit'
+    ),
+    path(
+        'admins/<int:pk>/delete/',
+        views.admin_delete,
+        name='admin_delete'
+    ),
+    path(
+        'content/',
+        views.content_management,
+        name='content_management'
+    ),
+    path(
+        'content/crops/<int:pk>/',
+        views.crop_detail,
+        name='crop_detail'
+    ),
+    path(
+        'content/crops/save/',
+        views.crop_save,
+        name='crop_save'
+    ),
+    path(
+        'content/crops/<int:pk>/toggle/',
+        views.crop_toggle_status,
+        name='crop_toggle_status'
+    ),
+    path(
+        'content/crops/<int:pk>/delete/',
+        views.crop_delete,
+        name='crop_delete'
+    ),
+    path(
+        'content/<str:content_type>/<int:pk>/toggle/',
+        views.content_toggle_status,
+        name='content_toggle_status'
+    ),
+    path(
+        'content/<str:content_type>/<int:pk>/delete/',
+        views.content_delete,
+        name='content_delete'
+    ),
 
     path(
         'farmers/',
@@ -185,6 +255,11 @@ urlpatterns = [
         name='crops_list'
     ),
     path(
+        "crops/add/",
+        views.admin_required(views.add_crop),
+        name="add_crop"
+    ),
+    path(
         "crops/add/ajax/",
         views.admin_required(views.add_crop_ajax),
         name="add_crop_ajax"
@@ -192,25 +267,65 @@ urlpatterns = [
     
     path(
         "site-settings/",
-        views.site_settings,
+        views.admin_required(views.site_settings),
         name="site_settings"
     ),
     
     path(
         "why-choose-us/",
-        views.why_choose_list,
+        views.admin_required(views.why_choose_list),
         name="why_choose_list"
     ),
     path(
         "why-choose-us/add/",
-        views.add_why_choose,
+        views.admin_required(views.add_why_choose),
         name="add_why_choose"
     ),
     
     path(
         "footer-settings/",
-        views.footer_settings,
+        views.admin_required(views.footer_settings),
         name="footer_settings"
+    ),
+    path(
+        "registration-fields/",
+        views.registration_fields,
+        name="registration_fields"
+    ),
+    path(
+        "registration-fields/add/",
+        views.registration_fields,
+        name="add_registration_field"
+    ),
+    path(
+        "registration-fields/edit/<int:pk>/",
+        views.registration_fields,
+        name="edit_registration_field"
+    ),
+    path(
+        "registration-fields/delete/<int:pk>/",
+        views.registration_field_delete,
+        name="delete_registration_field"
+    ),
+    path(
+        "roles/",
+        views.roles_management,
+        name="roles_management"
+    ),
+    path(
+        "roles/add/",
+        views.roles_management,
+        name="add_role"
+    ),
+    path(
+        "roles/edit/<int:pk>/",
+        views.roles_management,
+        name="edit_role"
+    ),
+    path(
+        "roles/delete/<int:pk>/",
+        views.role_delete,
+        name="delete_role"
     ),
 
     path(
@@ -244,6 +359,11 @@ urlpatterns = [
         views.delete_doctor,
         name='delete_doctor'
     ),
+    path(
+        'doctors/<int:pk>/',
+        views.admin_required(views.doctor_detail),
+        name='doctor_detail'
+    ),
 
     path(
         'doctors/<int:pk>/<str:action>/',
@@ -260,6 +380,11 @@ urlpatterns = [
         'consultants/<int:pk>/delete/',
         views.delete_consultant,
         name='delete_consultant'
+    ),
+    path(
+        'consultants/<int:pk>/',
+        views.admin_required(views.consultant_detail),
+        name='consultant_detail'
     ),
 
     path(

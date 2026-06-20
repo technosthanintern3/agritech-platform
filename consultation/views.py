@@ -5,7 +5,7 @@ from django.utils import timezone
 from django.views.decorators.http import require_POST
 
 from .forms import ConsultationForm
-from .models import ConsultationRequest
+from .models import ConsultationRequest, ConsultationTopic
 from agritech.utils import login_required_session
 from agritech.utils import doctor_required, consultant_required
 from accounts.models import Doctor, Consultant
@@ -105,6 +105,10 @@ def _dashboard_context(request, owner_field_name, owner_id, role_label):
 @login_required_session
 def consultation(request):
 
+    consultation_topics = ConsultationTopic.objects.filter(
+        is_active=True
+    ).order_by('display_order', 'title')
+
     if request.method == 'POST':
 
         form = ConsultationForm(request.POST)
@@ -130,7 +134,8 @@ def consultation(request):
                 'consultation/consultation.html',
                 {
                     'form': ConsultationForm(),
-                    'success': True
+                    'success': True,
+                    'consultation_topics': consultation_topics
                 }
             )
 
@@ -145,12 +150,38 @@ def consultation(request):
         'consultation/consultation.html',
         {
             'form': form,
+            'consultation_topics': consultation_topics,
             'doctors': Doctor.objects.filter(
                 is_approved=True, is_active_status=True
             ).order_by('-is_online', 'full_name'),
             'consultants': Consultant.objects.filter(
                 is_approved=True, is_active_status=True
             ).order_by('-is_online', 'full_name'),
+        }
+    )
+
+
+@login_required_session
+def consultation_topic_detail(request, slug):
+
+    topic = get_object_or_404(
+        ConsultationTopic,
+        slug=slug,
+        is_active=True
+    )
+
+    related_topics = ConsultationTopic.objects.filter(
+        is_active=True
+    ).exclude(
+        id=topic.id
+    ).order_by('display_order', 'title')[:3]
+
+    return render(
+        request,
+        'consultation/consultation_detail.html',
+        {
+            'topic': topic,
+            'related_topics': related_topics,
         }
     )
 

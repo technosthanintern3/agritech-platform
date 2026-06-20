@@ -1,132 +1,225 @@
 {% extends 'base.html' %}
 
 {% block content %}
+<div class="support-page">
+    <div class="container py-4 py-lg-5">
+        <section class="support-hero mb-4">
+            <span>Farmer Support</span>
+            <h1>Crop Problem Support Center</h1>
+            <p>Share crop diseases, pest attacks, nutrient deficiencies, or field challenges with AgroSthan specialists.</p>
+        </section>
 
-<div class="container py-5">
-
-    <div class="text-center mb-5">
-
-        <h1 class="text-success">
-            🌾 Farmer Support Center
-        </h1>
-
-        <p class="lead">
-
-            Facing crop diseases, pest attacks, nutrient deficiencies
-            or any farming challenges? Submit your crop problem and
-            get expert agricultural guidance from our specialists.
-
-        </p>
-
-    </div>
-
-    <div class="row mb-5">
-
-        <div class="col-md-4">
-
-            <div class="card service-card p-4">
-
-                <div class="service-icon">
-                    🐛
+        <div class="support-feature-grid mb-4">
+            {% for guide in problem_guides %}
+                <article class="support-feature">
+                    {% if guide.image %}
+                        <img src="{{ guide.image.url }}" alt="{{ guide.title }}">
+                    {% else %}
+                        <div class="support-feature-icon"><i class="{{ guide.icon }}"></i></div>
+                    {% endif %}
+                    <div class="support-feature-body">
+                        <h2>{{ guide.title }}</h2>
+                        <p>{{ guide.short_summary }}</p>
+                        <a href="{% url 'crop_problem_detail' guide.slug %}" class="btn btn-outline-success">View Details</a>
+                    </div>
+                </article>
+            {% empty %}
+                <div class="support-empty">
+                    <i class="bi bi-life-preserver"></i>
+                    <h2>No support guides available</h2>
+                    <p>Please check again later.</p>
                 </div>
-
-                <h4>
-                    Pest Management
-                </h4>
-
-                <p>
-                    Get expert solutions for insects,
-                    pests and crop infestations.
-                </p>
-
-            </div>
-
+            {% endfor %}
         </div>
 
-        <div class="col-md-4">
-
-            <div class="card service-card p-4">
-
-                <div class="service-icon">
-                    🍂
-                </div>
-
-                <h4>
-                    Disease Diagnosis
-                </h4>
-
-                <p>
-                    Upload crop images and receive
-                    guidance on disease identification.
-                </p>
-
+        <section class="support-form-panel" id="crop-problem-request">
+            <div class="support-form-copy">
+                <span>Problem Form</span>
+                <h2>Submit Crop Problem</h2>
+                <p>Add clear details and an image so the team can assess the issue accurately.</p>
             </div>
-
-        </div>
-
-        <div class="col-md-4">
-
-            <div class="card service-card p-4">
-
-                <div class="service-icon">
-                    🌱
-                </div>
-
-                <h4>
-                    Soil & Nutrient Support
-                </h4>
-
-                <p>
-                    Improve soil fertility and crop
-                    health through expert recommendations.
-                </p>
-
+            <div class="support-form-body">
+                {% if success %}
+                    <div class="alert alert-success">Crop problem submitted successfully.</div>
+                {% endif %}
+                {% if form.errors %}
+                    <div class="alert alert-danger">Please correct the highlighted fields.</div>
+                {% endif %}
+                <form method="POST" enctype="multipart/form-data" class="styled-form">
+                    {% csrf_token %}
+                    {{ form.as_p }}
+                    <button type="submit" class="btn btn-success btn-lg">Submit Problem</button>
+                </form>
             </div>
-
-        </div>
-
+        </section>
     </div>
-
-    <div class="card shadow p-4">
-
-        <h2 class="text-center mb-4">
-            Submit Crop Problem
-        </h2>
-
-        {% if success %}
-
-        <div class="alert alert-success">
-
-            Crop problem submitted successfully.
-
-        </div>
-
-        {% endif %}
-
-        {{ form.errors }}
-
-        <form method="POST" enctype="multipart/form-data">
-
-            {% csrf_token %}
-
-            {{ form.as_p }}
-
-            <div class="text-center">
-
-                <button
-                    type="submit"
-                    class="btn btn-success btn-lg">
-
-                    Submit Problem
-
-                </button>
-
-            </div>
-
-        </form>
-
-    </div>
-
 </div>
 
+<style>
+.support-page {
+    background:
+        radial-gradient(circle at top right, rgba(25, 135, 84, .07), transparent 28rem),
+        #f6f8f3;
+    min-height: calc(100vh - 76px);
+}
+.support-hero {
+    max-width: 780px;
+}
+.support-hero span,
+.support-form-copy span {
+    color: #17633a;
+    font-weight: 850;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    font-size: .78rem;
+}
+.support-hero h1,
+.support-feature h2,
+.support-form-copy h2 {
+    font-weight: 850;
+}
+.support-hero p,
+.support-feature p {
+    color: #607168;
+}
+.support-feature-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 1rem;
+    align-items: stretch;
+}
+.support-feature,
+.support-form-panel,
+.support-empty {
+    background: #fff;
+    border: 1px solid rgba(15, 61, 46, .1);
+    border-radius: 8px;
+    box-shadow: 0 12px 30px rgba(15, 61, 46, .08);
+}
+.support-feature {
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    transition: transform .2s ease, box-shadow .2s ease, border-color .2s ease;
+}
+.support-feature:hover {
+    border-color: rgba(25, 135, 84, .22);
+    transform: translateY(-3px);
+    box-shadow: 0 18px 36px rgba(15, 61, 46, .12);
+}
+.support-feature img,
+.support-feature-icon {
+    width: 100%;
+    aspect-ratio: 16 / 10;
+}
+.support-feature img {
+    object-fit: cover;
+}
+.support-feature-icon {
+    display: grid;
+    place-items: center;
+    background: #e4f4ea;
+    color: #17633a;
+    font-size: 2.4rem;
+}
+.support-feature-body {
+    padding: 1rem;
+    display: grid;
+    grid-template-rows: auto 1fr auto;
+    gap: .5rem;
+    flex: 1;
+}
+.support-feature h2 {
+    font-size: 1.15rem;
+    margin: 0;
+    overflow-wrap: anywhere;
+}
+.support-feature p {
+    overflow-wrap: anywhere;
+}
+.support-feature .btn {
+    align-self: end;
+    justify-self: start;
+}
+.support-empty {
+    grid-column: 1 / -1;
+    padding: 3rem 1rem;
+    text-align: center;
+}
+.support-empty i {
+    color: #17633a;
+    font-size: 2.4rem;
+}
+.support-form-panel {
+    display: grid;
+    grid-template-columns: 320px minmax(0, 1fr);
+    gap: 1.5rem;
+    padding: 1.25rem;
+    overflow: hidden;
+}
+.support-form-copy {
+    margin: -1.25rem 0 -1.25rem -1.25rem;
+    padding: 1.25rem;
+    background: linear-gradient(135deg, #17633a, #0f3d2e);
+    color: #fff;
+}
+.support-form-copy span,
+.support-form-copy p {
+    color: rgba(255,255,255,.78);
+}
+.support-form-copy h2 {
+    color: #fff;
+}
+.support-form-body {
+    min-width: 0;
+}
+.styled-form p {
+    margin-bottom: 1rem;
+}
+.styled-form label {
+    display: block;
+    font-weight: 700;
+    margin-bottom: .35rem;
+}
+.styled-form input,
+.styled-form select,
+.styled-form textarea {
+    width: 100%;
+    border: 1px solid #d7e3da;
+    border-radius: 8px;
+    padding: .7rem .85rem;
+}
+.styled-form textarea {
+    min-height: 120px;
+}
+.styled-form input:focus,
+.styled-form select:focus,
+.styled-form textarea:focus {
+    border-color: #198754;
+    box-shadow: 0 0 0 .2rem rgba(25, 135, 84, .12);
+    outline: none;
+}
+.styled-form .errorlist {
+    color: #b42318;
+    margin-bottom: .4rem;
+    padding-left: 1.1rem;
+    font-size: .92rem;
+}
+@media (max-width: 991.98px) {
+    .support-feature-grid,
+    .support-form-panel {
+        grid-template-columns: 1fr;
+    }
+    .support-form-copy {
+        margin: -1.25rem -1.25rem 0;
+    }
+}
+@media (max-width: 575.98px) {
+    .styled-form .btn,
+    .support-feature .btn {
+        width: 100%;
+    }
+}
+</style>
 {% endblock %}

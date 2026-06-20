@@ -1,24 +1,26 @@
 {% load static %}
 <footer class="global-footer text-white">
     <div class="container py-5">
-        <div class="row g-4">
+        <div class="row g-4 align-items-start">
             <div class="col-lg-4 col-md-6">
-                <div class="mb-3 d-flex align-items-center gap-2">
+                <div class="mb-3 d-flex align-items-center gap-3">
                     {% if site_settings and site_settings.logo %}
-                        <img src="{{ site_settings.logo.url }}" alt="Logo" width="44" height="44" class="rounded-circle bg-white p-1" style="object-fit:cover;">
+                        <img src="{{ site_settings.logo.url }}" alt="Logo" width="48" height="48" class="footer-logo">
                     {% else %}
-                        <div class="rounded-circle bg-white text-success d-inline-flex align-items-center justify-content-center" style="width:44px;height:44px;">🌾</div>
+                        <div class="footer-logo d-inline-flex align-items-center justify-content-center text-success bg-white">
+                            <i class="bi bi-flower1"></i>
+                        </div>
                     {% endif %}
                     <div>
                         <h5 class="mb-0 fw-bold">{{ site_settings.site_name|default:'AgroSthan' }}</h5>
-                        <div class="text-white-50 small">AgriTech SaaS Platform</div>
+                        <div class="footer-kicker">Agritech management platform</div>
                     </div>
                 </div>
-                <p class="text-white-50 mb-0">{{ footer_settings.company_description|default:'A production-ready platform for farmers, doctors, consultants, and agri businesses.' }}</p>
+                <p class="footer-copy mb-0">{{ footer_settings.company_description|default:'A trusted digital platform for farmers, agriculture doctors, consultants, and agribusiness operations.' }}</p>
             </div>
 
             <div class="col-lg-2 col-md-6">
-                <h6 class="text-uppercase text-white-50 mb-3">Company</h6>
+                <h6 class="footer-title">Company</h6>
                 <ul class="list-unstyled footer-links">
                     <li><a href="{% url 'about' %}">About Us</a></li>
                     <li><a href="{% url 'contact' %}">Contact Us</a></li>
@@ -28,7 +30,7 @@
             </div>
 
             <div class="col-lg-2 col-md-6">
-                <h6 class="text-uppercase text-white-50 mb-3">Services</h6>
+                <h6 class="footer-title">Support Links</h6>
                 <ul class="list-unstyled footer-links">
                     <li><a href="{% url 'consultation' %}">Consultation</a></li>
                     <li><a href="{% url 'tractor_booking' %}">Machinery Booking</a></li>
@@ -38,21 +40,21 @@
             </div>
 
             <div class="col-lg-2 col-md-6">
-                <h6 class="text-uppercase text-white-50 mb-3">Products</h6>
+                <h6 class="footer-title">Quick Links</h6>
                 <ul class="list-unstyled footer-links">
                     <li><a href="{% url 'products' %}">Seeds</a></li>
                     <li><a href="{% url 'products' %}">Fertilizers</a></li>
                     <li><a href="{% url 'products' %}">Pesticides</a></li>
-                    <li><a href="{% url 'products' %}">Equipment</a></li>
+                    <li><a href="{% url 'services' %}">Services</a></li>
                 </ul>
             </div>
 
             <div class="col-lg-2 col-md-6">
-                <h6 class="text-uppercase text-white-50 mb-3">Quick Links</h6>
+                <h6 class="footer-title">Portal</h6>
                 <ul class="list-unstyled footer-links">
                     <li><a href="{% url 'home' %}">Home</a></li>
-                    <li><a href="{% url 'products' %}">Products</a></li>
-                    <li><a href="{% url 'services' %}">Services</a></li>
+                    <li><a href="{% url 'choose_role' %}">Register</a></li>
+                    <li><a href="{% url 'login' %}">Login</a></li>
                     <li><a href="{% url 'dashboard' %}">Dashboard</a></li>
                 </ul>
             </div>
@@ -60,7 +62,7 @@
 
         <div class="row g-4 mt-2 align-items-center">
             <div class="col-lg-6">
-                <h6 class="text-uppercase text-white-50 mb-3">Contact Information</h6>
+                <h6 class="footer-title">Contact Information</h6>
                 <div class="footer-contact">
                     <div><i class="bi bi-envelope me-2"></i>{{ footer_settings.email|default:'contact@agrosthan.com' }}</div>
                     <div><i class="bi bi-telephone me-2"></i>{{ footer_settings.phone|default:'+91 00000 00000' }}</div>
@@ -68,7 +70,7 @@
                 </div>
             </div>
             <div class="col-lg-6 text-lg-end">
-                <h6 class="text-uppercase text-white-50 mb-3">Follow Us</h6>
+                <h6 class="footer-title">Social Media</h6>
                 <div class="d-flex gap-3 justify-content-lg-end footer-socials">
                     <a href="{{ footer_settings.facebook|default:'#' }}" aria-label="Facebook"><i class="bi bi-facebook"></i></a>
                     <a href="{{ footer_settings.instagram|default:'#' }}" aria-label="Instagram"><i class="bi bi-instagram"></i></a>
@@ -80,8 +82,8 @@
 
         <hr class="border-white border-opacity-25 my-4">
 
-        <div class="d-flex flex-column flex-md-row justify-content-between align-items-center gap-2 small text-white-50">
-            <div>© AgroSthan 2026. All Rights Reserved.</div>
+        <div class="d-flex flex-column flex-md-row justify-content-between align-items-center gap-2 small footer-copy">
+            <div>Copyright AgroSthan 2026. All Rights Reserved.</div>
             <div>{{ footer_settings.copyright_text|default:'AgroSthan' }}</div>
         </div>
     </div>
@@ -89,19 +91,43 @@
 
 <style>
 .global-footer {
-    background: linear-gradient(180deg, #0f5132 0%, #08311f 100%);
+    background:
+        linear-gradient(135deg, rgba(12, 83, 45, .96), rgba(7, 42, 29, .98)),
+        radial-gradient(circle at top right, rgba(250, 204, 21, .18), transparent 32%);
+    border-top: 1px solid rgba(255,255,255,.12);
+    margin-top: 3rem;
+}
+.footer-logo {
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+    object-fit: cover;
+    box-shadow: 0 10px 24px rgba(0,0,0,.18);
+}
+.footer-kicker,
+.footer-copy {
+    color: rgba(255,255,255,.72);
+}
+.footer-title {
+    color: rgba(255,255,255,.9);
+    font-size: .8rem;
+    text-transform: uppercase;
+    letter-spacing: .08em;
+    margin-bottom: 1rem;
+    font-weight: 700;
 }
 .footer-links li + li {
-    margin-top: .55rem;
+    margin-top: .65rem;
 }
 .footer-links a {
-    color: rgba(255,255,255,.78);
+    color: rgba(255,255,255,.76);
     text-decoration: none;
-    transition: color .2s ease, padding-left .2s ease;
+    transition: color .2s ease, transform .2s ease;
+    display: inline-block;
 }
 .footer-links a:hover {
     color: #fff;
-    padding-left: 4px;
+    transform: translateX(3px);
 }
 .footer-contact div {
     color: rgba(255,255,255,.78);
@@ -110,7 +136,7 @@
 .footer-socials a {
     width: 38px;
     height: 38px;
-    border-radius: 999px;
+    border-radius: 10px;
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -122,5 +148,11 @@
 .footer-socials a:hover {
     background: rgba(255,255,255,.18);
     transform: translateY(-2px);
+}
+@media (max-width: 991.98px) {
+    .global-footer {
+        margin-left: -30px;
+        margin-right: -30px;
+    }
 }
 </style>

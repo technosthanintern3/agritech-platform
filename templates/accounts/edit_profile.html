@@ -1,82 +1,90 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<div class="container py-5">
-    <div class="row justify-content-center">
-        <div class="col-lg-10 col-xl-9">
-            <div class="card border-0 shadow-lg rounded-4 overflow-hidden">
-                <div class="card-header bg-success text-white d-flex justify-content-between align-items-center flex-wrap gap-3 py-3 px-4">
-                    <div>
-                        <h3 class="mb-0 fw-bold">Edit Profile</h3>
-                        <div class="small text-white-50">Update your profile photo, name, email, phone number, and password.</div>
+<div class="profile-edit-page">
+    <div class="container py-4 py-lg-5">
+        <div class="row justify-content-center">
+            <div class="col-lg-10 col-xl-9">
+                <div class="profile-edit-card overflow-hidden">
+                    <div class="profile-edit-header d-flex justify-content-between align-items-center flex-wrap gap-3">
+                        <div>
+                            <h3 class="mb-0 fw-bold">Edit Profile</h3>
+                            <div class="small text-white-50">Update your profile photo, contact details, and password.</div>
+                        </div>
+                        <a href="{% url 'dashboard' %}" class="btn btn-light btn-sm px-3">Back to Dashboard</a>
                     </div>
-                    <a href="{% url 'dashboard' %}" class="btn btn-light btn-sm px-3">Back to Dashboard</a>
-                </div>
 
-                <div class="card-body p-4 p-md-5">
-                    {% if messages %}
-                        {% for message in messages %}
-                            <div class="alert alert-{{ message.tags|default:'info' }}">{{ message }}</div>
-                        {% endfor %}
-                    {% endif %}
+                    <div class="p-4 p-md-5">
+                        {% if messages %}
+                            {% for message in messages %}
+                                <div class="alert alert-{{ message.tags|default:'info' }}">{{ message }}</div>
+                            {% endfor %}
+                        {% endif %}
 
-                    <div class="row g-4 align-items-start">
-                        <div class="col-lg-4">
-                            <div class="profile-preview text-center p-4 h-100">
-                                {% if logged_in_farmer and logged_in_farmer.profile_picture %}
-                                    <img src="{{ logged_in_farmer.profile_picture.url }}" alt="Profile photo" class="rounded-circle mb-3 shadow-sm" width="160" height="160" style="object-fit:cover;">
-                                {% else %}
-                                    <div class="rounded-circle bg-success text-white d-inline-flex align-items-center justify-content-center mb-3 shadow-sm" style="width:160px;height:160px;font-size:4rem;">👤</div>
-                                {% endif %}
+                        <div class="row g-4 align-items-start">
+                            <div class="col-lg-4">
+                                <div class="profile-preview text-center p-4 h-100">
+                                    {% if logged_in_farmer and logged_in_farmer.profile_picture %}
+                                        <img src="{{ logged_in_farmer.profile_picture.url }}" alt="Profile photo" class="profile-preview-avatar mb-3 shadow-sm" id="profileAvatarPreview">
+                                    {% else %}
+                                        <div class="profile-preview-avatar profile-preview-fallback mb-3 shadow-sm" id="profileAvatarFallback"><i class="bi bi-person"></i></div>
+                                        <img src="" alt="Profile photo preview" class="profile-preview-avatar mb-3 shadow-sm d-none" id="profileAvatarPreview">
+                                    {% endif %}
 
-                                <h4 class="mb-1">{{ logged_in_farmer.name }}</h4>
-                                <p class="text-muted mb-3">Farmer Profile</p>
+                                    <h4 class="mb-1 text-truncate">{{ logged_in_farmer.name }}</h4>
+                                    <p class="text-muted mb-3">Farmer Profile</p>
 
-                                <div class="d-grid gap-2">
-                                    <label for="id_profile_picture" class="btn btn-outline-success">Change Profile Photo</label>
-                                </div>
+                                    <div class="d-grid gap-2">
+                                        <label for="id_profile_picture" class="btn btn-outline-success">
+                                            <i class="bi bi-camera me-1"></i> Change Profile Photo
+                                        </label>
+                                        <button type="button" class="btn btn-success d-none" id="cropAgainButton">
+                                            <i class="bi bi-crop me-1"></i> Adjust Crop
+                                        </button>
+                                    </div>
 
-                                <div class="mt-4 text-start small text-muted bg-light border rounded-3 p-3">
-                                    <div class="fw-semibold text-dark mb-1">Verification documents</div>
-                                    <div>Contact administrator to update verification documents.</div>
+                                    <div class="mt-4 text-start small text-muted bg-light border rounded-3 p-3">
+                                        <div class="fw-semibold text-dark mb-1">Verification documents</div>
+                                        <div>Contact administrator to update verification documents.</div>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
 
-                        <div class="col-lg-8">
-                            <form method="post" enctype="multipart/form-data" class="row g-3">
-                                {% csrf_token %}
+                            <div class="col-lg-8">
+                                <form method="post" enctype="multipart/form-data" class="row g-3 profile-form" id="profileForm">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="cropped_profile_picture" id="croppedProfilePicture">
 
-                                <div class="col-md-6">
-                                    <label class="form-label fw-semibold">Name</label>
-                                    {{ form.name }}
-                                </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label fw-semibold">Name</label>
+                                        {{ form.name }}
+                                    </div>
 
-                                <div class="col-md-6">
-                                    <label class="form-label fw-semibold">Email</label>
-                                    {{ form.email }}
-                                </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label fw-semibold">Email</label>
+                                        {{ form.email }}
+                                    </div>
 
-                                <div class="col-md-6">
-                                    <label class="form-label fw-semibold">Phone Number</label>
-                                    {{ form.phone }}
-                                </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label fw-semibold">Phone Number</label>
+                                        {{ form.phone }}
+                                    </div>
 
-                                <div class="col-md-6">
-                                    <label class="form-label fw-semibold">Profile Photo</label>
-                                    {{ form.profile_picture }}
-                                </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label fw-semibold">Profile Photo</label>
+                                        {{ form.profile_picture }}
+                                        <div class="form-text">Choose an image, crop it square, and preview the avatar before saving.</div>
+                                    </div>
 
-                                <div class="col-12">
-                                    <label class="form-label fw-semibold">Address</label>
-                                    {{ form.address }}
-                                </div>
+                                    <div class="col-12">
+                                        <label class="form-label fw-semibold">Address</label>
+                                        {{ form.address }}
+                                    </div>
 
-                                <div class="col-12"><hr class="my-2"></div>
+                                    <div class="col-12"><hr class="my-2"></div>
 
-                                <div class="col-12">
-                                    <div class="card bg-light border-0 rounded-4">
-                                        <div class="card-body p-4">
+                                    <div class="col-12">
+                                        <div class="password-panel">
                                             <div class="d-flex align-items-start justify-content-between flex-wrap gap-3 mb-3">
                                                 <div>
                                                     <h5 class="mb-1">Update Password</h5>
@@ -92,21 +100,21 @@
                                                 <div class="col-md-4 password-field-group">
                                                     <label class="form-label fw-semibold">Current Password</label>
                                                     <input type="password" name="current_password" id="current_password" class="form-control" placeholder="Current password">
-                                                    <button type="button" class="password-toggle-btn" onclick="togglePasswordVisibility('id_current_password', this)" aria-label="Toggle current password visibility" aria-pressed="false">
+                                                    <button type="button" class="password-toggle-btn" onclick="togglePasswordVisibility('current_password', this)" aria-label="Toggle current password visibility" aria-pressed="false">
                                                         <i class="bi bi-eye-fill password-toggle"></i>
                                                     </button>
                                                 </div>
                                                 <div class="col-md-4 password-field-group">
                                                     <label class="form-label fw-semibold">New Password</label>
                                                     <input type="password" name="new_password" id="new_password" class="form-control" placeholder="New password">
-                                                    <button type="button" class="password-toggle-btn" onclick="togglePasswordVisibility('id_new_password', this)" aria-label="Toggle new password visibility" aria-pressed="false">
+                                                    <button type="button" class="password-toggle-btn" onclick="togglePasswordVisibility('new_password', this)" aria-label="Toggle new password visibility" aria-pressed="false">
                                                         <i class="bi bi-eye-fill password-toggle"></i>
                                                     </button>
                                                 </div>
                                                 <div class="col-md-4 password-field-group">
                                                     <label class="form-label fw-semibold">Confirm Password</label>
                                                     <input type="password" name="confirm_password" id="confirm_password" class="form-control" placeholder="Confirm password">
-                                                    <button type="button" class="password-toggle-btn" onclick="togglePasswordVisibility('id_confirm_password', this)" aria-label="Toggle confirm password visibility" aria-pressed="false">
+                                                    <button type="button" class="password-toggle-btn" onclick="togglePasswordVisibility('confirm_password', this)" aria-label="Toggle confirm password visibility" aria-pressed="false">
                                                         <i class="bi bi-eye-fill password-toggle"></i>
                                                     </button>
                                                 </div>
@@ -114,33 +122,34 @@
 
                                             <div class="mt-3">
                                                 <button type="submit" name="change_password" value="1" class="btn btn-warning">Update Password</button>
+                                                <a href="{% url 'forgot_password' %}" class="ms-3 small text-decoration-none">Forgot Password?</a>
                                             </div>
                                         </div>
                                     </div>
-                                </div>
 
-                                <div class="col-12"><hr class="my-2"></div>
+                                    <div class="col-12"><hr class="my-2"></div>
 
-                                <div class="col-md-4">
-                                    <label class="form-label fw-semibold">Aadhaar</label>
-                                    <input type="text" class="form-control" value="{{ logged_in_farmer.aadhaar_number|default:'' }}" disabled>
-                                </div>
+                                    <div class="col-md-4">
+                                        <label class="form-label fw-semibold">Aadhaar</label>
+                                        <input type="text" class="form-control" value="{{ logged_in_farmer.aadhaar_number|default:'' }}" disabled>
+                                    </div>
 
-                                <div class="col-md-4">
-                                    <label class="form-label fw-semibold">PAN</label>
-                                    <input type="text" class="form-control" value="{{ logged_in_farmer.pan_number|default:'' }}" disabled>
-                                </div>
+                                    <div class="col-md-4">
+                                        <label class="form-label fw-semibold">PAN</label>
+                                        <input type="text" class="form-control" value="{{ logged_in_farmer.pan_number|default:'' }}" disabled>
+                                    </div>
 
-                                <div class="col-md-4">
-                                    <label class="form-label fw-semibold">Identity Documents</label>
-                                    <input type="text" class="form-control" value="Contact administrator to update verification documents." disabled>
-                                </div>
+                                    <div class="col-md-4">
+                                        <label class="form-label fw-semibold">Identity Documents</label>
+                                        <input type="text" class="form-control" value="Contact administrator to update verification documents." disabled>
+                                    </div>
 
-                                <div class="col-12 d-flex flex-wrap gap-2 mt-2">
-                                    <button type="submit" class="btn btn-success px-4">Save Changes</button>
-                                    <a href="{% url 'dashboard' %}" class="btn btn-outline-secondary px-4">Cancel</a>
-                                </div>
-                            </form>
+                                    <div class="col-12 d-flex flex-wrap gap-2 mt-2">
+                                        <button type="submit" class="btn btn-success px-4">Save Changes</button>
+                                        <a href="{% url 'dashboard' %}" class="btn btn-outline-secondary px-4">Cancel</a>
+                                    </div>
+                                </form>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -149,10 +158,248 @@
     </div>
 </div>
 
+<div class="modal fade" id="profileCropModal" tabindex="-1" aria-labelledby="profileCropModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content crop-modal">
+            <div class="modal-header">
+                <h5 class="modal-title" id="profileCropModalLabel">Crop Profile Photo</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="crop-layout">
+                    <div class="crop-stage">
+                        <img src="" alt="Crop source" id="cropSourceImage">
+                    </div>
+                    <div class="crop-preview-panel">
+                        <span>Avatar Preview</span>
+                        <div class="crop-avatar-preview"></div>
+                        <p>Square crop is saved and displayed as a circular avatar.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-success" id="applyCropButton">
+                    <i class="bi bi-check2 me-1"></i> Use Cropped Photo
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <style>
+.profile-edit-page {
+    background:
+        radial-gradient(circle at top right, rgba(25, 135, 84, .07), transparent 28rem),
+        #f6f8f3;
+    min-height: calc(100vh - 76px);
+}
+.profile-edit-card {
+    background: #fff;
+    border: 1px solid rgba(15, 61, 46, .1);
+    border-radius: 8px;
+    box-shadow: 0 18px 45px rgba(15, 61, 46, .12);
+}
+.profile-edit-header {
+    background: linear-gradient(135deg, #17633a, #0f3d2e);
+    color: #fff;
+    padding: 1rem 1.25rem;
+}
 .profile-preview {
     background: linear-gradient(180deg, rgba(25,135,84,.08), rgba(25,135,84,.03));
-    border-radius: 24px;
+    border: 1px solid rgba(15, 61, 46, .1);
+    border-radius: 8px;
+    min-width: 0;
+}
+.profile-preview-avatar {
+    width: 150px;
+    height: 150px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+.profile-preview-fallback {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: #198754;
+    color: #fff;
+    font-size: 4rem;
+}
+.password-panel {
+    background: #f8fbf8;
+    border: 1px solid #e4ece6;
+    border-radius: 8px;
+    padding: 1.25rem;
+}
+.profile-form .form-control,
+.profile-form .form-select {
+    border-color: #d7e3da;
+    border-radius: 8px;
+    min-height: 46px;
+}
+.profile-form textarea.form-control {
+    min-height: 110px;
+}
+.profile-form .form-control:focus,
+.profile-form .form-select:focus {
+    border-color: #198754;
+    box-shadow: 0 0 0 .2rem rgba(25, 135, 84, .12);
+}
+.profile-form label {
+    color: #17352a;
+}
+.crop-modal {
+    border: 0;
+    border-radius: 8px;
+    overflow: hidden;
+}
+.crop-layout {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 190px;
+    gap: 1rem;
+    align-items: start;
+}
+.crop-stage {
+    min-height: 360px;
+    max-height: 520px;
+    background: #eef4ee;
+    border-radius: 8px;
+    overflow: hidden;
+}
+#cropSourceImage {
+    display: block;
+    max-width: 100%;
+}
+.crop-preview-panel {
+    display: grid;
+    gap: .75rem;
+    color: #607168;
+}
+.crop-preview-panel span {
+    color: #17633a;
+    font-weight: 800;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    font-size: .75rem;
+}
+.crop-avatar-preview {
+    width: 150px;
+    height: 150px;
+    overflow: hidden;
+    border-radius: 50%;
+    border: 4px solid #e4f4ea;
+    background: #f6f8f3;
+}
+@media (max-width: 767.98px) {
+    .crop-layout {
+        grid-template-columns: 1fr;
+    }
+    .crop-stage {
+        min-height: 280px;
+    }
+    .crop-preview-panel {
+        justify-items: center;
+        text-align: center;
+    }
+    .profile-form .btn {
+        width: 100%;
+    }
 }
 </style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const fileInput = document.getElementById('id_profile_picture');
+    const cropSourceImage = document.getElementById('cropSourceImage');
+    const croppedInput = document.getElementById('croppedProfilePicture');
+    const avatarPreview = document.getElementById('profileAvatarPreview');
+    const avatarFallback = document.getElementById('profileAvatarFallback');
+    const cropAgainButton = document.getElementById('cropAgainButton');
+    const applyCropButton = document.getElementById('applyCropButton');
+    const modalElement = document.getElementById('profileCropModal');
+
+    if (!fileInput || !cropSourceImage || !modalElement || typeof Cropper === 'undefined' || typeof bootstrap === 'undefined') {
+        return;
+    }
+
+    const cropModal = new bootstrap.Modal(modalElement);
+    let cropper = null;
+    let objectUrl = '';
+
+    function openCropperFromFile(file) {
+        if (!file || !file.type.startsWith('image/')) {
+            return;
+        }
+
+        if (objectUrl) {
+            URL.revokeObjectURL(objectUrl);
+        }
+        objectUrl = URL.createObjectURL(file);
+        cropSourceImage.src = objectUrl;
+        croppedInput.value = '';
+        cropModal.show();
+    }
+
+    modalElement.addEventListener('shown.bs.modal', function () {
+        if (cropper) {
+            cropper.destroy();
+        }
+        cropper = new Cropper(cropSourceImage, {
+            aspectRatio: 1,
+            viewMode: 1,
+            autoCropArea: 0.9,
+            responsive: true,
+            background: false,
+            preview: '.crop-avatar-preview'
+        });
+    });
+
+    modalElement.addEventListener('hidden.bs.modal', function () {
+        if (cropper) {
+            cropper.destroy();
+            cropper = null;
+        }
+    });
+
+    fileInput.addEventListener('change', function () {
+        openCropperFromFile(fileInput.files && fileInput.files[0]);
+    });
+
+    if (cropAgainButton) {
+        cropAgainButton.addEventListener('click', function () {
+            openCropperFromFile(fileInput.files && fileInput.files[0]);
+        });
+    }
+
+    applyCropButton.addEventListener('click', function () {
+        if (!cropper) {
+            return;
+        }
+
+        const canvas = cropper.getCroppedCanvas({
+            width: 512,
+            height: 512,
+            imageSmoothingQuality: 'high'
+        });
+
+        if (!canvas) {
+            return;
+        }
+
+        const dataUrl = canvas.toDataURL('image/png', 0.92);
+        croppedInput.value = dataUrl;
+        avatarPreview.src = dataUrl;
+        avatarPreview.classList.remove('d-none');
+
+        if (avatarFallback) {
+            avatarFallback.classList.add('d-none');
+        }
+        if (cropAgainButton) {
+            cropAgainButton.classList.remove('d-none');
+        }
+
+        cropModal.hide();
+    });
+});
+</script>
 {% endblock %}

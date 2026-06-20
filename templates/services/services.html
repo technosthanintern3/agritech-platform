@@ -1,107 +1,233 @@
 {% extends 'base.html' %}
 
 {% block content %}
-
-<div class="container py-5">
-
-<div class="text-center mb-5">
-
-    <h1 class="fw-bold">
-        Our Agricultural Services
-    </h1>
-
-    <p class="text-muted">
-        Smart farming solutions for modern agriculture.
-    </p>
-
-</div>
-
-<div class="row g-4">
-
-    {% for service in services_list %}
-
-    <div class="col-md-4">
-
-        <div class="card service-card p-4 text-center h-100 shadow-sm">
-
-            {% if service.image %}
-            <img
-                src="{{ service.image.url }}"
-                class="img-fluid rounded mb-3"
-                style="height:200px; object-fit:cover;">
-            {% endif %}
-
-            <h4>
-                {{ service.title }}
-            </h4>
-
-            <p>
-                {{ service.short_description }}
-            </p>
-
-         {% if service.slug %}
-<a href="{% url 'service_info' service.slug %}"
-   class="btn btn-primary mt-auto">
-    View Details
-</a>
-{% else %}
-<button class="btn btn-secondary mt-auto" disabled>
-    No Details
-</button>
-{% endif %}
-
+<div class="services-page">
+    <div class="container py-4 py-lg-5">
+        <div class="services-hero mb-4">
+            <span>Farm Services</span>
+            <h1>Agricultural Services</h1>
+            <p>Request practical support for crop health, soil, equipment, and farm operations.</p>
         </div>
 
-    </div>
-
-    {% empty %}
-
-    <div class="col-12 text-center">
-
-        <div class="alert alert-warning">
-
-            No services available.
-
+        <div class="service-grid mb-5">
+            {% for service in services_list %}
+                <article class="service-card">
+                    {% if service.image %}
+                        <img src="{{ service.image.url }}" alt="{{ service.title }}">
+                    {% else %}
+                        <div class="service-icon"><i class="bi bi-clipboard2-pulse"></i></div>
+                    {% endif %}
+                    <div class="service-body">
+                        <h2>{{ service.title }}</h2>
+                        <p>{{ service.short_description }}</p>
+                        {% if service.slug %}
+                            <a href="{% url 'service_info' service.slug %}" class="btn btn-outline-success">View Details</a>
+                        {% else %}
+                            <button class="btn btn-secondary" disabled>No Details</button>
+                        {% endif %}
+                    </div>
+                </article>
+            {% empty %}
+                <div class="service-empty">
+                    <i class="bi bi-tools"></i>
+                    <h2>No services available</h2>
+                    <p>Please check again later.</p>
+                </div>
+            {% endfor %}
         </div>
 
+        <section class="request-panel" id="service-request">
+            <div class="request-copy">
+                <span>Service Request</span>
+                <h2>Tell us what your farm needs</h2>
+                <p>Submit a request and the AgroSthan team will review it from the admin panel.</p>
+            </div>
+            <div class="request-form">
+                {% if success %}
+                    <div class="alert alert-success">Service request submitted successfully.</div>
+                {% endif %}
+                {% if form.errors %}
+                    <div class="alert alert-danger">Please correct the highlighted fields.</div>
+                {% endif %}
+                <form method="POST" enctype="multipart/form-data" class="styled-form">
+                    {% csrf_token %}
+                    {{ form.as_p }}
+                    <button type="submit" class="btn btn-success btn-lg">Submit Request</button>
+                </form>
+            </div>
+        </section>
     </div>
-
-    {% endfor %}
-
 </div>
 
-<hr class="my-5">
-
-<h2 class="text-center mb-4">
-    Request a Service
-</h2>
-
-{% if success %}
-
-<div class="alert alert-success">
-
-    Service Request Submitted Successfully
-
-</div>
-
-{% endif %}
-
-<form method="POST" enctype="multipart/form-data">
-
-    {% csrf_token %}
-
-    {{ form.as_p }}
-
-    <button
-        type="submit"
-        class="btn btn-success">
-
-        Submit Request
-
-    </button>
-
-</form>
-
-</div>
-
+<style>
+.services-page {
+    background:
+        radial-gradient(circle at top left, rgba(25, 135, 84, .07), transparent 30rem),
+        #f6f8f3;
+    min-height: calc(100vh - 76px);
+}
+.services-hero {
+    max-width: 760px;
+}
+.services-hero span,
+.request-copy span {
+    color: #17633a;
+    font-weight: 800;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    font-size: .78rem;
+}
+.services-hero h1,
+.request-copy h2,
+.service-card h2,
+.service-empty h2 {
+    font-weight: 850;
+}
+.services-hero p,
+.request-copy p,
+.service-card p {
+    color: #607168;
+}
+.service-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 1.25rem;
+    align-items: stretch;
+}
+.service-card,
+.request-panel,
+.service-empty {
+    background: #fff;
+    border: 1px solid rgba(15, 61, 46, .1);
+    border-radius: 8px;
+    box-shadow: 0 12px 30px rgba(15, 61, 46, .08);
+}
+.service-card {
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    transition: transform .2s ease, box-shadow .2s ease, border-color .2s ease;
+}
+.service-card:hover {
+    border-color: rgba(25, 135, 84, .22);
+    transform: translateY(-4px);
+    box-shadow: 0 20px 38px rgba(15, 61, 46, .14);
+}
+.service-card img,
+.service-icon {
+    width: 100%;
+    aspect-ratio: 16 / 10;
+}
+.service-card img {
+    object-fit: cover;
+    transition: transform .35s ease;
+}
+.service-card:hover img {
+    transform: scale(1.04);
+}
+.service-icon {
+    display: grid;
+    place-items: center;
+    background: #e4f4ea;
+    color: #17633a;
+    font-size: 2.5rem;
+}
+.service-body {
+    padding: 1rem;
+    display: grid;
+    grid-template-rows: auto 1fr auto;
+    gap: .5rem;
+    flex: 1;
+}
+.service-body h2 {
+    font-size: 1.15rem;
+    margin: 0;
+    overflow-wrap: anywhere;
+}
+.service-body p {
+    overflow-wrap: anywhere;
+}
+.service-body .btn {
+    align-self: end;
+    justify-self: start;
+}
+.request-panel {
+    display: grid;
+    grid-template-columns: 320px minmax(0, 1fr);
+    gap: 1.5rem;
+    padding: 1.25rem;
+    overflow: hidden;
+}
+.request-copy {
+    margin: -1.25rem 0 -1.25rem -1.25rem;
+    padding: 1.25rem;
+    background: linear-gradient(135deg, #17633a, #0f3d2e);
+    color: #fff;
+}
+.request-copy span,
+.request-copy p {
+    color: rgba(255,255,255,.78);
+}
+.request-copy h2 {
+    color: #fff;
+}
+.request-form {
+    min-width: 0;
+}
+.styled-form p {
+    margin-bottom: 1rem;
+}
+.styled-form label {
+    display: block;
+    font-weight: 700;
+    margin-bottom: .35rem;
+}
+.styled-form input,
+.styled-form select,
+.styled-form textarea {
+    width: 100%;
+    border: 1px solid #d7e3da;
+    border-radius: 8px;
+    padding: .7rem .85rem;
+}
+.styled-form input:focus,
+.styled-form select:focus,
+.styled-form textarea:focus {
+    border-color: #198754;
+    box-shadow: 0 0 0 .2rem rgba(25, 135, 84, .12);
+    outline: none;
+}
+.styled-form textarea {
+    min-height: 120px;
+}
+.styled-form .errorlist {
+    color: #b42318;
+    margin-bottom: .4rem;
+}
+.service-empty {
+    grid-column: 1 / -1;
+    text-align: center;
+    padding: 3rem 1rem;
+}
+.service-empty i {
+    color: #17633a;
+    font-size: 2.4rem;
+}
+@media (max-width: 991.98px) {
+    .service-grid,
+    .request-panel {
+        grid-template-columns: 1fr;
+    }
+    .request-copy {
+        margin: -1.25rem -1.25rem 0;
+    }
+}
+@media (max-width: 575.98px) {
+    .service-body .btn,
+    .request-form .btn {
+        width: 100%;
+    }
+}
+</style>
 {% endblock %}

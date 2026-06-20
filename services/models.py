@@ -72,6 +72,11 @@ class ServiceInfo(models.Model):
         unique=True
     )
 
+    category = models.CharField(
+        max_length=120,
+        blank=True
+    )
+
     short_description = models.TextField()
 
     full_description = models.TextField()
@@ -82,8 +87,29 @@ class ServiceInfo(models.Model):
         null=True
     )
 
+    hero_banner_image = models.ImageField(
+        upload_to='service_hero_images/',
+        blank=True,
+        null=True
+    )
+
     benefits = models.TextField(
         help_text="Enter one benefit per line",
+        blank=True
+    )
+
+    features = models.TextField(
+        help_text="Enter one feature per line",
+        blank=True
+    )
+
+    process_steps = models.TextField(
+        help_text="Enter one process step per line",
+        blank=True
+    )
+
+    requirements = models.TextField(
+        help_text="Enter one requirement per line",
         blank=True
     )
 
@@ -91,12 +117,34 @@ class ServiceInfo(models.Model):
         blank=True
     )
 
+    related_services = models.ManyToManyField(
+        'self',
+        blank=True,
+        symmetrical=False
+    )
+
+    display_order = models.PositiveIntegerField(default=0)
+
+    is_active = models.BooleanField(default=True)
+
     created_at = models.DateTimeField(
         auto_now_add=True
     )
 
+    class Meta:
+        ordering = ['display_order', 'title']
+
     def get_benefits_list(self):
         return self.benefits.splitlines()
+
+    def get_features_list(self):
+        return self.features.splitlines()
+
+    def get_process_steps_list(self):
+        return self.process_steps.splitlines()
+
+    def get_requirements_list(self):
+        return self.requirements.splitlines()
 
     def __str__(self):
         return self.title

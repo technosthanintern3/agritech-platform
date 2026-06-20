@@ -1,463 +1,248 @@
 {% extends 'base.html' %}
 
 {% block content %}
-
-<div class="container py-5">
-
-<div class="text-center mb-5">
-
-    <h1 class="text-success">
-        🚜 Agricultural Machinery Services
-    </h1>
-
-    <p class="lead">
-
-        Rent modern agricultural machinery to improve
-        farming efficiency, reduce labor costs and
-        increase productivity.
-
-    </p>
-
-</div>
-
-<div class="row mb-5">
-
-    {% for machine in machines %}
-
-    <div class="col-md-3 mb-4">
-
-        <div class="card h-100 shadow service-card">
-
-            <img
-                src="{{ machine.image.url }}"
-                class="card-img-top"
-                height="200">
-
-            <div class="card-body text-center">
-
-                <h5>
-                    {{ machine.name }}
-                </h5>
-
-                <p>
-                    {{ machine.description }}
-                </p>
-
-                <p class="text-success">
-
-                    <strong>
-                        ₹ {{ machine.price_per_day }}/day
-                    </strong>
-
-                </p>
-
-                <button
-                    type="button"
-                    class="btn btn-success"
-                    onclick="selectMachine('{{ machine.name }}')">
-
-                    Book This Machine
-
-                </button>
-
-            </div>
-
-        </div>
-
-    </div>
-
-    {% empty %}
-
-    <div class="col-12">
-
-        <div class="alert alert-warning text-center">
-
-            No machinery available.
-            Please add machinery from Admin Panel.
-
-        </div>
-
-    </div>
-
-    {% endfor %}
-
-</div>
-
-<div class="card shadow p-4">
-
-    <h2 class="text-center mb-4">
-        Machinery Booking Form
-    </h2>
-
-    {% if success %}
-
-    <div class="alert alert-success">
-
-        Booking Submitted Successfully
-
-    </div>
-
-    {% endif %}
-
-    {{ form.errors }}
-
-    <form method="POST" id="booking-form">
-
-        {% csrf_token %}
-
-        <div class="mb-3">
-
-            <label class="form-label">
-                Machinery Type
-            </label>
-
-            {{ form.machinery_type }}
-
-        </div>
-
-        <div class="mb-3">
-
-            <label class="form-label">
-                Full Name
-            </label>
-
-            {{ form.name }}
-
-        </div>
-
-        <div class="mb-3">
-
-            <label class="form-label">
-                Email Address
-            </label>
-
-            {{ form.email }}
-
-        </div>
-
-        <div class="mb-3">
-
-            <label class="form-label">
-                Phone Number
-            </label>
-
-            {{ form.phone }}
-
-        </div>
-
-        <div class="mb-3">
-
-            <label class="form-label">
-                Address
-            </label>
-
-            {{ form.address }}
-
-        </div>
-
-        <div class="mb-3">
-
-            <label class="form-label">
-                Booking Date
-            </label>
-
-            {{ form.booking_date }}
-
-        </div>
-
-        <div class="mb-3">
-
-            <label class="form-label">
-                Purpose
-            </label>
-
-            {{ form.purpose }}
-
-        </div>
-
-        <div class="text-center">
-
-            <button
-                type="submit"
-                class="btn btn-success btn-lg">
-
-                Book Machinery
-
-            </button>
-
-        </div>
-
-    </form>
-
-</div>
-
-</div>
-
-<script>
-
-function selectMachine(machineName) {
-
-    let dropdown =
-        document.getElementById(
-            "id_machinery_type"
-        );
-
-    if (dropdown) {
-
-        dropdown.value =
-            machineName;
-
-    }
-
-    document
-        .getElementById(
-            "booking-form"
-        )
-        .scrollIntoView({
-            behavior: "smooth"
-        });
-
-}
-
-</script>
-
-{% endblock %}
-{% comment %} {% extends 'base.html' %}
-
-{% block content %}
-
-<div class="container py-5">
-
-<div class="text-center mb-5">
-
-    <h1 class="text-success">
-        🚜 Agricultural Machinery Services
-    </h1>
-
-    <p class="lead">
-
-        Rent modern agricultural machinery to improve
-        farming efficiency, reduce labor costs and
-        increase productivity.
-
-    </p>
-
-</div>
-
-<div class="row mb-5">
-
-    {% for machine in machines %}
-
-    <div class="col-md-3 mb-4">
-
-        <div class="card h-100 shadow service-card">
-
-            <img
-                src="{{ machine.image.url }}"
-                class="card-img-top"
-                height="200">
-
-            <div class="card-body text-center">
-
-                <h5>
-                    {{ machine.name }}
-                </h5>
-
-                <p>
-                    {{ machine.description }}
-                </p>
-
-                <p class="text-success">
-
-                    <strong>
-                        ₹ {{ machine.price_per_day }}/day
-                    </strong>
-
-                </p>
-
-                <button
-                    type="button"
-                    class="btn btn-success"
-                    onclick="selectMachine('{{ machine.name }}')">
-
-                    Book This Machine
-
-                </button>
-
-            </div>
-
-        </div>
-
-    </div>
-
-    {% empty %}
-
-    <div class="col-12">
-
-        <div class="alert alert-warning text-center">
-
-            No machinery available.
-            Please add machinery from Admin Panel.
-
-        </div>
-
-    </div>
-
-    {% endfor %}
-
-</div>
-
-<div class="row justify-content-center">
-
-    <div class="col-md-8">
-
-        <div class="card shadow-lg border-0">
-
-            <div class="card-header bg-success text-white text-center py-3">
-
-                <h3>
-                    Machinery Booking Form
-                </h3>
-
-            </div>
-
-            <div class="card-body p-4">
-
-                {% if success %}
-
-                <div class="alert alert-success">
-
-                    Booking Submitted Successfully
-
-                </div>
-
-                {% endif %}
-
-                <form method="POST" id="booking-form">
-
-                    {% csrf_token %}
-
-                    <div class="mb-3">
-
-                        <label class="form-label">
-                            Machinery Type
-                        </label>
-
-                        {{ form.machinery_type }}
-
-                    </div>
-
-                    <div class="mb-3">
-
-                        <label class="form-label">
-                            Full Name
-                        </label>
-
-                        {{ form.name }}
-
-                    </div>
-
-                    <div class="mb-3">
-
-                        <label class="form-label">
-                            Email Address
-                        </label>
-
-                        {{ form.email }}
-
-                    </div>
-
-                    <div class="mb-3">
-
-                        <label class="form-label">
-                            Phone Number
-                        </label>
-
-                        {{ form.phone }}
-
-                    </div>
-
-                    <div class="mb-3">
-
-                        <label class="form-label">
-                            Address
-                        </label>
-
-                        {{ form.address }}
-
-                    </div>
-
-                    <div class="mb-3">
-
-                        <label class="form-label">
-                            Booking Date
-                        </label>
-
-                        {{ form.booking_date }}
-
-                    </div>
-
-                    <div class="mb-3">
-
-                        <label class="form-label">
-                            Purpose
-                        </label>
-
-                        {{ form.purpose }}
-
-                    </div>
-
-                    <div class="text-center">
-
-                        <button
-                            type="submit"
-                            class="btn btn-success btn-lg px-5">
-
-                            Book Machinery
-
+<div class="machinery-page">
+    <div class="container py-4 py-lg-5">
+        <section class="machinery-hero mb-4">
+            <span>Equipment Booking</span>
+            <h1>Agricultural Machinery Services</h1>
+            <p>Rent modern farm equipment to reduce labor effort and improve field productivity.</p>
+        </section>
+
+        <div class="machine-grid mb-5">
+            {% for machine in machines %}
+                <article class="machine-card">
+                    {% if machine.image %}
+                        <img src="{{ machine.image.url }}" alt="{{ machine.name }}">
+                    {% endif %}
+                    <div class="machine-body">
+                        <h2>{{ machine.name }}</h2>
+                        <p>{{ machine.description }}</p>
+                        <strong>Rs {{ machine.price_per_day }}/day</strong>
+                        <button type="button" class="btn btn-success" onclick="selectMachine('{{ machine.name }}')">
+                            Book This Machine
                         </button>
-
                     </div>
-
-                </form>
-
-            </div>
-
+                </article>
+            {% empty %}
+                <div class="machine-empty">
+                    <i class="bi bi-truck"></i>
+                    <h2>No machinery available</h2>
+                    <p>Please check again later.</p>
+                </div>
+            {% endfor %}
         </div>
 
+        <section class="booking-panel" id="booking-panel">
+            <div class="booking-copy">
+                <span>Booking Form</span>
+                <h2>Reserve Machinery</h2>
+                <p>Choose equipment and submit your booking details.</p>
+            </div>
+            <div class="booking-form-body">
+                {% if success %}
+                    <div class="alert alert-success">Booking submitted successfully.</div>
+                {% endif %}
+                {% if form.errors %}
+                    <div class="alert alert-danger">Please correct the highlighted fields.</div>
+                {% endif %}
+                <form method="POST" id="booking-form" class="styled-form">
+                    {% csrf_token %}
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label">Machinery Type</label>
+                            {{ form.machinery_type }}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Full Name</label>
+                            {{ form.name }}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Email Address</label>
+                            {{ form.email }}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Phone Number</label>
+                            {{ form.phone }}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Booking Date</label>
+                            {{ form.booking_date }}
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label">Address</label>
+                            {{ form.address }}
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label">Purpose</label>
+                            {{ form.purpose }}
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-success btn-lg mt-4">Book Machinery</button>
+                </form>
+            </div>
+        </section>
     </div>
-
-</div>
-
 </div>
 
 <script>
-
 function selectMachine(machineName) {
-
-    let dropdown =
-        document.getElementById(
-            "id_machinery_type"
-        );
-
+    const dropdown = document.getElementById("id_machinery_type");
     if (dropdown) {
-
-        dropdown.value =
-            machineName;
-
+        dropdown.value = machineName;
     }
-
-    document
-        .getElementById(
-            "booking-form"
-        )
-        .scrollIntoView({
-            behavior: "smooth"
-        });
-
+    document.getElementById("booking-panel").scrollIntoView({ behavior: "smooth" });
 }
-
 </script>
 
-{% endblock %} {% endcomment %}
-
+<style>
+.machinery-page {
+    background:
+        radial-gradient(circle at top left, rgba(25, 135, 84, .07), transparent 28rem),
+        #f6f8f3;
+    min-height: calc(100vh - 76px);
+}
+.machinery-hero {
+    max-width: 760px;
+}
+.machinery-hero span,
+.booking-panel span {
+    color: #17633a;
+    font-weight: 800;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    font-size: .78rem;
+}
+.machinery-hero h1,
+.booking-panel h2,
+.machine-card h2,
+.machine-empty h2 {
+    font-weight: 850;
+}
+.machinery-hero p,
+.booking-panel p,
+.machine-card p {
+    color: #607168;
+}
+.machine-grid {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 1rem;
+}
+.machine-card,
+.booking-panel,
+.machine-empty {
+    background: #fff;
+    border: 1px solid rgba(15, 61, 46, .1);
+    border-radius: 8px;
+    box-shadow: 0 12px 30px rgba(15, 61, 46, .08);
+}
+.machine-card {
+    overflow: hidden;
+    transition: transform .2s ease, box-shadow .2s ease, border-color .2s ease;
+}
+.machine-card:hover {
+    border-color: rgba(25, 135, 84, .22);
+    transform: translateY(-4px);
+    box-shadow: 0 20px 38px rgba(15, 61, 46, .14);
+}
+.machine-card img {
+    width: 100%;
+    aspect-ratio: 4 / 3;
+    object-fit: cover;
+    transition: transform .35s ease;
+}
+.machine-card:hover img {
+    transform: scale(1.04);
+}
+.machine-body {
+    display: grid;
+    gap: .55rem;
+    padding: 1rem;
+}
+.machine-body h2 {
+    font-size: 1.1rem;
+    margin: 0;
+    overflow-wrap: anywhere;
+}
+.machine-body p {
+    overflow-wrap: anywhere;
+}
+.machine-body strong {
+    color: #17633a;
+}
+.booking-panel {
+    display: grid;
+    grid-template-columns: 300px minmax(0, 1fr);
+    gap: 1.5rem;
+    padding: 1.25rem;
+    overflow: hidden;
+}
+.booking-copy {
+    margin: -1.25rem 0 -1.25rem -1.25rem;
+    padding: 1.25rem;
+    background: linear-gradient(135deg, #17633a, #0f3d2e);
+    color: #fff;
+}
+.booking-copy span,
+.booking-copy p {
+    color: rgba(255,255,255,.78);
+}
+.booking-copy h2 {
+    color: #fff;
+}
+.booking-form-body {
+    min-width: 0;
+}
+.styled-form label {
+    font-weight: 700;
+}
+.styled-form input,
+.styled-form select,
+.styled-form textarea {
+    width: 100%;
+    border: 1px solid #d7e3da;
+    border-radius: 8px;
+    padding: .7rem .85rem;
+}
+.styled-form input:focus,
+.styled-form select:focus,
+.styled-form textarea:focus {
+    border-color: #198754;
+    box-shadow: 0 0 0 .2rem rgba(25, 135, 84, .12);
+    outline: none;
+}
+.styled-form textarea {
+    min-height: 120px;
+}
+.machine-empty {
+    grid-column: 1 / -1;
+    text-align: center;
+    padding: 3rem 1rem;
+}
+.machine-empty i {
+    color: #17633a;
+    font-size: 2.4rem;
+}
+@media (max-width: 991.98px) {
+    .machine-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+    .booking-panel {
+        grid-template-columns: 1fr;
+    }
+    .booking-copy {
+        margin: -1.25rem -1.25rem 0;
+    }
+}
+@media (max-width: 575.98px) {
+    .machine-grid {
+        grid-template-columns: 1fr;
+    }
+    .machine-body .btn,
+    .styled-form .btn {
+        width: 100%;
+    }
+}
+</style>
+{% endblock %}

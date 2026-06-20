@@ -1,0 +1,30 @@
+{% extends 'dashboard/base_admin.html' %}
+{% load humanize %}
+
+{% block content %}
+<div class="table-card">
+    <div class="d-flex align-items-center gap-3 flex-wrap mb-4">
+        {% if profile.profile_photo %}
+            <img src="{{ profile.profile_photo.url }}" class="rounded-circle" width="72" height="72" style="object-fit:cover;" alt="Admin photo">
+        {% else %}
+            <span class="rounded-circle bg-success text-white d-inline-flex align-items-center justify-content-center" style="width:72px;height:72px;"><i class="bi bi-shield fs-2"></i></span>
+        {% endif %}
+        <div>
+            <h3 class="mb-1">{{ profile.full_name }}</h3>
+            <span class="badge {% if profile.is_super_admin %}bg-dark{% else %}bg-secondary{% endif %}">{{ profile.get_role_display }}</span>
+            <span class="badge {% if profile.user.is_active %}bg-success{% else %}bg-danger{% endif %}">{% if profile.user.is_active %}Active{% else %}Inactive{% endif %}</span>
+        </div>
+    </div>
+    <div class="row g-3">
+        <div class="col-md-4"><div class="text-muted small">Username</div><div class="fw-semibold">{{ profile.user.username }}</div></div>
+        <div class="col-md-4"><div class="text-muted small">Email</div><div class="fw-semibold">{{ profile.user.email }}</div></div>
+        <div class="col-md-4"><div class="text-muted small">Phone</div><div class="fw-semibold">{{ profile.phone_number }}</div></div>
+        <div class="col-md-4"><div class="text-muted small">Date Joined</div><div class="fw-semibold">{{ profile.user.date_joined|date:'M d, Y H:i' }}</div></div>
+        <div class="col-md-4"><div class="text-muted small">Last Login</div><div class="fw-semibold">{% if profile.user.last_login %}{{ profile.user.last_login|naturaltime }}{% else %}Never{% endif %}</div></div>
+    </div>
+    <div class="mt-4">
+        <a href="{% url 'admin_edit' profile.id %}" class="btn btn-primary">Edit</a>
+        <a href="{% url 'admins_management' %}" class="btn btn-outline-secondary">Back</a>
+    </div>
+</div>
+{% endblock %}

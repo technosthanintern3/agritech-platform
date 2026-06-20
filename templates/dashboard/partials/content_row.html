@@ -1,0 +1,39 @@
+<tr>
+    <td>
+        <div class="d-flex align-items-center gap-3">
+            {% if image %}
+                <img src="{{ image.url }}" alt="" width="58" height="58" class="rounded" style="object-fit:cover;">
+            {% else %}
+                <span class="bg-light border rounded d-inline-flex align-items-center justify-content-center" style="width:58px;height:58px;">
+                    <i class="bi bi-image text-muted"></i>
+                </span>
+            {% endif %}
+            <div>
+                <div class="fw-semibold">{{ label }}</div>
+                {% if item.slug %}
+                    <small class="text-muted">{{ item.slug }}</small>
+                {% elif item.crop %}
+                    <small class="text-muted">{{ item.crop }}</small>
+                {% endif %}
+            </div>
+        </div>
+    </td>
+    <td>{{ item.display_order|default:0 }}</td>
+    <td>
+        {% if item.is_active %}
+            <span class="badge bg-success">Active</span>
+        {% else %}
+            <span class="badge bg-secondary">Inactive</span>
+        {% endif %}
+    </td>
+    <td class="text-end text-nowrap">
+        <a class="btn btn-sm btn-outline-primary" href="{% url 'content_management' %}?tab={{ content_type }}&type={{ content_type }}&id={{ item.id }}">Edit</a>
+        <a class="btn btn-sm btn-outline-warning" href="{% url 'content_toggle_status' content_type item.id %}">
+            {% if item.is_active %}Deactivate{% else %}Activate{% endif %}
+        </a>
+        <form method="post" action="{% url 'content_delete' content_type item.id %}" class="d-inline" onsubmit="return confirm('Delete this item?');">
+            {% csrf_token %}
+            <button class="btn btn-sm btn-outline-danger" type="submit">Delete</button>
+        </form>
+    </td>
+</tr>

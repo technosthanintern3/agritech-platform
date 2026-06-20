@@ -4,15 +4,21 @@ from django.contrib.auth.hashers import check_password, make_password
 from django.contrib import messages
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import authenticate, get_user_model, login as auth_login
+from django.contrib.auth import update_session_auth_hash
 from django.views.decorators.http import require_POST
 from django.utils import timezone
 from django.urls import NoReverseMatch, reverse
 from django.core.mail import send_mail
+from django.core.files.base import ContentFile
+from django.core.files.storage import default_storage
 from django.utils.dateparse import parse_datetime
 from django.utils import timezone as dj_timezone
 from datetime import timedelta
 import secrets
 import re
+import base64
+import binascii
+import uuid
 
 from .forms import (
     FarmerRegistrationForm,
@@ -23,6 +29,11 @@ from .forms import (
     ConsultantProfileForm,
     AdminRegistrationForm,
     OTPVerificationForm,
+    PasswordChangeForm,
+    ForgotPasswordRequestForm,
+    ForgotPasswordOTPForm,
+    PasswordResetForm,
+    extract_dynamic_registration_data,
 )
 from .models import (
     Farmer,
@@ -31,13 +42,18 @@ from .models import (
     Role,
     IdentityChangeRequest,
     RegistrationOTP,
+    PasswordResetOTP,
     AdminProfile,
+    AccessCode,
 )
 
 from consultation.models import ConsultationRequest
 from machinery.models import TractorBooking
-from services.models import ServiceRequest
-from farmer_support.models import CropProblem
+from services.models import ServiceInfo, ServiceRequest
+from farmer_support.models import CropProblem, CropProblemGuide
+from products.models import SeedVariety
+from consultation.models import ConsultationTopic
+from orders.models import Order
 from .forms import EditProfileForm
 from agritech.utils import doctor_required, consultant_required
 
@@ -124,6 +140,10 @@ def _clean_registration_payload(cleaned_data):
     payload.pop('admin_code', None)
     payload.pop('profile_photo', None)
     payload.pop('identity_photo_upload', None)
+    payload.pop('certification_upload', None)
+    for key in list(payload.keys()):
+        if key.startswith('dynamic_'):
+            payload.pop(key, None)
     return payload
 
 
@@ -315,6 +335,107 @@ def _account_photo_url(account):
     return ''
 
 
+def _clear_role_session(request, role_slug):
+
+    if role_slug == 'farmer':
+        session_keys = ('farmer_id', 'farmer_name', 'profile_picture')
+    elif role_slug == 'doctor':
+        session_keys = ('doctor_id', 'doctor_name', 'doctor_photo')
+    elif role_slug == 'consultant':
+        session_keys = ('consultant_id', 'consultant_name', 'consultant_photo')
+    else:
+        session_keys = ()
+
+    for session_key in session_keys:
+        request.session.pop(session_key, None)
+
+    if role_slug in {'farmer', 'doctor', 'consultant'}:
+        for session_key in ('user_role', 'account_role', 'account_id', 'account_name', 'account_photo'):
+            request.session.pop(session_key, None)
+
+
+def _password_reset_target(email):
+
+    for model in _account_models_for_login():
+        account = model.objects.filter(email__iexact=email).first()
+        if account:
+            return account.__class__.__name__.lower(), account
+
+    admin_user = User.objects.filter(email__iexact=email, is_staff=True).first()
+
+    if not admin_user:
+        admin_user = User.objects.filter(username__iexact=email, is_staff=True).first()
+
+    if admin_user:
+        return 'admin', admin_user
+
+    return None, None
+
+
+def _password_reset_account(role_slug, account_id):
+
+    model_map = {
+        'farmer': Farmer,
+        'doctor': Doctor,
+        'consultant': Consultant,
+        'admin': User,
+    }
+
+    model = model_map.get(role_slug)
+
+    if not model:
+        return None
+
+    return model.objects.filter(id=account_id).first()
+
+
+def _password_reset_minutes():
+
+    return getattr(settings, 'PASSWORD_RESET_OTP_MINUTES', 10)
+
+
+def _generate_password_reset_otp():
+
+    return f'{secrets.randbelow(1000000):06d}'
+
+
+def _send_password_reset_otp(email_address, otp_code):
+
+    send_mail(
+        subject='AgroSthan password reset OTP',
+        message=(
+            f'Your AgroSthan password reset OTP is {otp_code}. '
+            f'It expires in {_password_reset_minutes()} minutes.'
+        ),
+        from_email=getattr(settings, 'DEFAULT_FROM_EMAIL', None),
+        recipient_list=[email_address],
+        fail_silently=True,
+    )
+
+
+def _store_password_reset_session(request, token_obj):
+
+    request.session['password_reset_token'] = str(token_obj.token)
+    request.session['password_reset_email'] = token_obj.email
+    request.session['password_reset_role'] = token_obj.role
+
+
+def _clear_password_reset_session(request):
+
+    for session_key in ('password_reset_token', 'password_reset_email', 'password_reset_role'):
+        request.session.pop(session_key, None)
+
+
+def _update_account_password(role_slug, account, new_password):
+
+    if role_slug == 'admin':
+        account.set_password(new_password)
+        account.save(update_fields=['password'])
+    else:
+        account.password = make_password(new_password)
+        account.save(update_fields=['password'])
+
+
 def _set_account_session(request, role_slug, account):
 
     for session_key in (
@@ -416,9 +537,22 @@ def _dashboard_url_for_account(role_slug, account):
     return None
 
 
-def _try_common_login(email, password):
+def _try_common_login(email, password, expected_role=None):
 
-    for model in _account_models_for_login():
+    role_model_map = {
+        'farmer': Farmer,
+        'doctor': Doctor,
+        'consultant': Consultant,
+    }
+
+    if expected_role in role_model_map:
+        models_to_check = [role_model_map[expected_role]]
+    elif expected_role == 'admin':
+        models_to_check = []
+    else:
+        models_to_check = [Farmer, Doctor, Consultant]
+
+    for model in models_to_check:
 
         field_names = {field.name for field in model._meta.fields}
         filters = {'email': email}
@@ -449,6 +583,9 @@ def _try_common_login(email, password):
             )
 
             return role_slug, account
+
+    if expected_role and expected_role != 'admin':
+        return None, None
 
     admin_user = User.objects.filter(
         email=email,
@@ -513,24 +650,21 @@ def admin_register(request):
 
     if request.method == 'POST':
 
-        form = AdminRegistrationForm(request.POST)
+        form = AdminRegistrationForm(request.POST, request.FILES)
 
         if form.is_valid():
 
-            admin_code = form.cleaned_data.get('admin_code')
-            configured_code = getattr(settings, 'ADMIN_SECRET_CODE', 'AGROSTHAN2026')
-
-            if admin_code != configured_code:
-                form.add_error('admin_code', 'Invalid Admin Code')
-            else:
-                payload = _clean_registration_payload(form.cleaned_data)
-                otp_token = _create_registration_token(
-                    'admin',
-                    payload['email'],
-                    payload['phone_number'],
-                    payload,
-                )
-                return redirect('registration_verify', token=otp_token.token)
+            payload = _clean_registration_payload(form.cleaned_data)
+            payload['access_code_type'] = getattr(form, 'access_code_type', AccessCode.ROLE_ADMIN)
+            dynamic_data = _persist_dynamic_files(extract_dynamic_registration_data(form.cleaned_data), 'admin')
+            otp_token = _create_registration_token(
+                'admin',
+                payload['email'],
+                payload['phone_number'],
+                payload,
+                dynamic_data=dynamic_data,
+            )
+            return redirect('registration_verify', token=otp_token.token)
 
     else:
 
@@ -555,8 +689,10 @@ def _start_role_registration(request, form_class, template_name, role_slug):
         if form.is_valid():
 
             payload = _clean_registration_payload(form.cleaned_data)
+            dynamic_data = _persist_dynamic_files(extract_dynamic_registration_data(form.cleaned_data), role_slug)
             profile_photo = form.cleaned_data.get('profile_photo')
             identity_photo = form.cleaned_data.get('identity_photo_upload')
+            certification_upload = form.cleaned_data.get('certification_upload')
 
             otp_token = _create_registration_token(
                 role_slug,
@@ -565,6 +701,8 @@ def _start_role_registration(request, form_class, template_name, role_slug):
                 payload,
                 profile_photo=profile_photo,
                 identity_photo=identity_photo,
+                certification_upload=certification_upload,
+                dynamic_data=dynamic_data,
             )
             return redirect('registration_verify', token=otp_token.token)
 
@@ -582,7 +720,23 @@ def _start_role_registration(request, form_class, template_name, role_slug):
     )
 
 
-def _create_registration_token(role, email, phone_number, payload, profile_photo=None, identity_photo=None):
+def _persist_dynamic_files(dynamic_data, role):
+
+    saved_data = {}
+
+    for key, value in dynamic_data.items():
+        if hasattr(value, 'name'):
+            saved_data[key] = default_storage.save(
+                f'dynamic_registration/{role}/{value.name}',
+                value,
+            )
+        else:
+            saved_data[key] = value
+
+    return saved_data
+
+
+def _create_registration_token(role, email, phone_number, payload, profile_photo=None, identity_photo=None, certification_upload=None, dynamic_data=None):
 
     email_otp = _generate_otp()
     phone_otp = _generate_otp()
@@ -598,6 +752,17 @@ def _create_registration_token(role, email, phone_number, payload, profile_photo
         phone_otp_hash=make_password(phone_otp),
         expires_at=timezone.now() + timedelta(minutes=5),
     )
+
+    if certification_upload:
+        token.payload['certification_upload'] = default_storage.save(
+            f'registration_otps/certifications/{certification_upload.name}',
+            certification_upload,
+        )
+        token.save(update_fields=['payload'])
+
+    if dynamic_data:
+        token.payload['dynamic_fields'] = dynamic_data
+        token.save(update_fields=['payload'])
 
     _send_otp_email(email, role.title(), email_otp, phone_otp)
     return token
@@ -634,11 +799,17 @@ def _finalize_registration(token_obj):
             phone=payload['phone'],
             aadhaar_number=payload['aadhaar_number'],
             pan_number=payload['pan_number'],
+            qualification=payload.get('qualification', ''),
+            experience=payload.get('experience', ''),
+            specialization=payload.get('specialization', ''),
+            certification_upload=payload.get('certification_upload') or None,
             identity_photo_upload=token_obj.identity_photo_upload,
             profile_photo=token_obj.profile_photo,
             password=make_password(payload['password']),
             is_approved=True,
             is_active_status=True,
+            verification_status=Doctor.STATUS_VERIFIED,
+            dynamic_fields=payload.get('dynamic_fields', {}),
             email_verified=True,
             phone_verified=True,
         )
@@ -651,17 +822,27 @@ def _finalize_registration(token_obj):
             phone=payload['phone'],
             aadhaar_number=payload['aadhaar_number'],
             pan_number=payload['pan_number'],
+            qualification=payload.get('qualification', ''),
+            experience=payload.get('experience', ''),
+            specialization=payload.get('specialization', ''),
+            certification_upload=payload.get('certification_upload') or None,
             identity_photo_upload=token_obj.identity_photo_upload,
             profile_photo=token_obj.profile_photo,
             password=make_password(payload['password']),
             is_approved=True,
             is_active_status=True,
+            verification_status=Consultant.STATUS_VERIFIED,
+            dynamic_fields=payload.get('dynamic_fields', {}),
             email_verified=True,
             phone_verified=True,
         )
         return 'consultant', consultant
 
     if token_obj.role == 'admin':
+        access_code_type = payload.get('access_code_type')
+        if access_code_type not in (AdminProfile.ROLE_ADMIN, AdminProfile.ROLE_SUPER_ADMIN):
+            raise ValueError('Invalid admin access code state.')
+
         username = payload['email']
         user = User.objects.create_user(
             username=username,
@@ -671,10 +852,13 @@ def _finalize_registration(token_obj):
             is_staff=True,
             is_active=True,
         )
+        user.is_superuser = access_code_type == AdminProfile.ROLE_SUPER_ADMIN
+        user.save(update_fields=['is_superuser'])
         AdminProfile.objects.create(
             user=user,
             full_name=payload['full_name'],
             phone_number=payload['phone_number'],
+            role=access_code_type,
             email_verified=True,
             phone_verified=True,
         )
@@ -768,10 +952,15 @@ def login_view(request, role=None):
 
         if form.is_valid():
 
+            selected_role = form.cleaned_data['role']
             email = form.cleaned_data['email']
             password = form.cleaned_data['password']
 
-            matched_role, user = _try_common_login(email, password)
+            matched_role, user = _try_common_login(
+                email,
+                password,
+                expected_role=selected_role,
+            )
 
             if matched_role == 'farmer':
                 _set_account_session(request, 'farmer', user)
@@ -805,11 +994,11 @@ def login_view(request, role=None):
                 if dashboard_url:
                     return redirect(dashboard_url)
 
-            error = "Invalid Email or Password"
+            error = "Invalid email, password, or selected role."
 
     else:
 
-        form = CommonLoginForm()
+        form = CommonLoginForm(initial={'role': role or 'farmer'})
 
     return render(
         request,
@@ -851,15 +1040,55 @@ def dashboard(request):
         farmer_id=farmer_id
     ).count()
 
+    orders = Order.objects.filter(farmer_id=farmer_id)
+    active_orders = orders.exclude(status='Delivered').count()
+    products_purchased = orders.filter(status='Delivered').count()
+
+    recent_activity = []
+    for order in orders.order_by('-created_at')[:3]:
+        recent_activity.append({
+            'label': f'Order #{order.id}',
+            'detail': order.status or 'Pending',
+            'date': order.created_at,
+            'icon': 'bi-bag-check',
+        })
+    for consultation in ConsultationRequest.objects.filter(farmer_id=farmer_id).order_by('-created_at')[:3]:
+        recent_activity.append({
+            'label': 'Consultation request',
+            'detail': consultation.status,
+            'date': consultation.created_at,
+            'icon': 'bi-chat-dots',
+        })
+    for booking in TractorBooking.objects.filter(farmer_id=farmer_id).order_by('-created_at')[:3]:
+        recent_activity.append({
+            'label': booking.machinery_type,
+            'detail': 'Machinery booking',
+            'date': booking.created_at,
+            'icon': 'bi-truck',
+        })
+    recent_activity = sorted(
+        recent_activity,
+        key=lambda item: item['date'],
+        reverse=True,
+    )[:5]
+
     return render(
         request,
         'accounts/dashboard.html',
         {
             'farmer': farmer,
+            'total_orders': orders.count(),
+            'active_orders': active_orders,
+            'products_purchased': products_purchased,
             'consultations': consultations,
             'bookings': bookings,
             'services': services,
-            'problems': problems
+            'problems': problems,
+            'recent_activity': recent_activity,
+            'featured_services': ServiceInfo.objects.filter(is_active=True).order_by('display_order', 'title')[:3],
+            'featured_products': SeedVariety.objects.filter(is_active=True).select_related('crop').order_by('display_order', 'name')[:3],
+            'featured_consultations': ConsultationTopic.objects.filter(is_active=True).order_by('display_order', 'title')[:3],
+            'featured_problem_guides': CropProblemGuide.objects.filter(is_active=True).order_by('display_order', 'title')[:3],
         }
     )
 
@@ -1015,6 +1244,8 @@ def edit_profile(request):
 
             farmer.password = make_password(new_password)
             farmer.save()
+            _clear_role_session(request, 'farmer')
+            messages.success(request, 'Password changed successfully. Please login again.')
 
             return redirect('login')
 
@@ -1028,7 +1259,32 @@ def edit_profile(request):
 
         if form.is_valid():
 
-            farmer = form.save()
+            farmer = form.save(commit=False)
+            cropped_profile_picture = request.POST.get(
+                'cropped_profile_picture',
+                ''
+            )
+
+            if cropped_profile_picture.startswith('data:image'):
+                try:
+                    header, encoded_image = cropped_profile_picture.split(';base64,', 1)
+                    extension = header.split('/')[-1].split('+')[0] or 'png'
+                    farmer.profile_picture.save(
+                        f'profile_{farmer.id}_{uuid.uuid4().hex[:10]}.{extension}',
+                        ContentFile(base64.b64decode(encoded_image)),
+                        save=False,
+                    )
+                except (ValueError, TypeError, binascii.Error):
+                    messages.error(request, 'The cropped profile photo could not be saved. Please try again.')
+                    return render(
+                        request,
+                        'accounts/edit_profile.html',
+                        {
+                            'form': form
+                        }
+                    )
+
+            farmer.save()
 
             request.session['farmer_name'] = farmer.name
 
@@ -1109,8 +1365,8 @@ def change_password(request):
 
             farmer.password = make_password(new_password)
             farmer.save()
-            # Logout useer after password change
-            request.session.flush()
+            _clear_role_session(request, 'farmer')
+            messages.success(request, 'Password changed successfully. Please login again.')
 
             return redirect('login')
 
@@ -1139,12 +1395,8 @@ def _handle_role_profile_update(request, account, form_class, dashboard_url_name
 
     if request.method == 'POST' and form.is_valid():
         updated_account = form.save(commit=False)
-        new_password = form.cleaned_data.get('password')
         new_profile_photo = form.cleaned_data.get('profile_photo')
         new_identity_photo = form.cleaned_data.get('identity_photo_upload')
-
-        if new_password:
-            updated_account.password = make_password(new_password)
 
         if not new_profile_photo:
             updated_account.profile_photo = account.profile_photo
@@ -1179,6 +1431,25 @@ def doctor_profile(request):
     if not doctor:
         return redirect('login')
 
+    password_form = PasswordChangeForm()
+
+    if request.method == 'POST' and request.POST.get('change_password'):
+
+        password_form = PasswordChangeForm(request.POST)
+
+        if password_form.is_valid():
+
+            current_password = password_form.cleaned_data['current_password']
+            new_password = password_form.cleaned_data['new_password']
+
+            if not _account_password_matches(doctor.password, current_password):
+                password_form.add_error('current_password', 'Current password is incorrect.')
+            else:
+                _update_account_password('doctor', doctor, new_password)
+                _clear_role_session(request, 'doctor')
+                messages.success(request, 'Password changed successfully. Please login again.')
+                return redirect('login')
+
     form = _handle_role_profile_update(request, doctor, DoctorProfileForm, 'doctor_dashboard', 'doctor')
 
     pending_request = IdentityChangeRequest.objects.filter(
@@ -1193,6 +1464,7 @@ def doctor_profile(request):
         {
             'doctor': doctor,
             'form': form,
+            'password_form': password_form,
             'pending_request': pending_request,
         }
     )
@@ -1205,6 +1477,25 @@ def consultant_profile(request):
 
     if not consultant:
         return redirect('login')
+
+    password_form = PasswordChangeForm()
+
+    if request.method == 'POST' and request.POST.get('change_password'):
+
+        password_form = PasswordChangeForm(request.POST)
+
+        if password_form.is_valid():
+
+            current_password = password_form.cleaned_data['current_password']
+            new_password = password_form.cleaned_data['new_password']
+
+            if not _account_password_matches(consultant.password, current_password):
+                password_form.add_error('current_password', 'Current password is incorrect.')
+            else:
+                _update_account_password('consultant', consultant, new_password)
+                _clear_role_session(request, 'consultant')
+                messages.success(request, 'Password changed successfully. Please login again.')
+                return redirect('login')
 
     form = _handle_role_profile_update(request, consultant, ConsultantProfileForm, 'consultant_dashboard', 'consultant')
 
@@ -1220,7 +1511,126 @@ def consultant_profile(request):
         {
             'consultant': consultant,
             'form': form,
+            'password_form': password_form,
             'pending_request': pending_request,
+        }
+    )
+
+
+def forgot_password(request):
+
+    form = ForgotPasswordRequestForm(request.POST or None)
+
+    if request.method == 'POST' and form.is_valid():
+
+        email = form.cleaned_data['email']
+        role_slug, account = _password_reset_target(email)
+
+        if not account:
+            form.add_error('email', 'Email not found.')
+        else:
+            PasswordResetOTP.objects.filter(email__iexact=email, is_used=False).update(is_used=True)
+
+            otp_code = _generate_password_reset_otp()
+            otp_record = PasswordResetOTP.objects.create(
+                role=role_slug,
+                email=email,
+                account_id=account.id,
+                otp_hash=make_password(otp_code),
+                expires_at=timezone.now() + timedelta(minutes=_password_reset_minutes()),
+            )
+            _send_password_reset_otp(email, otp_code)
+            _store_password_reset_session(request, otp_record)
+            messages.success(request, 'OTP sent to your email address.')
+            return redirect('forgot_password_verify', token=otp_record.token)
+
+    return render(
+        request,
+        'accounts/forgot_password.html',
+        {
+            'form': form,
+        }
+    )
+
+
+def forgot_password_verify(request, token):
+
+    otp_record = get_object_or_404(PasswordResetOTP, token=token)
+    expired = timezone.now() > otp_record.expires_at
+    form = ForgotPasswordOTPForm(request.POST or None)
+
+    if otp_record.is_used:
+        messages.info(request, 'This password reset link has already been used.')
+        return redirect('login')
+
+    if request.method == 'POST' and form.is_valid():
+
+        otp_code = form.cleaned_data['otp_code']
+
+        if expired:
+            form.add_error(None, 'OTP expired. Please request a new one.')
+        elif otp_record.attempt_count >= 5:
+            form.add_error(None, 'Maximum verification attempts reached. Request a new OTP.')
+        elif not check_password(otp_code, otp_record.otp_hash):
+            otp_record.attempt_count += 1
+            otp_record.save(update_fields=['attempt_count', 'updated_at'])
+            form.add_error('otp_code', 'Invalid OTP code.')
+        else:
+            otp_record.verified_at = timezone.now()
+            otp_record.attempt_count = 0
+            otp_record.save(update_fields=['verified_at', 'attempt_count', 'updated_at'])
+            _store_password_reset_session(request, otp_record)
+            messages.success(request, 'OTP verified successfully.')
+            return redirect('forgot_password_reset')
+
+    return render(
+        request,
+        'accounts/forgot_password_verify.html',
+        {
+            'form': form,
+            'token': otp_record,
+            'expired': expired,
+        }
+    )
+
+
+def forgot_password_reset(request):
+
+    token_value = request.session.get('password_reset_token')
+
+    if not token_value:
+        messages.error(request, 'Please verify your OTP before resetting your password.')
+        return redirect('forgot_password')
+
+    otp_record = get_object_or_404(PasswordResetOTP, token=token_value)
+
+    if otp_record.is_used or not otp_record.verified_at:
+        _clear_password_reset_session(request)
+        messages.error(request, 'Please verify your OTP before resetting your password.')
+        return redirect('forgot_password')
+
+    form = PasswordResetForm(request.POST or None)
+
+    if request.method == 'POST' and form.is_valid():
+
+        account = _password_reset_account(otp_record.role, otp_record.account_id)
+
+        if not account:
+            form.add_error(None, 'Password reset target account could not be found.')
+        else:
+            _update_account_password(otp_record.role, account, form.cleaned_data['new_password'])
+            otp_record.is_used = True
+            otp_record.save(update_fields=['is_used', 'updated_at'])
+            _clear_password_reset_session(request)
+            messages.success(request, 'Password changed successfully. Please login again.')
+            return redirect('login')
+
+    return render(
+        request,
+        'accounts/forgot_password_reset.html',
+        {
+            'form': form,
+            'token': otp_record,
         }
     )
 

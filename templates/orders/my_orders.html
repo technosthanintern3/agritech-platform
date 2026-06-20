@@ -1,87 +1,169 @@
 {% extends 'base.html' %}
 
 {% block content %}
+<div class="orders-page">
+    <div class="container py-4 py-lg-5">
+        <div class="orders-header mb-4">
+            <div>
+                <span>Order Tracking</span>
+                <h1>My Orders</h1>
+                <p>Monitor farm input purchases and delivery progress.</p>
+            </div>
+            <a href="{% url 'products' %}" class="btn btn-success">Shop Again</a>
+        </div>
 
-<div class="container py-5">
-
-    <h1 class="mb-4">
-
-        📦 My Orders
-
-    </h1>
-
-    {% if orders %}
-
-    <table class="table table-bordered">
-
-        <thead class="table-success">
-
-            <tr>
-
-                <th>Order ID</th>
-                <th>Name</th>
-                <th>Total Amount</th>
-                <th>Status</th>
-                <th>Date</th>
-
-            </tr>
-
-        </thead>
-
-        <tbody>
-
-            {% for order in orders %}
-
-            <tr>
-
-                <td>
-                    #{{ order.id }}
-                </td>
-
-                <td>
-                    {{ order.name }}
-                </td>
-
-                <td>
-                    ₹ {{ order.total_amount }}
-                </td>
-
-                <td>
-
-                    {% if order.status %}
-
-                        {{ order.status }}
-
-                    {% else %}
-
-                        Pending
-
-                    {% endif %}
-
-                </td>
-
-                <td>
-                    {{ order.created_at }}
-                </td>
-
-            </tr>
-
-            {% endfor %}
-
-        </tbody>
-
-    </table>
-
-    {% else %}
-
-    <div class="alert alert-warning">
-
-        No orders found.
-
+        {% if orders %}
+            <div class="orders-list">
+                {% for order in orders %}
+                    <article class="order-card">
+                        <div>
+                            <span class="order-id">Order #{{ order.id }}</span>
+                            <h2>{{ order.name }}</h2>
+                            <p>{{ order.created_at|date:'M d, Y' }}</p>
+                        </div>
+                        <div class="order-amount">Rs {{ order.total_amount }}</div>
+                        <div class="order-status status-{{ order.status|default:'Pending'|slugify }}">
+                            {{ order.status|default:'Pending' }}
+                        </div>
+                        <div class="order-track">
+                            <span class="{% if order.status == 'Pending' or order.status == 'Confirmed' or order.status == 'Shipped' or order.status == 'Delivered' %}done{% endif %}" title="Pending"></span>
+                            <span class="{% if order.status == 'Confirmed' or order.status == 'Shipped' or order.status == 'Delivered' %}done{% endif %}" title="Confirmed"></span>
+                            <span class="{% if order.status == 'Shipped' or order.status == 'Delivered' %}done{% endif %}" title="Shipped"></span>
+                            <span class="{% if order.status == 'Delivered' %}done{% endif %}" title="Delivered"></span>
+                        </div>
+                    </article>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="orders-empty">
+                <i class="bi bi-box-seam"></i>
+                <h2>No orders found</h2>
+                <p>Your purchases will appear here after checkout.</p>
+                <a href="{% url 'products' %}" class="btn btn-success">Browse Products</a>
+            </div>
+        {% endif %}
     </div>
-
-    {% endif %}
-
 </div>
 
+<style>
+.orders-page {
+    background:
+        radial-gradient(circle at top right, rgba(25, 135, 84, .07), transparent 28rem),
+        #f6f8f3;
+    min-height: calc(100vh - 76px);
+}
+.orders-header {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+    align-items: end;
+}
+.orders-header span,
+.order-id {
+    color: #17633a;
+    font-weight: 800;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    font-size: .78rem;
+}
+.orders-header h1,
+.order-card h2,
+.orders-empty h2 {
+    font-weight: 850;
+}
+.orders-header p,
+.order-card p,
+.orders-empty p {
+    color: #607168;
+    margin: 0;
+}
+.orders-list {
+    display: grid;
+    gap: 1rem;
+}
+.order-card,
+.orders-empty {
+    background: #fff;
+    border: 1px solid rgba(15, 61, 46, .1);
+    border-radius: 8px;
+    box-shadow: 0 12px 30px rgba(15, 61, 46, .08);
+}
+.order-card {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 140px 130px 160px;
+    align-items: center;
+    gap: 1rem;
+    padding: 1rem;
+    transition: transform .2s ease, box-shadow .2s ease, border-color .2s ease;
+}
+.order-card:hover {
+    border-color: rgba(25, 135, 84, .22);
+    transform: translateY(-3px);
+    box-shadow: 0 18px 36px rgba(15, 61, 46, .12);
+}
+.order-card h2 {
+    font-size: 1.1rem;
+    margin: .15rem 0;
+    overflow-wrap: anywhere;
+}
+.order-amount {
+    color: #17633a;
+    font-weight: 850;
+}
+.order-status {
+    justify-self: start;
+    border-radius: 999px;
+    padding: .35rem .7rem;
+    font-weight: 800;
+    font-size: .85rem;
+    background: #fff7df;
+    color: #8a5a00;
+}
+.status-delivered {
+    background: #e4f4ea;
+    color: #17633a;
+}
+.status-shipped,
+.status-confirmed {
+    background: #e8f1ff;
+    color: #24549c;
+}
+.order-track {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: .35rem;
+}
+.order-track span {
+    height: 7px;
+    border-radius: 999px;
+    background: #dfe7e1;
+}
+.order-track span.done {
+    background: #17633a;
+}
+.orders-empty {
+    text-align: center;
+    padding: 3rem 1rem;
+}
+.orders-empty i {
+    color: #17633a;
+    font-size: 2.4rem;
+}
+@media (max-width: 767.98px) {
+    .orders-header,
+    .order-card {
+        display: grid;
+    }
+    .order-card {
+        grid-template-columns: 1fr;
+    }
+    .order-status,
+    .order-amount {
+        justify-self: start;
+    }
+    .order-track {
+        width: 100%;
+    }
+}
+</style>
 {% endblock %}

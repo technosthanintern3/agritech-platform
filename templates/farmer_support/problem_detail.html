@@ -1,0 +1,173 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="detail-landing">
+    <section class="detail-hero">
+        <div class="container">
+            <div class="detail-hero-grid">
+                <div class="detail-hero-copy">
+                    <span class="detail-badge"><i class="bi bi-life-preserver me-1"></i> Crop Support</span>
+                    <h1>{{ guide.title }}</h1>
+                    <p>{{ guide.short_summary }}</p>
+                    <div class="detail-hero-actions">
+                        <a href="{% url 'farmer_support' %}#crop-problem-request" class="btn btn-light btn-lg">
+                            <i class="bi bi-send me-1"></i> Request Expert Support
+                        </a>
+                    </div>
+                </div>
+                <div class="detail-hero-media">
+                    {% if guide.hero_image %}
+                        <img src="{{ guide.hero_image.url }}" alt="{{ guide.title }}">
+                    {% elif guide.image %}
+                        <img src="{{ guide.image.url }}" alt="{{ guide.title }}">
+                    {% else %}
+                        <div class="detail-media-fallback"><i class="{{ guide.icon }}"></i></div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <div class="container py-4 py-lg-5">
+        <div class="detail-layout">
+            <main class="detail-main">
+                <section class="detail-card">
+                    <span class="section-kicker">Overview</span>
+                    <h2>Problem Description</h2>
+                    <p>{{ guide.description }}</p>
+                </section>
+
+                <section class="detail-card">
+                    <span class="section-kicker">Symptoms</span>
+                    <h2>Common Signs</h2>
+                    <div class="info-grid">
+                        {% for symptom in guide.get_symptoms_list %}
+                            <div class="info-item"><i class="bi bi-exclamation-circle"></i><span>{{ symptom }}</span></div>
+                        {% empty %}
+                            <div class="info-item"><i class="bi bi-exclamation-circle"></i><span>Visible change in crop health, growth, color, or field performance.</span></div>
+                        {% endfor %}
+                    </div>
+                </section>
+
+                <section class="detail-card">
+                    <span class="section-kicker">Prevention</span>
+                    <h2>Prevention Methods</h2>
+                    <div class="mini-grid">
+                        {% for method in guide.get_prevention_methods_list %}
+                            <div class="mini-card"><i class="bi bi-shield-check"></i><p>{{ method }}</p></div>
+                        {% empty %}
+                            <div class="mini-card"><i class="bi bi-shield-check"></i><p>Monitor the field regularly and keep crop conditions balanced.</p></div>
+                        {% endfor %}
+                    </div>
+                </section>
+
+                <section class="detail-card">
+                    <span class="section-kicker">Causes</span>
+                    <h2>Likely Causes</h2>
+                    <div class="mini-grid">
+                        {% for cause in guide.get_causes_list %}
+                            <div class="mini-card"><i class="bi bi-search"></i><p>{{ cause }}</p></div>
+                        {% empty %}
+                            <div class="mini-card"><i class="bi bi-search"></i><p>Causes vary by crop, weather, soil, pest pressure, and field history.</p></div>
+                        {% endfor %}
+                    </div>
+                </section>
+
+                <section class="detail-card">
+                    <span class="section-kicker">Actions</span>
+                    <h2>Recommended Actions</h2>
+                    <div class="process-list">
+                        {% for action in guide.get_recommended_actions_list %}
+                            <div><strong>{{ forloop.counter }}</strong><span>{{ action }}</span></div>
+                        {% empty %}
+                            <div><strong>1</strong><span>Submit the crop problem form with clear details.</span></div>
+                            <div><strong>2</strong><span>Upload a recent crop or field image if available.</span></div>
+                            <div><strong>3</strong><span>Follow the expert response from the support team.</span></div>
+                        {% endfor %}
+                    </div>
+                </section>
+
+                {% if guide.expert_advice %}
+                    <section class="detail-card">
+                        <span class="section-kicker">Expert Advice</span>
+                        <h2>Additional Guidance</h2>
+                        <p>{{ guide.expert_advice }}</p>
+                    </section>
+                {% endif %}
+            </main>
+
+            <aside class="detail-sidebar">
+                <div class="sidebar-card">
+                    <span class="section-kicker">Expert Support</span>
+                    <h2>Need A Diagnosis?</h2>
+                    <p>Share crop details and images so AgroSthan can review the issue.</p>
+                    <a href="{% url 'farmer_support' %}#crop-problem-request" class="btn btn-success w-100">
+                        <i class="bi bi-send me-1"></i> Submit Problem
+                    </a>
+                </div>
+            </aside>
+        </div>
+
+        <section class="related-section">
+            <div class="section-heading">
+                <span class="section-kicker">Related Problems</span>
+                <h2>Explore More Crop Support</h2>
+            </div>
+            <div class="related-grid">
+                {% for related in related_guides %}
+                    <a href="{% url 'crop_problem_detail' related.slug %}" class="related-card">
+                        {% if related.image %}
+                            <img src="{{ related.image.url }}" alt="{{ related.title }}">
+                        {% else %}
+                            <span><i class="{{ related.icon }}"></i></span>
+                        {% endif %}
+                        <strong>{{ related.title }}</strong>
+                        <small>{{ related.short_summary }}</small>
+                    </a>
+                {% empty %}
+                    <div class="related-empty">More crop problem guides will appear here as they are added.</div>
+                {% endfor %}
+            </div>
+        </section>
+    </div>
+</div>
+
+<style>
+.detail-landing { background: #f6f8f3; min-height: calc(100vh - 76px); }
+.detail-hero { background: linear-gradient(135deg, #17633a, #0f3d2e); color: #fff; padding: clamp(1.5rem, 5vw, 3rem) 0; }
+.detail-hero-grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(280px, 460px); gap: 2rem; align-items: center; }
+.detail-badge, .section-kicker { display: inline-flex; align-items: center; color: #17633a; font-size: .78rem; font-weight: 850; letter-spacing: .08em; text-transform: uppercase; }
+.detail-badge { color: #fff; background: rgba(255,255,255,.14); border: 1px solid rgba(255,255,255,.2); border-radius: 999px; padding: .4rem .7rem; }
+.detail-hero h1 { margin: .8rem 0 .75rem; font-size: clamp(2.1rem, 5vw, 4rem); font-weight: 900; line-height: 1.03; overflow-wrap: anywhere; }
+.detail-hero p { max-width: 720px; color: rgba(255,255,255,.82); font-size: 1.08rem; }
+.detail-hero-actions { display: flex; flex-wrap: wrap; gap: .75rem; margin-top: 1.25rem; }
+.detail-hero-media { aspect-ratio: 4 / 3; border-radius: 8px; overflow: hidden; background: rgba(255,255,255,.12); box-shadow: 0 24px 60px rgba(0,0,0,.24); }
+.detail-hero-media img, .detail-media-fallback { width: 100%; height: 100%; }
+.detail-hero-media img { object-fit: cover; }
+.detail-media-fallback { display: grid; place-items: center; color: rgba(255,255,255,.9); font-size: 4rem; }
+.detail-layout { display: grid; grid-template-columns: minmax(0, 1fr) 320px; gap: 1.25rem; align-items: start; }
+.detail-main, .detail-sidebar { display: grid; gap: 1rem; min-width: 0; }
+.detail-sidebar { position: sticky; top: 92px; }
+.detail-card, .sidebar-card, .related-card, .related-empty { background: #fff; border: 1px solid rgba(15, 61, 46, .1); border-radius: 8px; box-shadow: 0 12px 30px rgba(15, 61, 46, .08); }
+.detail-card, .sidebar-card { padding: 1.25rem; }
+.detail-card h2, .sidebar-card h2, .section-heading h2 { font-weight: 850; margin: .25rem 0 .75rem; }
+.detail-card p, .sidebar-card p, .related-card small { color: #607168; overflow-wrap: anywhere; }
+.info-grid, .mini-grid, .related-grid { display: grid; gap: .85rem; grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.info-item, .mini-card, .process-list div { border: 1px solid #e4ece6; border-radius: 8px; background: #fbfdfb; }
+.info-item { display: flex; gap: .65rem; padding: .85rem; }
+.info-item i, .mini-card i { color: #198754; }
+.mini-card { padding: 1rem; }
+.process-list { display: grid; gap: .75rem; }
+.process-list div { display: grid; grid-template-columns: 42px minmax(0, 1fr); gap: .75rem; align-items: center; padding: .85rem; }
+.process-list strong { width: 38px; height: 38px; display: grid; place-items: center; border-radius: 999px; background: #e4f4ea; color: #17633a; }
+.related-section { margin-top: 1.5rem; }
+.section-heading { margin-bottom: 1rem; }
+.related-card { display: grid; grid-template-rows: 150px auto 1fr; gap: .65rem; padding: .75rem; color: #17352a; text-decoration: none; transition: transform .2s ease, box-shadow .2s ease, border-color .2s ease; }
+.related-card:hover { color: #0f5132; border-color: rgba(25, 135, 84, .24); transform: translateY(-3px); box-shadow: 0 18px 36px rgba(15, 61, 46, .12); }
+.related-card img, .related-card > span { width: 100%; height: 150px; border-radius: 8px; object-fit: cover; background: #e4f4ea; }
+.related-card > span { display: grid; place-items: center; color: #17633a; font-size: 2rem; }
+.related-empty { grid-column: 1 / -1; padding: 1.25rem; color: #607168; }
+@media (max-width: 991.98px) { .detail-hero-grid, .detail-layout { grid-template-columns: 1fr; } .detail-sidebar { position: static; } }
+@media (max-width: 767.98px) { .info-grid, .mini-grid, .related-grid { grid-template-columns: 1fr; } .detail-hero-actions .btn { width: 100%; } }
+</style>
+{% endblock %}

@@ -27,6 +27,18 @@
                     <div class="mb-3">{{ form.phone.label_tag }}{{ form.phone }}</div>
                     <div class="mb-3">{{ form.aadhaar_number.label_tag }}{{ form.aadhaar_number }}</div>
                     <div class="mb-3">{{ form.pan_number.label_tag }}{{ form.pan_number }}</div>
+                    <div class="mb-3">{{ form.qualification.label_tag }}{{ form.qualification }}</div>
+                    <div class="mb-3">{{ form.experience.label_tag }}{{ form.experience }}</div>
+                    <div class="mb-3">{{ form.specialization.label_tag }}{{ form.specialization }}</div>
+                    <div class="mb-3">{{ form.certification_upload.label_tag }}{{ form.certification_upload }}</div>
+                    {% for field in form %}
+                        {% if field.name != 'full_name' and field.name != 'email' and field.name != 'phone' and field.name != 'aadhaar_number' and field.name != 'pan_number' and field.name != 'qualification' and field.name != 'experience' and field.name != 'specialization' and field.name != 'certification_upload' and field.name != 'identity_photo_upload' and field.name != 'profile_photo' and field.name != 'password' and field.name != 'confirm_password' %}
+                            <div class="mb-3">
+                                {{ field.label_tag }}{{ field }}
+                                {% if field.help_text %}<div class="form-text">{{ field.help_text }}</div>{% endif %}
+                            </div>
+                        {% endif %}
+                    {% endfor %}
                     <div class="mb-3">{{ form.identity_photo_upload.label_tag }}{{ form.identity_photo_upload }}</div>
                     <div class="mb-3">{{ form.profile_photo.label_tag }}{{ form.profile_photo }}</div>
                     <div class="mb-3 password-field-group">

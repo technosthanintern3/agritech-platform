@@ -9,19 +9,19 @@ from accounts.models import Farmer
 def products(request):
 
     query = request.GET.get('q')
+    seeds = SeedVariety.objects.filter(is_active=True).select_related('crop')
 
     if query:
 
-        seeds = SeedVariety.objects.filter(
+        seeds = seeds.filter(
             Q(name__icontains=query) |
             Q(crop__name__icontains=query) |
             Q(season__icontains=query) |
-            Q(soil_type__icontains=query)
+            Q(soil_type__icontains=query) |
+            Q(category__icontains=query)
         )
 
-    else:
-
-        seeds = SeedVariety.objects.all()
+    seeds = seeds.order_by('display_order', 'name')
 
     cart = request.session.get(
         'cart',
@@ -45,7 +45,8 @@ def product_detail(request, id):
 
     seed = get_object_or_404(
         SeedVariety,
-        id=id
+        id=id,
+        is_active=True
     )
 
     public_reviews = Review.objects.filter(
@@ -97,6 +98,10 @@ def product_detail(request, id):
         'products/product_detail.html',
         {
             'seed': seed,
+            'related_products': SeedVariety.objects.filter(
+                is_active=True,
+                crop=seed.crop
+            ).exclude(id=seed.id).order_by('display_order', 'name')[:3],
             'reviews': public_reviews,
             'form': form,
             'cart': cart,

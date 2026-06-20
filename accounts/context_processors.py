@@ -30,28 +30,30 @@ def current_account(request):
     doctor_id = request.session.get('doctor_id')
     consultant_id = request.session.get('consultant_id')
     admin_id = request.session.get('admin_id')
+    session_role = request.session.get('user_role')
 
-    if admin_id or (
-        request.user.is_authenticated
-        and (request.user.is_staff or request.user.is_superuser)
-    ):
-        current_role = 'admin'
-        current_user_object = AdminProfile.objects.select_related('user').filter(user_id=admin_id).first()
-
-        if not current_user_object:
-            current_user_object = getattr(request.user, 'agritech_profile', None) or request.user
-
-    elif farmer_id:
+    if session_role == 'farmer' and farmer_id:
         current_role = 'farmer'
         current_user_object = Farmer.objects.filter(id=farmer_id).first()
 
-    elif doctor_id:
+    elif session_role == 'doctor' and doctor_id:
         current_role = 'doctor'
         current_user_object = Doctor.objects.filter(id=doctor_id).first()
 
-    elif consultant_id:
+    elif session_role == 'consultant' and consultant_id:
         current_role = 'consultant'
         current_user_object = Consultant.objects.filter(id=consultant_id).first()
+
+    elif session_role == 'admin' and admin_id:
+        current_role = 'admin'
+        current_user_object = AdminProfile.objects.select_related('user').filter(user_id=admin_id).first()
+
+        if not current_user_object and request.user.is_authenticated and (request.user.is_staff or request.user.is_superuser):
+            current_user_object = getattr(request.user, 'agritech_profile', None) or request.user
+
+    elif request.user.is_authenticated and (request.user.is_staff or request.user.is_superuser):
+        current_role = 'admin'
+        current_user_object = getattr(request.user, 'agritech_profile', None) or request.user
 
     return {
         'current_role': current_role,

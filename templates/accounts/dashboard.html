@@ -1,195 +1,434 @@
 {% extends 'base.html' %}
 
 {% block content %}
+<div class="farmer-shell">
+    <div class="container py-4 py-lg-5">
+        <section class="farmer-hero mb-4">
+            <div>
+                <span class="hero-kicker">Farmer Portal</span>
+                <h1>Welcome back, <span>{{ farmer.name }}</span></h1>
+                <p>Track orders, book expert help, and manage your farm services from one clean workspace.</p>
+                <div class="d-flex flex-wrap gap-2">
+                    <a href="{% url 'products' %}" class="btn btn-light btn-lg">Browse Products</a>
+                    <a href="{% url 'consultation' %}" class="btn btn-outline-light btn-lg">Book Consultation</a>
+                </div>
+            </div>
+            <div class="profile-summary">
+                {% if farmer.profile_picture %}
+                    <img src="{{ farmer.profile_picture.url }}" alt="{{ farmer.name }}" class="profile-photo">
+                {% else %}
+                    <div class="profile-photo profile-fallback"><i class="bi bi-person"></i></div>
+                {% endif %}
+                <div class="profile-copy">
+                    <h2>{{ farmer.name }}</h2>
+                    <p>{{ farmer.email }}</p>
+                    <p>{{ farmer.phone }}</p>
+                </div>
+            </div>
+        </section>
 
-<div class="container py-5">
+        <section class="stats-grid mb-4">
+            <div class="metric-card">
+                <span><i class="bi bi-receipt"></i></span>
+                <div>
+                    <p>Total Orders</p>
+                    <h3>{{ total_orders }}</h3>
+                </div>
+            </div>
+            <div class="metric-card">
+                <span><i class="bi bi-truck"></i></span>
+                <div>
+                    <p>Active Orders</p>
+                    <h3>{{ active_orders }}</h3>
+                </div>
+            </div>
+            <div class="metric-card">
+                <span><i class="bi bi-bag-check"></i></span>
+                <div>
+                    <p>Products Purchased</p>
+                    <h3>{{ products_purchased }}</h3>
+                </div>
+            </div>
+            <div class="metric-card">
+                <span><i class="bi bi-chat-dots"></i></span>
+                <div>
+                    <p>Consultations</p>
+                    <h3>{{ consultations }}</h3>
+                </div>
+            </div>
+            <div class="metric-card">
+                <span><i class="bi bi-tools"></i></span>
+                <div>
+                    <p>Machinery Bookings</p>
+                    <h3>{{ bookings }}</h3>
+                </div>
+            </div>
+        </section>
 
-    <h1 class="text-center mb-4">
-        Welcome {{ farmer.name }}
-    </h1>
-
-    <hr>
-
-    <div class="row mb-5">
-
-        <div class="col-md-3">
-            <div class="card text-center p-3 shadow">
-                <h3>{{ consultations }}</h3>
-                <p>Consultations</p>
+        <div class="row g-4">
+            <div class="col-lg-8">
+                <section class="portal-panel h-100">
+                    <div class="panel-heading">
+                        <div>
+                            <span class="section-kicker">Quick Actions</span>
+                            <h2>What would you like to do?</h2>
+                        </div>
+                    </div>
+                    <div class="action-grid">
+                        <a href="{% url 'products' %}" class="action-card">
+                            <i class="bi bi-basket"></i>
+                            <strong>Buy Farm Inputs</strong>
+                            <span>Seeds, fertilizers, and crop essentials.</span>
+                        </a>
+                        <a href="{% url 'my_orders' %}" class="action-card">
+                            <i class="bi bi-box-seam"></i>
+                            <strong>Track Orders</strong>
+                            <span>Review order status and history.</span>
+                        </a>
+                        <a href="{% url 'tractor_booking' %}" class="action-card">
+                            <i class="bi bi-truck-front"></i>
+                            <strong>Book Machinery</strong>
+                            <span>Reserve equipment for field work.</span>
+                        </a>
+                        <a href="{% url 'services' %}" class="action-card">
+                            <i class="bi bi-clipboard2-pulse"></i>
+                            <strong>Request Service</strong>
+                            <span>Get support for farm operations.</span>
+                        </a>
+                        <a href="{% url 'farmer_support' %}" class="action-card">
+                            <i class="bi bi-flower1"></i>
+                            <strong>Crop Problem</strong>
+                            <span>Report disease or crop health issues.</span>
+                        </a>
+                        <a href="{% url 'edit_profile' %}" class="action-card">
+                            <i class="bi bi-person-gear"></i>
+                            <strong>Profile Settings</strong>
+                            <span>Update contact and profile details.</span>
+                        </a>
+                    </div>
+                </section>
+            </div>
+            <div class="col-lg-4">
+                <section class="portal-panel h-100">
+                    <span class="section-kicker">Recent Activity</span>
+                    <h2 class="mb-3">Latest updates</h2>
+                    <div class="activity-list">
+                        {% for item in recent_activity %}
+                            <div class="activity-item">
+                                <div class="activity-icon"><i class="bi {{ item.icon }}"></i></div>
+                                <div>
+                                    <strong>{{ item.label }}</strong>
+                                    <span>{{ item.detail }} • {{ item.date|date:'M d, Y' }}</span>
+                                </div>
+                            </div>
+                        {% empty %}
+                            <div class="empty-state">
+                                <i class="bi bi-calendar2-check"></i>
+                                <p>No recent activity yet.</p>
+                                <a href="{% url 'products' %}" class="btn btn-success btn-sm">Start Shopping</a>
+                            </div>
+                        {% endfor %}
+                    </div>
+                </section>
             </div>
         </div>
 
-        <div class="col-md-3">
-            <div class="card text-center p-3 shadow">
-                <h3>{{ bookings }}</h3>
-                <p>Machinery</p>
+        <section class="portal-panel mt-4">
+            <span class="section-kicker">Managed Content</span>
+            <h2 class="mb-3">Available farm support</h2>
+            <div class="managed-grid">
+                {% for service in featured_services %}
+                    <a href="{% url 'service_info' service.slug %}" class="managed-card">
+                        <i class="bi bi-tools"></i>
+                        <strong>{{ service.title }}</strong>
+                        <span>{{ service.short_description }}</span>
+                    </a>
+                {% endfor %}
+                {% for topic in featured_consultations %}
+                    <a href="{% url 'consultation_detail' topic.slug %}" class="managed-card">
+                        <i class="{{ topic.icon }}"></i>
+                        <strong>{{ topic.title }}</strong>
+                        <span>{{ topic.short_summary }}</span>
+                    </a>
+                {% endfor %}
+                {% for guide in featured_problem_guides %}
+                    <a href="{% url 'crop_problem_detail' guide.slug %}" class="managed-card">
+                        <i class="{{ guide.icon }}"></i>
+                        <strong>{{ guide.title }}</strong>
+                        <span>{{ guide.short_summary }}</span>
+                    </a>
+                {% endfor %}
+                {% for product in featured_products %}
+                    <a href="{% url 'product_detail' product.id %}" class="managed-card">
+                        <i class="bi bi-basket"></i>
+                        <strong>{{ product.name }}</strong>
+                        <span>{{ product.crop }} | Rs {{ product.price }}</span>
+                    </a>
+                {% endfor %}
             </div>
-        </div>
-
-        <div class="col-md-3">
-            <div class="card text-center p-3 shadow">
-                <h3>{{ services }}</h3>
-                <p>Service Requests</p>
-            </div>
-        </div>
-
-        <div class="col-md-3">
-            <div class="card text-center p-3 shadow">
-                <h3>{{ problems }}</h3>
-                <p>Crop Problems</p>
-            </div>
-        </div>
-
+        </section>
     </div>
-
-    <div class="row g-4">
-
-        <!-- Consultation -->
-
-        <div class="col-md-6">
-
-            <div class="card shadow h-100">
-
-                <div class="card-body text-center">
-
-                    <h3>🌾 Consultation</h3>
-
-                    <p>
-                        Get expert farming advice and crop guidance.
-                    </p>
-
-                    <a href="/consultation/"
-                       class="btn btn-primary mb-2">
-
-                        Book Consultation
-
-                    </a>
-
-                    <br>
-
-                    <a href="/consultation/my-consultations/"
-                       class="btn btn-outline-primary">
-
-                        My Consultations
-
-                    </a>
-
-                </div>
-
-            </div>
-
-        </div>
-
-        <!-- Machinery Booking -->
-
-        <div class="col-md-6">
-
-            <div class="card shadow h-100">
-
-                <div class="card-body text-center">
-
-                    <h3>🚜 Machinery Booking</h3>
-
-                    <p>
-                       ook tractors, harvesters, rotavators and other agricultural machinery.
-                    </p>
-
-                    <a href="/tractor-booking/"
-                       class="btn btn-warning mb-2">
-
-                        Book Machinery
-
-                    </a>
-
-                    <br>
-
-                    <a href="/tractor-booking/my-bookings/"
-                       class="btn btn-outline-warning">
-
-                        My Machinery Bookings
-
-                    </a>
-
-                </div>
-
-            </div>
-
-        </div>
-
-        <!-- Services -->
-
-        <div class="col-md-6">
-
-            <div class="card shadow h-100">
-
-                <div class="card-body text-center">
-
-                    <h3>🛠 Services</h3>
-
-                    <p>
-                        Request farming services and assistance.
-                    </p>
-
-                    <a href="/services/"
-                       class="btn btn-success mb-2">
-
-                        Request Service
-
-                    </a>
-
-                    <br>
-
-                    <a href="/services/my-requests/"
-                       class="btn btn-outline-success">
-
-                        My Service Requests
-
-                    </a>
-
-                </div>
-
-            </div>
-
-        </div>
-
-        <!-- Crop Problems -->
-
-        <div class="col-md-6">
-
-            <div class="card shadow h-100">
-
-                <div class="card-body text-center">
-
-                    <h3>🌱 Crop Problems</h3>
-
-                    <p>
-                        Submit crop disease and farming issues.
-                    </p>
-
-                    <a href="/farmer-support/"
-                       class="btn btn-danger mb-2">
-
-                        Report Problem
-
-                    </a>
-
-                    <br>
-
-                    <a href="/farmer-support/my-problems/"
-                       class="btn btn-outline-danger">
-
-                        My Crop Problems
-
-                    </a>
-
-                </div>
-
-            </div>
-
-        </div>
-
-    </div>
-
 </div>
 
+<style>
+.farmer-shell {
+    background:
+        radial-gradient(circle at top left, rgba(25, 135, 84, .08), transparent 32rem),
+        #f6f8f3;
+    min-height: calc(100vh - 76px);
+}
+.farmer-hero {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(260px, 340px);
+    gap: 1.5rem;
+    align-items: center;
+    color: #fff;
+    background: linear-gradient(135deg, #17633a 0%, #0f3d2e 62%, #244b34 100%);
+    border-radius: 8px;
+    padding: clamp(1.5rem, 4vw, 2.5rem);
+    box-shadow: 0 22px 55px rgba(15, 61, 46, .2);
+    overflow: hidden;
+}
+.farmer-hero h1 {
+    max-width: 760px;
+    font-size: clamp(2rem, 4vw, 3rem);
+    line-height: 1.05;
+    font-weight: 800;
+    margin: .35rem 0 .75rem;
+}
+.farmer-hero h1 span {
+    overflow-wrap: anywhere;
+}
+.farmer-hero p {
+    color: rgba(255,255,255,.82);
+    max-width: 650px;
+}
+.hero-kicker,
+.section-kicker {
+    display: block;
+    font-size: .78rem;
+    font-weight: 800;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+}
+.profile-summary,
+.portal-panel,
+.metric-card,
+.action-card {
+    border: 1px solid rgba(15, 61, 46, .1);
+    border-radius: 8px;
+    background: #fff;
+}
+.profile-summary {
+    display: flex;
+    gap: .9rem;
+    align-items: center;
+    color: #163528;
+    min-width: 0;
+    padding: .95rem;
+    box-shadow: 0 18px 38px rgba(15, 61, 46, .15);
+}
+.profile-copy {
+    min-width: 0;
+}
+.profile-summary h2 {
+    margin: 0 0 .25rem;
+    font-size: 1.1rem;
+    font-weight: 850;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+.profile-summary p {
+    margin: 0;
+    color: #5b6d64;
+    max-width: 210px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+.profile-photo {
+    flex: 0 0 auto;
+    width: 74px;
+    height: 74px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+.profile-fallback {
+    display: grid;
+    place-items: center;
+    background: #e4f4ea;
+    color: #17633a;
+    font-size: 2rem;
+}
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    gap: 1rem;
+}
+.metric-card {
+    display: flex;
+    gap: .85rem;
+    align-items: center;
+    padding: 1rem;
+    box-shadow: 0 12px 30px rgba(15, 61, 46, .08);
+    transition: transform .2s ease, box-shadow .2s ease, border-color .2s ease;
+}
+.metric-card:hover {
+    border-color: rgba(25, 135, 84, .24);
+    transform: translateY(-3px);
+    box-shadow: 0 18px 36px rgba(15, 61, 46, .12);
+}
+.metric-card span {
+    width: 44px;
+    height: 44px;
+    display: grid;
+    place-items: center;
+    border-radius: 8px;
+    background: #e4f4ea;
+    color: #17633a;
+    font-size: 1.25rem;
+}
+.metric-card p {
+    margin: 0;
+    color: #66766f;
+    font-size: .9rem;
+}
+.metric-card h3 {
+    margin: 0;
+    font-weight: 800;
+}
+.portal-panel {
+    padding: 1.25rem;
+    box-shadow: 0 12px 30px rgba(15, 61, 46, .08);
+    min-width: 0;
+}
+.portal-panel h2 {
+    font-size: 1.35rem;
+    font-weight: 800;
+}
+.action-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1rem;
+}
+.managed-grid {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 1rem;
+}
+.action-card {
+    display: grid;
+    gap: .35rem;
+    padding: 1rem;
+    color: #163528;
+    text-decoration: none;
+    min-width: 0;
+    transition: transform .2s ease, box-shadow .2s ease, border-color .2s ease;
+}
+.managed-card {
+    display: grid;
+    gap: .35rem;
+    color: #163528;
+    text-decoration: none;
+    border: 1px solid #e4ece6;
+    border-radius: 8px;
+    padding: 1rem;
+    background: #fbfdfb;
+    min-width: 0;
+    transition: transform .2s ease, box-shadow .2s ease, border-color .2s ease;
+}
+.action-card:hover {
+    color: #0f5132;
+    border-color: rgba(25, 135, 84, .24);
+    transform: translateY(-3px);
+    box-shadow: 0 14px 26px rgba(15, 61, 46, .12);
+}
+.managed-card:hover {
+    color: #0f5132;
+    border-color: rgba(25, 135, 84, .24);
+    transform: translateY(-3px);
+    box-shadow: 0 14px 26px rgba(15, 61, 46, .12);
+}
+.action-card strong,
+.action-card span,
+.managed-card strong,
+.managed-card span,
+.activity-item strong,
+.activity-item span {
+    overflow-wrap: anywhere;
+}
+.action-card i {
+    color: #17633a;
+    font-size: 1.5rem;
+}
+.managed-card i {
+    color: #17633a;
+    font-size: 1.45rem;
+}
+.managed-card span {
+    color: #69786f;
+}
+.action-card span {
+    color: #69786f;
+}
+.activity-list {
+    display: grid;
+    gap: .85rem;
+}
+.activity-item {
+    display: flex;
+    gap: .75rem;
+    align-items: center;
+    padding-bottom: .85rem;
+    border-bottom: 1px solid #edf2ee;
+}
+.activity-item span {
+    display: block;
+    color: #69786f;
+    font-size: .9rem;
+}
+.activity-icon {
+    width: 40px;
+    height: 40px;
+    display: grid;
+    place-items: center;
+    border-radius: 8px;
+    background: #f0f7e8;
+    color: #17633a;
+}
+.empty-state {
+    text-align: center;
+    color: #69786f;
+    padding: 2rem 1rem;
+}
+.empty-state i {
+    font-size: 2rem;
+    color: #17633a;
+}
+@media (max-width: 991.98px) {
+    .farmer-hero,
+    .stats-grid {
+        grid-template-columns: 1fr;
+    }
+    .managed-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+@media (max-width: 575.98px) {
+    .action-grid {
+        grid-template-columns: 1fr;
+    }
+    .managed-grid {
+        grid-template-columns: 1fr;
+    }
+    .profile-summary {
+        align-items: center;
+        width: 100%;
+    }
+    .profile-summary p {
+        max-width: 100%;
+    }
+}
+</style>
 {% endblock %}

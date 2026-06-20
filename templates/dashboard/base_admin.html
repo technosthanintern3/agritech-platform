@@ -180,6 +180,28 @@ body{
     <i class="bi bi-gear-fill"></i>
     Site Settings
 </a>
+<a href="{% url 'admins_management' %}">
+    <i class="bi bi-shield-lock"></i>
+    Admin Management
+</a>
+<a href="{% url 'roles_management' %}">
+    <i class="bi bi-person-gear"></i>
+    Role Management
+</a>
+{% if request.user.is_superuser or request.user.agritech_profile.is_super_admin %}
+<a href="{% url 'access_code_management' %}">
+    <i class="bi bi-key-fill"></i>
+    Access Code Management
+</a>
+{% endif %}
+<a href="{% url 'registration_fields' %}">
+    <i class="bi bi-input-cursor-text"></i>
+    Registration Fields
+</a>
+<a href="{% url 'content_management' %}">
+    <i class="bi bi-grid-1x2-fill"></i>
+    Content Management
+</a>
 <a href="{% url 'why_choose_list' %}">
     <i class="bi bi-award"></i>
     Why Choose Us
@@ -208,10 +230,6 @@ body{
     <i class="bi bi-people-fill"></i> Farmers
 </a>
 
-<a href="{% url 'products_list' %}">
-    <i class="bi bi-box-seam"></i> Products
-</a>
-
 <a href="{% url 'product_reviews_management' %}">
     <i class="bi bi-star-half"></i> Product Reviews Management
 </a>
@@ -230,18 +248,6 @@ body{
 
 <a href="{% url 'orders_list' %}">
     <i class="bi bi-cart-check"></i> Orders
-</a>
-
-<a href="{% url 'services_list' %}">
-    <i class="bi bi-tools"></i> Services
-</a>
-
-<a href="{% url 'consultations_list' %}">
-    <i class="bi bi-chat-dots"></i> Consultations
-</a>
-
-<a href="{% url 'crop_problems_list' %}">
-    <i class="bi bi-bug"></i> Crop Problems
 </a>
 
 <a href="{% url 'admin_logout' %}">
@@ -295,6 +301,7 @@ body{
                         <div class="small text-muted">Admin Profile</div>
                         <div class="fw-semibold">{{ current_user_name|default:'Admin' }}</div>
                     </li>
+                    <li><a class="dropdown-item" href="{% url 'admin_profile' %}"><i class="bi bi-person-badge me-2"></i>My Profile</a></li>
                     <li><a class="dropdown-item" href="{% url 'admin_dashboard' %}"><i class="bi bi-speedometer2 me-2"></i>Dashboard</a></li>
                     <li><a class="dropdown-item" href="/"><i class="bi bi-house me-2"></i>Website/Home</a></li>
                     <li><hr class="dropdown-divider"></li>
@@ -303,6 +310,17 @@ body{
             </div>
         </div>
     </div>
+
+    {% if messages %}
+        <div class="mb-3">
+            {% for message in messages %}
+                <div class="alert alert-{{ message.tags|default:'info' }} alert-dismissible fade show" role="alert">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
 
     {% block content %}{% endblock %}
 

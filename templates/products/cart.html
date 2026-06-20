@@ -1,89 +1,209 @@
 {% extends 'base.html' %}
 
 {% block content %}
+<div class="cart-page">
+    <div class="container py-4 py-lg-5">
+        <div class="cart-header mb-4">
+            <div>
+                <span>Checkout Basket</span>
+                <h1>Shopping Cart</h1>
+                <p>Review selected farm inputs before placing your order.</p>
+            </div>
+            <a href="{% url 'products' %}" class="btn btn-outline-success">Continue Shopping</a>
+        </div>
 
-<div class="container py-5">
-
-    <h1 class="mb-4">
-        🛒 Shopping Cart
-    </h1>
-
-    {% if items %}
-
-    <table class="table table-bordered">
-
-        <thead class="table-success">
-
-            <tr>
-
-                <th>Product</th>
-                <th>Price</th>
-                <th>Quantity</th>
-                <th>Total</th>
-                <th>Action</th>
-
-            </tr>
-
-        </thead>
-
-        <tbody>
-
-            {% for item in items %}
-
-            <tr>
-
-                <td>{{ item.seed.name }}</td>
-
-                <td>₹ {{ item.seed.price }}</td>
-
-                <td>{{ item.quantity }}</td>
-
-                <td>₹ {{ item.subtotal }}</td>
-
-                <td>
-
-                    <a
-                        href="{% url 'remove_from_cart' item.seed.id %}"
-                        class="btn btn-danger btn-sm">
-
-                        Remove
-
-                    </a>
-
-                </td>
-
-            </tr>
-
-            {% endfor %}
-
-        </tbody>
-
-    </table>
-
-    <h3 class="text-success">
-
-        Grand Total:
-        ₹ {{ total }}
-
-    </h3>
-    <a
-        href="{% url 'checkout' %}"
-        class="btn btn-success btn-lg">
-
-        Proceed To Checkout
-
-    </a>
-
-    {% else %}
-
-    <div class="alert alert-warning">
-
-        Your cart is empty.
-
+        {% if items %}
+            <div class="row g-4">
+                <div class="col-lg-8">
+                    <div class="cart-list">
+                        {% for item in items %}
+                            <div class="cart-item">
+                                <div class="cart-thumb">
+                                    {% if item.seed.image %}
+                                        <img src="{{ item.seed.image.url }}" alt="{{ item.seed.name }}">
+                                    {% else %}
+                                        <i class="bi bi-basket"></i>
+                                    {% endif %}
+                                </div>
+                                <div class="cart-info">
+                                    <h2>{{ item.seed.name }}</h2>
+                                    <p>{{ item.seed.crop }} • {{ item.seed.season }}</p>
+                                </div>
+                                <div class="cart-qty">
+                                    <span>Qty</span>
+                                    <strong>{{ item.quantity }}</strong>
+                                </div>
+                                <div class="cart-price">
+                                    <span>Subtotal</span>
+                                    <strong>Rs {{ item.subtotal }}</strong>
+                                </div>
+                                <a href="{% url 'remove_from_cart' item.seed.id %}" class="btn btn-outline-danger btn-sm">
+                                    <i class="bi bi-trash me-1"></i> Remove
+                                </a>
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+                <div class="col-lg-4">
+                    <aside class="cart-summary">
+                        <h2>Order Summary</h2>
+                        <div class="summary-row">
+                            <span>Items</span>
+                            <strong>{{ items|length }}</strong>
+                        </div>
+                        <div class="summary-row total">
+                            <span>Grand Total</span>
+                            <strong>Rs {{ total }}</strong>
+                        </div>
+                        <a href="{% url 'checkout' %}" class="btn btn-success btn-lg w-100">
+                            Proceed To Checkout
+                        </a>
+                    </aside>
+                </div>
+            </div>
+        {% else %}
+            <div class="empty-cart">
+                <i class="bi bi-cart3"></i>
+                <h2>Your cart is empty</h2>
+                <p>Add seeds or farm inputs to build your order.</p>
+                <a href="{% url 'products' %}" class="btn btn-success">Browse Products</a>
+            </div>
+        {% endif %}
     </div>
-
-    {% endif %}
-
 </div>
 
+<style>
+.cart-page {
+    background:
+        radial-gradient(circle at top left, rgba(25, 135, 84, .07), transparent 28rem),
+        #f6f8f3;
+    min-height: calc(100vh - 76px);
+}
+.cart-header {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+    align-items: end;
+}
+.cart-header span {
+    color: #17633a;
+    font-weight: 800;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    font-size: .78rem;
+}
+.cart-header h1,
+.cart-summary h2,
+.empty-cart h2 {
+    font-weight: 850;
+}
+.cart-header p {
+    color: #607168;
+    margin: 0;
+}
+.cart-list {
+    display: grid;
+    gap: 1rem;
+}
+.cart-item,
+.cart-summary,
+.empty-cart {
+    background: #fff;
+    border: 1px solid rgba(15, 61, 46, .1);
+    border-radius: 8px;
+    box-shadow: 0 12px 30px rgba(15, 61, 46, .08);
+}
+.cart-item {
+    display: grid;
+    grid-template-columns: 92px minmax(0, 1fr) 72px 120px auto;
+    gap: 1rem;
+    align-items: center;
+    padding: 1rem;
+    transition: transform .2s ease, box-shadow .2s ease, border-color .2s ease;
+}
+.cart-item:hover {
+    border-color: rgba(25, 135, 84, .22);
+    transform: translateY(-3px);
+    box-shadow: 0 18px 36px rgba(15, 61, 46, .12);
+}
+.cart-thumb {
+    width: 92px;
+    aspect-ratio: 1;
+    border-radius: 8px;
+    overflow: hidden;
+    display: grid;
+    place-items: center;
+    background: #e8efe7;
+    color: #17633a;
+    font-size: 1.75rem;
+}
+.cart-thumb img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+.cart-info h2 {
+    font-size: 1.1rem;
+    margin: 0;
+    font-weight: 800;
+    overflow-wrap: anywhere;
+}
+.cart-info p,
+.cart-qty span,
+.cart-price span {
+    color: #68786f;
+    margin: 0;
+}
+.cart-qty,
+.cart-price {
+    display: grid;
+    gap: .15rem;
+}
+.cart-summary {
+    padding: 1.25rem;
+    position: sticky;
+    top: 92px;
+}
+.summary-row {
+    display: flex;
+    justify-content: space-between;
+    padding: .85rem 0;
+    border-bottom: 1px solid #edf2ee;
+}
+.summary-row.total {
+    font-size: 1.2rem;
+    border-bottom: 0;
+    margin-bottom: .75rem;
+}
+.summary-row.total strong {
+    color: #17633a;
+}
+.empty-cart {
+    text-align: center;
+    padding: 3rem 1rem;
+}
+.empty-cart i {
+    color: #17633a;
+    font-size: 2.4rem;
+}
+@media (max-width: 767.98px) {
+    .cart-header,
+    .cart-item {
+        display: grid;
+    }
+    .cart-item {
+        grid-template-columns: 78px 1fr;
+    }
+    .cart-qty,
+    .cart-price {
+        grid-column: 2;
+    }
+    .cart-item .btn {
+        grid-column: 1 / -1;
+    }
+    .cart-summary {
+        position: static;
+    }
+}
+</style>
 {% endblock %}

@@ -1,158 +1,255 @@
 {% extends 'base.html' %}
 
 {% block content %}
-
-<div class="container py-5">
-
-<h1 class="text-center mb-4">
-    🌾 Our Seed Varieties
-</h1>
-
-<form method="GET" class="mb-5">
-
-    <div class="input-group">
-
-        <input
-            type="text"
-            name="q"
-            class="form-control"
-            placeholder="Search by seed, crop, season, soil..."
-            value="{{ request.GET.q }}">
-
-        <button
-            class="btn btn-success"
-            type="submit">
-
-            Search
-
-        </button>
-
-    </div>
-
-</form>
-
-<div class="row">
-
-    {% for seed in seeds %}
-
-    <div class="col-md-4 mb-4">
-
-        <div class="card h-100 shadow product-card">
-
-            <img
-                src="{{ seed.image.url }}"
-                class="card-img-top"
-                height="250">
-
-            <div class="card-body">
-
-                <h4>
-
-                    <a
-                        href="{% url 'product_detail' seed.id %}"
-                        class="text-decoration-none">
-
-                        {{ seed.name }}
-
-                    </a>
-
-                </h4>
-
-                <span class="badge bg-success">
-                    {{ seed.crop }}
-                </span>
-
-                <span class="badge bg-primary">
-                    {{ seed.season }}
-                </span>
-
-                <p class="mt-3">
-
-                    <strong>Soil:</strong>
-
-                    {{ seed.soil_type }}
-
-                </p>
-
-                <p>
-
-                    <strong>Water:</strong>
-
-                    {{ seed.water_requirement }}
-
-                </p>
-
-                <h5 class="text-success">
-
-                    ₹ {{ seed.price }}
-
-                </h5>
-
-               <div class="mt-3">
-
-            <a
-                href="{% url 'product_detail' seed.id %}"
-                class="btn btn-outline-success">
-
-                View Details
-
-            </a>
-
-{% if seed.id|stringformat:"s" in cart_ids %}
-
-            <button
-                class="btn btn-secondary"
-                disabled>
-
-                ✅ Added To Cart
-
-            </button>
-
-            <a
-               href="{% url 'cart' %}"
-               class="btn btn-success">
-
-               🛒 View Cart
-
-            </a>
-
-    {% else %}
-
-            <a
-               href="{% url 'add_to_cart' seed.id %}"
-               class="btn btn-success">
-
-               🛒 Add To Cart
-
-        </a>
-
-    {% endif %}
-
-</div>
-
+<div class="farmer-market">
+    <div class="container py-4 py-lg-5">
+        <div class="market-header mb-4">
+            <div>
+                <span>Farm Input Store</span>
+                <h1>Seed Varieties</h1>
+                <p>Find crop-ready seed varieties by name, crop, season, or soil type.</p>
             </div>
-
+            <a href="{% url 'cart' %}" class="btn btn-success">
+                <i class="bi bi-cart3 me-1"></i> View Cart
+            </a>
         </div>
 
-    </div>
+        <form method="GET" class="search-panel mb-4">
+            <div class="input-group input-group-lg">
+                <span class="input-group-text bg-white"><i class="bi bi-search"></i></span>
+                <input type="text" name="q" class="form-control" placeholder="Search seed, crop, season, soil..." value="{{ request.GET.q }}">
+                <button class="btn btn-success" type="submit">Search</button>
+            </div>
+            {% if request.GET.q %}
+                <a href="{% url 'products' %}" class="btn btn-outline-secondary">Clear</a>
+            {% endif %}
+        </form>
 
-    {% empty %}
+        <div class="product-grid">
+            {% for seed in seeds %}
+                <article class="product-card">
+                    <a href="{% url 'product_detail' seed.id %}" class="product-image">
+                        {% if seed.image %}
+                            <img src="{{ seed.image.url }}" alt="{{ seed.name }}">
+                        {% else %}
+                            <span class="product-image-fallback"><i class="bi bi-basket2"></i></span>
+                        {% endif %}
+                        <span class="product-badge">{{ seed.crop }}</span>
+                    </a>
+                    <div class="product-body">
+                        <div class="d-flex justify-content-between gap-3 align-items-start">
+                            <div>
+                                <h2><a href="{% url 'product_detail' seed.id %}">{{ seed.name }}</a></h2>
+                                <div class="product-meta">
+                                    <span><i class="bi bi-calendar3"></i> {{ seed.season }}</span>
+                                    <span><i class="bi bi-moisture"></i> {{ seed.water_requirement }}</span>
+                                </div>
+                            </div>
+                            <div class="product-price">Rs {{ seed.price }}</div>
+                        </div>
 
-    <div class="col-12">
+                        <p class="soil-line"><strong>Soil:</strong> {{ seed.soil_type }}</p>
 
-        <div class="alert alert-warning text-center">
-
-            No products found.
-
+                        <div class="product-actions">
+                            <a href="{% url 'product_detail' seed.id %}" class="btn btn-outline-success">Details</a>
+                            {% if seed.id|stringformat:"s" in cart_ids %}
+                                <button class="btn btn-secondary" disabled>Added</button>
+                                <a href="{% url 'cart' %}" class="btn btn-success">Cart</a>
+                            {% else %}
+                                <a href="{% url 'add_to_cart' seed.id %}" class="btn btn-success">
+                                    <i class="bi bi-cart-plus me-1"></i> Add
+                                </a>
+                            {% endif %}
+                        </div>
+                    </div>
+                </article>
+            {% empty %}
+                <div class="empty-market">
+                    <i class="bi bi-search"></i>
+                    <h2>No products found</h2>
+                    <p>Try a different crop, season, or soil keyword.</p>
+                    <a href="{% url 'products' %}" class="btn btn-success">Reset Search</a>
+                </div>
+            {% endfor %}
         </div>
-
     </div>
-
-    {% endfor %}
-
 </div>
 
-
-</div>
-
+<style>
+.farmer-market {
+    background:
+        radial-gradient(circle at top right, rgba(25, 135, 84, .07), transparent 28rem),
+        #f6f8f3;
+    min-height: calc(100vh - 76px);
+}
+.market-header {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+    align-items: end;
+}
+.market-header span {
+    color: #17633a;
+    font-weight: 800;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    font-size: .78rem;
+}
+.market-header h1 {
+    font-weight: 850;
+    margin: .25rem 0;
+}
+.market-header p {
+    color: #607168;
+    margin: 0;
+}
+.search-panel {
+    display: flex;
+    gap: .75rem;
+    padding: 1rem;
+    background: #fff;
+    border: 1px solid rgba(15, 61, 46, .1);
+    border-radius: 8px;
+    box-shadow: 0 12px 30px rgba(15, 61, 46, .07);
+}
+.search-panel .form-control,
+.search-panel .input-group-text,
+.search-panel .btn {
+    border-color: #d7e3da;
+}
+.search-panel .form-control:focus {
+    border-color: #198754;
+    box-shadow: 0 0 0 .2rem rgba(25, 135, 84, .12);
+}
+.product-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 1.25rem;
+}
+.product-card {
+    background: #fff;
+    border: 1px solid rgba(15, 61, 46, .1);
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 12px 30px rgba(15, 61, 46, .08);
+    transition: transform .2s ease, box-shadow .2s ease, border-color .2s ease;
+}
+.product-card:hover {
+    border-color: rgba(25, 135, 84, .22);
+    transform: translateY(-4px);
+    box-shadow: 0 20px 38px rgba(15, 61, 46, .14);
+}
+.product-image {
+    display: block;
+    position: relative;
+    aspect-ratio: 4 / 3;
+    background: #e8efe7;
+    overflow: hidden;
+}
+.product-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform .35s ease;
+}
+.product-card:hover .product-image img {
+    transform: scale(1.04);
+}
+.product-image-fallback {
+    width: 100%;
+    height: 100%;
+    display: grid;
+    place-items: center;
+    color: #17633a;
+    font-size: 2.5rem;
+}
+.product-badge {
+    position: absolute;
+    left: .85rem;
+    top: .85rem;
+    background: rgba(15, 61, 46, .92);
+    color: #fff;
+    border-radius: 999px;
+    padding: .3rem .65rem;
+    font-size: .8rem;
+    max-width: calc(100% - 1.7rem);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+.product-body {
+    padding: 1rem;
+}
+.product-body h2 {
+    font-size: 1.15rem;
+    font-weight: 800;
+    margin: 0;
+}
+.product-body h2 a {
+    color: #163528;
+    text-decoration: none;
+    overflow-wrap: anywhere;
+}
+.product-price {
+    white-space: nowrap;
+    color: #17633a;
+    font-weight: 850;
+}
+.product-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: .5rem;
+    margin-top: .45rem;
+    color: #68786f;
+    font-size: .9rem;
+}
+.soil-line {
+    color: #596960;
+    margin: 1rem 0;
+    overflow-wrap: anywhere;
+}
+.product-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: .5rem;
+}
+.product-actions .btn {
+    min-width: 88px;
+}
+.empty-market {
+    grid-column: 1 / -1;
+    text-align: center;
+    background: #fff;
+    border: 1px solid rgba(15, 61, 46, .1);
+    border-radius: 8px;
+    padding: 3rem 1rem;
+}
+.empty-market i {
+    color: #17633a;
+    font-size: 2rem;
+}
+@media (max-width: 991.98px) {
+    .product-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+@media (max-width: 575.98px) {
+    .market-header,
+    .search-panel {
+        display: grid;
+    }
+    .product-grid {
+        grid-template-columns: 1fr;
+    }
+    .search-panel .input-group {
+        display: grid;
+        grid-template-columns: auto 1fr;
+    }
+    .search-panel .input-group .btn {
+        grid-column: 1 / -1;
+        border-radius: 8px !important;
+        margin-top: .5rem;
+    }
+}
+</style>
 {% endblock %}

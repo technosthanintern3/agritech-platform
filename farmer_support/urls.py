@@ -15,4 +15,10 @@ urlpatterns = [
         name='my_problems'
     ),
 
+    path(
+        '<slug:slug>/',
+        views.crop_problem_detail,
+        name='crop_problem_detail'
+    ),
+
 ]

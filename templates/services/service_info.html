@@ -1,86 +1,465 @@
 {% extends 'base.html' %}
 
 {% block content %}
+<div class="service-landing">
+    <section class="service-hero">
+        <div class="container">
+            <div class="service-hero-grid">
+                <div class="service-hero-copy">
+                    <span class="service-badge"><i class="bi bi-leaf me-1"></i> Farm Service</span>
+                    <h1>{{ service.title }}</h1>
+                    <p>{{ service.short_description|default:service.full_description }}</p>
+                    <div class="service-hero-actions">
+                        <a href="{% url 'services' %}#service-request" class="btn btn-light btn-lg">
+                            <i class="bi bi-calendar2-check me-1"></i> Book Service
+                        </a>
+                        <a href="{% url 'consultation' %}" class="btn btn-outline-light btn-lg">
+                            <i class="bi bi-person-video3 me-1"></i> Contact Consultant
+                        </a>
+                    </div>
+                </div>
+                <div class="service-hero-media">
+                    {% if service.hero_banner_image %}
+                        <img src="{{ service.hero_banner_image.url }}" alt="{{ service.title }}">
+                    {% elif service.image %}
+                        <img src="{{ service.image.url }}" alt="{{ service.title }}">
+                    {% else %}
+                        <div class="service-media-fallback"><i class="bi bi-clipboard2-pulse"></i></div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </section>
 
-<div class="container py-5">
+    <div class="container py-4 py-lg-5">
+        <div class="detail-layout">
+            <main class="detail-main">
+                <section class="detail-card">
+                    <span class="section-kicker">Overview</span>
+                    <h2>About This Service</h2>
+                    <p>{{ service.full_description }}</p>
+                </section>
 
-<div class="card shadow-lg border-0">
+                <section class="detail-card">
+                    <span class="section-kicker">Benefits</span>
+                    <h2>What Farmers Gain</h2>
+                    <div class="benefit-grid">
+                        {% for benefit in service.get_benefits_list %}
+                            <div class="benefit-item">
+                                <i class="bi bi-check2-circle"></i>
+                                <span>{{ benefit }}</span>
+                            </div>
+                        {% empty %}
+                            <div class="benefit-item">
+                                <i class="bi bi-check2-circle"></i>
+                                <span>Personalized guidance for better farm decisions.</span>
+                            </div>
+                            <div class="benefit-item">
+                                <i class="bi bi-check2-circle"></i>
+                                <span>Practical recommendations from agriculture experts.</span>
+                            </div>
+                        {% endfor %}
+                    </div>
+                </section>
 
-    {% if service.image %}
+                <section class="detail-card">
+                    <span class="section-kicker">Features</span>
+                    <h2>Included Support</h2>
+                    <div class="feature-grid">
+                        {% for feature in service.get_features_list %}
+                            <div class="mini-card">
+                                <i class="bi bi-lightbulb"></i>
+                                <p>{{ feature }}</p>
+                            </div>
+                        {% empty %}
+                            <div class="mini-card">
+                                <i class="bi bi-clipboard2-data"></i>
+                                <h3>Farm Assessment</h3>
+                                <p>Review crop, soil, issue details, and uploaded field images.</p>
+                            </div>
+                            <div class="mini-card">
+                                <i class="bi bi-lightbulb"></i>
+                                <h3>Action Plan</h3>
+                                <p>Receive clear next steps suited to your farm context.</p>
+                            </div>
+                            <div class="mini-card">
+                                <i class="bi bi-shield-check"></i>
+                                <h3>Follow-up Ready</h3>
+                                <p>Track service status from submission through completion.</p>
+                            </div>
+                        {% endfor %}
+                    </div>
+                </section>
 
-    <img
-        src="{{ service.image.url }}"
-        class="card-img-top"
-        style="height:400px; object-fit:cover;">
+                <section class="detail-card">
+                    <span class="section-kicker">Process</span>
+                    <h2>How It Works</h2>
+                    <div class="process-list">
+                        {% for step in service.get_process_steps_list %}
+                            <div><strong>{{ forloop.counter }}</strong><span>{{ step }}</span></div>
+                        {% empty %}
+                            <div><strong>1</strong><span>Submit the service request with your farm details.</span></div>
+                            <div><strong>2</strong><span>AgroSthan reviews the issue and assigns next action.</span></div>
+                            <div><strong>3</strong><span>You receive support updates through your farmer account.</span></div>
+                        {% endfor %}
+                    </div>
+                </section>
 
-    {% endif %}
+                <section class="detail-card">
+                    <span class="section-kicker">Requirements</span>
+                    <h2>Before You Book</h2>
+                    <ul class="requirements-list">
+                        {% for requirement in service.get_requirements_list %}
+                            <li>{{ requirement }}</li>
+                        {% empty %}
+                            <li>Keep crop name, location/address, and issue details ready.</li>
+                            <li>Upload a clear image when the request involves crop or field problems.</li>
+                            <li>Use an active phone number and email for service updates.</li>
+                        {% endfor %}
+                    </ul>
+                </section>
 
-    <div class="card-body p-5">
+                <section class="detail-card">
+                    <span class="section-kicker">FAQ</span>
+                    <h2>Common Questions</h2>
+                    <div class="faq-list">
+                        <details>
+                            <summary>How quickly will my request be reviewed?</summary>
+                            <p>Requests are listed for the AgroSthan team to review and update from the service workflow.</p>
+                        </details>
+                        <details>
+                            <summary>Can I attach a crop image?</summary>
+                            <p>Yes. The service request form supports image upload for clearer assessment.</p>
+                        </details>
+                        <details>
+                            <summary>Where can I check status?</summary>
+                            <p>Use your farmer account service/request history to monitor submitted work.</p>
+                        </details>
+                    </div>
+                </section>
+            </main>
 
-        <h1 class="text-success">
-
-            {{ service.title }}
-
-        </h1>
-
-        <hr>
-
-        <p class="lead">
-
-            {{ service.full_description }}
-
-        </p>
-
-        <h3 class="mt-4 text-primary">
-
-            Service Benefits
-
-        </h3>
-
-        <ul class="list-group mb-4">
-
-            {% for benefit in service.get_benefits_list %}
-
-            <li class="list-group-item">
-
-                ✅ {{ benefit }}
-
-            </li>
-
-            {% endfor %}
-
-        </ul>
-
-        <div class="alert alert-success">
-
-            <strong>
-
-                Why Choose This Service?
-
-            </strong>
-
-            <br><br>
-
-            {{ service.why_choose }}
-
+            <aside class="service-sidebar">
+                <div class="sidebar-card">
+                    <span class="section-kicker">Booking</span>
+                    <h2>Ready To Start?</h2>
+                    <p>Submit a request and AgroSthan will review your farm service need.</p>
+                    <a href="{% url 'services' %}#service-request" class="btn btn-success w-100">
+                        <i class="bi bi-send me-1"></i> Book Service
+                    </a>
+                    <a href="{% url 'consultation' %}" class="btn btn-outline-success w-100">
+                        <i class="bi bi-chat-dots me-1"></i> Contact Consultant
+                    </a>
+                </div>
+                <div class="sidebar-card">
+                    <span class="section-kicker">Availability</span>
+                    <div class="availability-row">
+                        <i class="bi bi-check-circle"></i>
+                        <span>Available for registered farmers</span>
+                    </div>
+                    <div class="availability-row">
+                        <i class="bi bi-clock"></i>
+                        <span>Request review through service dashboard</span>
+                    </div>
+                    <div class="availability-row">
+                        <i class="bi bi-phone"></i>
+                        <span>Phone and email updates supported</span>
+                    </div>
+                </div>
+            </aside>
         </div>
 
-        <div class="text-center mt-4">
-
-            <a
-                href="{% url 'services' %}"
-                class="btn btn-success btn-lg">
-
-                Request Service
-
-            </a>
-
-        </div>
-
+        <section class="related-section">
+            <div class="section-heading">
+                <span class="section-kicker">Related Services</span>
+                <h2>Explore More Farm Support</h2>
+            </div>
+            <div class="related-grid">
+                {% for related in related_services %}
+                    <a href="{% url 'service_info' related.slug %}" class="related-card">
+                        {% if related.image %}
+                            <img src="{{ related.image.url }}" alt="{{ related.title }}">
+                        {% else %}
+                            <span><i class="bi bi-clipboard2-pulse"></i></span>
+                        {% endif %}
+                        <strong>{{ related.title }}</strong>
+                        <small>{{ related.short_description }}</small>
+                    </a>
+                {% empty %}
+                    <div class="related-empty">More services will appear here as they are added.</div>
+                {% endfor %}
+            </div>
+        </section>
     </div>
-
 </div>
 
-</div>
-
+<style>
+.service-landing {
+    background: #f6f8f3;
+    min-height: calc(100vh - 76px);
+}
+.service-hero {
+    background: linear-gradient(135deg, #17633a, #0f3d2e);
+    color: #fff;
+    padding: clamp(1.5rem, 5vw, 3rem) 0;
+}
+.service-hero-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(280px, 460px);
+    gap: 2rem;
+    align-items: center;
+}
+.service-hero-copy {
+    min-width: 0;
+}
+.service-badge,
+.section-kicker {
+    display: inline-flex;
+    align-items: center;
+    color: #17633a;
+    font-size: .78rem;
+    font-weight: 850;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+}
+.service-badge {
+    color: #fff;
+    background: rgba(255,255,255,.14);
+    border: 1px solid rgba(255,255,255,.2);
+    border-radius: 999px;
+    padding: .4rem .7rem;
+}
+.service-hero h1 {
+    max-width: 780px;
+    margin: .8rem 0 .75rem;
+    font-size: clamp(2.1rem, 5vw, 4rem);
+    font-weight: 900;
+    line-height: 1.03;
+    overflow-wrap: anywhere;
+}
+.service-hero p {
+    max-width: 720px;
+    color: rgba(255,255,255,.82);
+    font-size: 1.08rem;
+}
+.service-hero-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: .75rem;
+    margin-top: 1.25rem;
+}
+.service-hero-media {
+    aspect-ratio: 4 / 3;
+    border-radius: 8px;
+    overflow: hidden;
+    background: rgba(255,255,255,.12);
+    box-shadow: 0 24px 60px rgba(0,0,0,.24);
+}
+.service-hero-media img,
+.service-media-fallback {
+    width: 100%;
+    height: 100%;
+}
+.service-hero-media img {
+    object-fit: cover;
+}
+.service-media-fallback {
+    display: grid;
+    place-items: center;
+    color: rgba(255,255,255,.9);
+    font-size: 4rem;
+}
+.detail-layout {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 320px;
+    gap: 1.25rem;
+    align-items: start;
+}
+.detail-main {
+    display: grid;
+    gap: 1rem;
+    min-width: 0;
+}
+.detail-card,
+.sidebar-card,
+.related-card,
+.related-empty {
+    background: #fff;
+    border: 1px solid rgba(15, 61, 46, .1);
+    border-radius: 8px;
+    box-shadow: 0 12px 30px rgba(15, 61, 46, .08);
+}
+.detail-card,
+.sidebar-card {
+    padding: 1.25rem;
+}
+.detail-card h2,
+.sidebar-card h2,
+.section-heading h2 {
+    font-weight: 850;
+    margin: .25rem 0 .75rem;
+}
+.detail-card p,
+.detail-card li,
+.sidebar-card p,
+.related-card small {
+    color: #607168;
+    overflow-wrap: anywhere;
+}
+.benefit-grid,
+.feature-grid,
+.related-grid {
+    display: grid;
+    gap: .85rem;
+}
+.benefit-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+.feature-grid,
+.related-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+.benefit-item,
+.mini-card,
+.process-list div,
+.availability-row {
+    border: 1px solid #e4ece6;
+    border-radius: 8px;
+    background: #fbfdfb;
+}
+.benefit-item,
+.availability-row {
+    display: flex;
+    align-items: flex-start;
+    gap: .65rem;
+    padding: .85rem;
+}
+.benefit-item i,
+.mini-card i,
+.availability-row i {
+    color: #198754;
+}
+.mini-card {
+    padding: 1rem;
+}
+.mini-card h3 {
+    font-size: 1rem;
+    font-weight: 850;
+    margin: .55rem 0 .25rem;
+}
+.process-list {
+    display: grid;
+    gap: .75rem;
+}
+.process-list div {
+    display: grid;
+    grid-template-columns: 42px minmax(0, 1fr);
+    gap: .75rem;
+    align-items: center;
+    padding: .85rem;
+}
+.process-list strong {
+    width: 38px;
+    height: 38px;
+    display: grid;
+    place-items: center;
+    border-radius: 999px;
+    background: #e4f4ea;
+    color: #17633a;
+}
+.requirements-list {
+    margin: 0;
+    padding-left: 1.2rem;
+}
+.faq-list {
+    display: grid;
+    gap: .75rem;
+}
+.faq-list details {
+    border: 1px solid #e4ece6;
+    border-radius: 8px;
+    padding: .85rem 1rem;
+    background: #fbfdfb;
+}
+.faq-list summary {
+    cursor: pointer;
+    font-weight: 800;
+}
+.faq-list p {
+    margin: .65rem 0 0;
+}
+.service-sidebar {
+    display: grid;
+    gap: 1rem;
+    position: sticky;
+    top: 92px;
+}
+.sidebar-card {
+    display: grid;
+    gap: .75rem;
+}
+.related-section {
+    margin-top: 1.5rem;
+}
+.section-heading {
+    margin-bottom: 1rem;
+}
+.related-card {
+    display: grid;
+    grid-template-rows: 150px auto 1fr;
+    gap: .65rem;
+    padding: .75rem;
+    color: #17352a;
+    text-decoration: none;
+    transition: transform .2s ease, box-shadow .2s ease, border-color .2s ease;
+}
+.related-card:hover {
+    color: #0f5132;
+    border-color: rgba(25, 135, 84, .24);
+    transform: translateY(-3px);
+    box-shadow: 0 18px 36px rgba(15, 61, 46, .12);
+}
+.related-card img,
+.related-card > span {
+    width: 100%;
+    height: 150px;
+    border-radius: 8px;
+    object-fit: cover;
+    background: #e4f4ea;
+}
+.related-card > span {
+    display: grid;
+    place-items: center;
+    color: #17633a;
+    font-size: 2rem;
+}
+.related-card strong,
+.related-card small {
+    overflow-wrap: anywhere;
+}
+.related-empty {
+    grid-column: 1 / -1;
+    padding: 1.25rem;
+    color: #607168;
+}
+@media (max-width: 991.98px) {
+    .service-hero-grid,
+    .detail-layout {
+        grid-template-columns: 1fr;
+    }
+    .service-sidebar {
+        position: static;
+    }
+}
+@media (max-width: 767.98px) {
+    .benefit-grid,
+    .feature-grid,
+    .related-grid {
+        grid-template-columns: 1fr;
+    }
+    .service-hero-actions .btn {
+        width: 100%;
+    }
+}
+</style>
 {% endblock %}

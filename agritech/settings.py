@@ -95,7 +95,7 @@ STORAGES = {
         "BACKEND": "cloudinary_storage.storage.MediaCloudinaryStorage",
     },
     "staticfiles": {
-        "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
+        "BACKEND": "whitenoise.storage.CompressedStaticFilesStorage",
     },
 }
 
@@ -152,6 +152,7 @@ LOGIN_REDIRECT_URL = 'home'
 LOGOUT_REDIRECT_URL = 'home'
 
 ADMIN_SECRET_CODE = os.getenv('ADMIN_SECRET_CODE', 'AGROSTHAN2026')
+SUPER_ADMIN_SECRET_CODE = os.getenv('SUPER_ADMIN_SECRET_CODE', 'AGROSTHAN2026-SUPER')
 
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 

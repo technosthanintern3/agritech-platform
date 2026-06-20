@@ -1,50 +1,82 @@
 from django.contrib import admin
-from .models import Farmer, SiteSettings, Doctor, Consultant, Role, RolePageSettings
+from .models import (
+    AdminProfile,
+    Farmer,
+    FooterSettings,
+    RegistrationField,
+    SiteSettings,
+    Doctor,
+    Consultant,
+    Role,
+    RolePageSettings,
+    VerificationHistory,
+    WhyChooseUs,
+)
 
 
 @admin.register(SiteSettings)
 class SiteSettingsAdmin(admin.ModelAdmin):
 
     fields = (
-
-        # Basic Site Settings
         'site_name',
         'logo',
-
-        # Hero Section
         'hero_background',
         'mobile_hero_background',
         'hero_video',
-
-        # Why Choose Us
-        'why_icon_1',
-        'why_title_1',
-
-        'why_icon_2',
-        'why_title_2',
-
-        'why_icon_3',
-        'why_title_3',
-
-        'why_icon_4',
-        'why_title_4',
-
-        # Footer
-        'company_description',
-        'footer_address',
-        'footer_phone',
-        'footer_email',
-
-        'facebook',
-        'instagram',
-        'youtube',
-        'linkedin',
-
-        'copyright_text',
     )
 
     def has_add_permission(self, request):
         return not SiteSettings.objects.exists()
+
+
+@admin.register(FooterSettings)
+class FooterSettingsAdmin(admin.ModelAdmin):
+
+    fields = (
+        'company_description',
+        'address',
+        'phone',
+        'email',
+        'facebook',
+        'instagram',
+        'youtube',
+        'linkedin',
+        'copyright_text',
+    )
+
+    def has_add_permission(self, request):
+        return not FooterSettings.objects.exists()
+
+
+@admin.register(WhyChooseUs)
+class WhyChooseUsAdmin(admin.ModelAdmin):
+
+    list_display = ('title', 'icon', 'created_at')
+    search_fields = ('title',)
+
+
+@admin.register(AdminProfile)
+class AdminProfileAdmin(admin.ModelAdmin):
+
+    list_display = ('full_name', 'user', 'role', 'email_verified', 'phone_verified', 'created_at')
+    list_filter = ('role', 'email_verified', 'phone_verified')
+    search_fields = ('full_name', 'user__username', 'user__email')
+
+
+@admin.register(RegistrationField)
+class RegistrationFieldAdmin(admin.ModelAdmin):
+
+    list_display = ('label', 'role', 'field_type', 'is_required', 'is_active', 'sort_order')
+    list_filter = ('role', 'field_type', 'is_active', 'is_required')
+    search_fields = ('label', 'key')
+
+
+@admin.register(VerificationHistory)
+class VerificationHistoryAdmin(admin.ModelAdmin):
+
+    list_display = ('role', 'account_id', 'action', 'performed_by', 'created_at')
+    list_filter = ('role', 'action')
+    search_fields = ('account_id', 'note')
 @admin.register(Doctor)
 class DoctorAdmin(admin.ModelAdmin):
 

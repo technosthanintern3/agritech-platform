@@ -9,7 +9,7 @@ from .models import ServiceInfo
 @login_required_session
 def services(request):
 
-    services_list = ServiceInfo.objects.all().order_by('title')
+    services_list = ServiceInfo.objects.filter(is_active=True).order_by('display_order', 'title')
 
     if request.method == 'POST':
 
@@ -80,14 +80,18 @@ def service_info(request, service_name):
 
     service = get_object_or_404(
         ServiceInfo,
-        slug=service_name
+        slug=service_name,
+        is_active=True
     )
 
     return render(
         request,
         'services/service_info.html',
         {
-            'service': service
+            'service': service,
+            'related_services': ServiceInfo.objects.exclude(
+                id=service.id
+            ).filter(is_active=True).order_by('display_order', 'title')[:3],
         }
     )
 

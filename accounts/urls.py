@@ -15,6 +15,9 @@ from .views import (
     request_doctor_identity_change,
     request_consultant_identity_change,
     admin_register,
+    forgot_password,
+    forgot_password_verify,
+    forgot_password_reset,
     registration_verify,
     resend_registration_otp,
 )
@@ -66,6 +69,21 @@ urlpatterns = [
         'verify-registration/<uuid:token>/resend/',
         resend_registration_otp,
         name='resend_registration_otp'
+    ),
+    path(
+        'forgot-password/',
+        forgot_password,
+        name='forgot_password'
+    ),
+    path(
+        'forgot-password/verify/<uuid:token>/',
+        forgot_password_verify,
+        name='forgot_password_verify'
+    ),
+    path(
+        'forgot-password/reset/',
+        forgot_password_reset,
+        name='forgot_password_reset'
     ),
 
     path(

@@ -1,11 +1,15 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from .forms import CropProblemForm
-from .models import CropProblem
+from .models import CropProblem, CropProblemGuide
 from agritech.utils import login_required_session
 
 
 @login_required_session
 def farmer_support(request):
+
+    problem_guides = CropProblemGuide.objects.filter(
+        is_active=True
+    ).order_by('display_order', 'title')
 
     if request.method == 'POST':
 
@@ -34,7 +38,8 @@ def farmer_support(request):
                 'farmer_support/support.html',
                 {
                     'form': CropProblemForm(),
-                    'success': True
+                    'success': True,
+                    'problem_guides': problem_guides
                 }
             )
 
@@ -46,7 +51,33 @@ def farmer_support(request):
         request,
         'farmer_support/support.html',
         {
-            'form': form
+            'form': form,
+            'problem_guides': problem_guides
+        }
+    )
+
+
+@login_required_session
+def crop_problem_detail(request, slug):
+
+    guide = get_object_or_404(
+        CropProblemGuide,
+        slug=slug,
+        is_active=True
+    )
+
+    related_guides = CropProblemGuide.objects.filter(
+        is_active=True
+    ).exclude(
+        id=guide.id
+    ).order_by('display_order', 'title')[:3]
+
+    return render(
+        request,
+        'farmer_support/problem_detail.html',
+        {
+            'guide': guide,
+            'related_guides': related_guides,
         }
     )
 

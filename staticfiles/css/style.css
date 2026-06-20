@@ -190,9 +190,7 @@ form select:focus {
 .password-toggle-btn{
     position: absolute;
     right: 15px;
-
-    /* label ki wajah se niche shift karna padega */
-    top: 73%;
+    top: calc(50% + .8rem);
 
     transform: translateY(-50%);
 

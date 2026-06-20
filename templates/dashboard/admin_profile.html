@@ -1,0 +1,135 @@
+{% extends 'dashboard/base_admin.html' %}
+
+{% block content %}
+<div class="row g-4">
+    <div class="col-lg-4">
+        <div class="table-card h-100">
+            <div class="text-center">
+                {% if profile and profile.profile_photo %}
+                    <img src="{{ profile.profile_photo.url }}" class="rounded-circle mb-3" width="132" height="132" style="object-fit:cover;" alt="Admin photo">
+                {% else %}
+                    <div class="rounded-circle bg-success text-white d-inline-flex align-items-center justify-content-center mb-3" style="width:132px;height:132px;font-size:3rem;">🛡️</div>
+                {% endif %}
+                <h4 class="mb-1">{% if profile %}{{ profile.full_name }}{% else %}{{ request.user.get_full_name|default:request.user.username }}{% endif %}</h4>
+                <p class="text-muted mb-3">{% if profile and profile.get_role_display %}{{ profile.get_role_display }}{% else %}Admin{% endif %}</p>
+                <span class="badge {% if request.user.is_active %}bg-success{% else %}bg-danger{% endif %}">{% if request.user.is_active %}Active{% else %}Inactive{% endif %}</span>
+            </div>
+            <hr>
+            <p class="mb-2"><strong>Username:</strong> {{ request.user.username }}</p>
+            <p class="mb-2"><strong>Email:</strong> {{ request.user.email }}</p>
+            {% if profile %}
+                <p class="mb-2"><strong>Phone:</strong> {{ profile.phone_number }}</p>
+            {% endif %}
+            <p class="mb-0"><strong>Last Login:</strong> {{ request.user.last_login|default:'Never' }}</p>
+        </div>
+    </div>
+
+    <div class="col-lg-8">
+        <div class="table-card">
+            <div class="d-flex justify-content-between align-items-start flex-wrap gap-3 mb-4">
+                <div>
+                    <h4 class="mb-1">My Profile</h4>
+                    <p class="text-muted mb-0">Change your password using your current credentials.</p>
+                </div>
+                <a href="{% url 'admins_management' %}" class="btn btn-outline-secondary btn-sm">Back to Admins</a>
+            </div>
+
+            {% if password_form.errors %}
+                <div class="alert alert-danger">
+                    {% for error in password_form.non_field_errors %}
+                        <div>{{ error }}</div>
+                    {% endfor %}
+                    {% for field in password_form %}
+                        {% for error in field.errors %}
+                            <div>{{ error }}</div>
+                        {% endfor %}
+                    {% endfor %}
+                </div>
+            {% endif %}
+
+            <form method="post" class="row g-3">
+                {% csrf_token %}
+                <div class="col-md-4 password-field-group">
+                    <label class="form-label fw-semibold">Current Password</label>
+                    {{ password_form.current_password }}
+                    <button type="button" class="password-toggle-btn" onclick="togglePasswordVisibility('id_current_password', this)" aria-label="Toggle current password visibility" aria-pressed="false">
+                        <i class="bi bi-eye-fill password-toggle"></i>
+                    </button>
+                </div>
+                <div class="col-md-4 password-field-group">
+                    <label class="form-label fw-semibold">New Password</label>
+                    {{ password_form.new_password }}
+                    <button type="button" class="password-toggle-btn" onclick="togglePasswordVisibility('id_new_password', this)" aria-label="Toggle new password visibility" aria-pressed="false">
+                        <i class="bi bi-eye-fill password-toggle"></i>
+                    </button>
+                </div>
+                <div class="col-md-4 password-field-group">
+                    <label class="form-label fw-semibold">Confirm New Password</label>
+                    {{ password_form.confirm_password }}
+                    <button type="button" class="password-toggle-btn" onclick="togglePasswordVisibility('id_confirm_password', this)" aria-label="Toggle confirm password visibility" aria-pressed="false">
+                        <i class="bi bi-eye-fill password-toggle"></i>
+                    </button>
+                </div>
+                <div class="col-12 d-flex gap-2">
+                    <button class="btn btn-success px-4" type="submit" name="change_password" value="1">Update Password</button>
+                    <a href="{% url 'forgot_password' %}" class="align-self-center small text-decoration-none">Forgot Password?</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<style>
+.password-field-group {
+    position: relative;
+}
+.password-field-group .form-control {
+    min-height: 52px;
+    border-radius: 14px;
+    padding-right: 3rem;
+}
+.password-toggle-btn {
+    position: absolute;
+    right: 12px;
+    top: calc(50% + .8rem);
+    transform: translateY(-50%);
+    width: 2rem;
+    height: 2rem;
+    border: 0;
+    background: transparent;
+    color: #6c757d;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    z-index: 5;
+}
+.password-toggle-btn:hover,
+.password-toggle-btn:focus {
+    color: #198754;
+}
+</style>
+<script>
+function togglePasswordVisibility(fieldId, button) {
+    const field = document.getElementById(fieldId);
+    if (!field) {
+        return;
+    }
+
+    const icon = button ? button.querySelector('.password-toggle') : null;
+    const isHidden = field.type === 'password';
+
+    field.type = isHidden ? 'text' : 'password';
+
+    if (icon) {
+        icon.classList.toggle('bi-eye-fill', !isHidden);
+        icon.classList.toggle('bi-eye-slash-fill', isHidden);
+    }
+
+    if (button) {
+        button.setAttribute('aria-label', isHidden ? 'Hide password' : 'Show password');
+        button.setAttribute('aria-pressed', isHidden ? 'true' : 'false');
+    }
+}
+</script>
+{% endblock %}

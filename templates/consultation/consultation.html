@@ -1,289 +1,226 @@
 {% extends 'base.html' %}
 
 {% block content %}
-
-<div class="container py-5">
-
-<div class="text-center mb-5">
-
-    <h1 class="text-success">
-        🌾 Expert Farming Consultation
-    </h1>
-
-    <p class="lead">
-
-        Get professional agricultural guidance from our experts.
-        We help farmers improve crop productivity, solve farming
-        challenges, manage irrigation and increase farm profits.
-
-    </p>
-
-</div>
-
-<div class="row mb-5">
-
-    <div class="col-md-4">
-
-        <div class="card service-card p-4">
-
-            <div class="service-icon">
-                🌱
-            </div>
-
-            <h4>
-                Crop Planning
-            </h4>
-
-            <p>
-                Expert recommendations for crop selection,
-                sowing methods and yield improvement.
-            </p>
-
-        </div>
-
-    </div>
-
-    <div class="col-md-4">
-
-        <div class="card service-card p-4">
-
-            <div class="service-icon">
-                💧
-            </div>
-
-            <h4>
-                Irrigation Guidance
-            </h4>
-
-            <p>
-                Learn modern irrigation techniques and
-                water management practices.
-            </p>
-
-        </div>
-
-    </div>
-
-    <div class="col-md-4">
-
-        <div class="card service-card p-4">
-
-            <div class="service-icon">
-                🛡️
-            </div>
-
-            <h4>
-                Disease Prevention
-            </h4>
-
-            <p>
-                Identify crop diseases early and receive
-                preventive treatment recommendations.
-            </p>
-
-        </div>
-
-    </div>
-
-</div>
-
-<div class="card shadow p-4">
-
-    <h2 class="text-center mb-4">
-        Submit Consultation Request
-    </h2>
-
-    {% if success %}
-
-    <div class="alert alert-success">
-
-        Consultation request submitted successfully.
-
-    </div>
-
-    {% endif %}
-
-    {{ form.errors }}
-
-    <form method="POST">
-
-        {% csrf_token %}
-
-        {{ form.as_p }}
-
-        <div class="text-center">
-
-            <button
-                type="submit"
-                class="btn btn-success btn-lg">
-
-                Book Consultation
-
-            </button>
-
-        </div>
-
-    </form>
-
-</div>
-
-</div>
-
-{% endblock %}
-
-{% comment %} {% extends 'base.html' %}
-
-{% block content %}
-
-<div class="container py-5">
-
-<div class="text-center mb-5">
-
-    <h1 class="text-success">
-        🌾 Expert Farming Consultation
-    </h1>
-
-    <p class="lead">
-
-        Get professional agricultural guidance from our experts.
-        We help farmers improve crop productivity, solve farming
-        challenges, manage irrigation, and increase profits.
-
-    </p>
-
-</div>
-
-<div class="row mb-5">
-
-    <div class="col-md-4">
-
-        <div class="card service-card p-4">
-
-            <div class="service-icon">
-                🌱
-            </div>
-
-            <h4>
-                Crop Planning
-            </h4>
-
-            <p>
-                Expert recommendations for crop selection,
-                sowing methods and yield improvement.
-            </p>
-
-        </div>
-
-    </div>
-
-    <div class="col-md-4">
-
-        <div class="card service-card p-4">
-
-            <div class="service-icon">
-                💧
-            </div>
-
-            <h4>
-                Irrigation Guidance
-            </h4>
-
-            <p>
-                Learn modern irrigation techniques and
-                water management practices.
-            </p>
-
-        </div>
-
-    </div>
-
-    <div class="col-md-4">
-
-        <div class="card service-card p-4">
-
-            <div class="service-icon">
-                🛡️
-            </div>
-
-            <h4>
-                Disease Prevention
-            </h4>
-
-            <p>
-                Identify crop diseases early and receive
-                preventive treatment recommendations.
-            </p>
-
-        </div>
-
-    </div>
-
-</div>
-
-<div class="row justify-content-center">
-
-    <div class="col-md-8">
-
-        <div class="card shadow-lg border-0">
-
-            <div class="card-header bg-success text-white text-center py-3">
-
-                <h3 class="mb-0">
-                    Submit Consultation Request
-                </h3>
-
-            </div>
-
-            <div class="card-body p-4">
-
-                {% if success %}
-
-                <div class="alert alert-success">
-
-                    Consultation request submitted successfully.
-
-                </div>
-
-                {% endif %}
-
-                {% if form.errors %}
-
-                <div class="alert alert-danger">
-
-                    Please correct the errors below.
-
-                </div>
-
-                {% endif %}
-
-                <form method="POST">
-
-                    {% csrf_token %}
-
-                    {{ form.as_p }}
-
-                    <div class="text-center mt-4">
-
-                        <button
-                            type="submit"
-                            class="btn btn-success btn-lg px-5">
-
-                            Book Consultation
-
-                        </button>
-
+<div class="consult-page">
+    <div class="container py-4 py-lg-5">
+        <section class="consult-hero mb-4">
+            <span>Expert Guidance</span>
+            <h1>Farming Consultation</h1>
+            <p>Get practical crop, irrigation, and disease guidance from AgroSthan specialists.</p>
+        </section>
+
+        <div class="feature-grid mb-4">
+            {% for topic in consultation_topics %}
+                <article class="feature-card">
+                    {% if topic.image %}
+                        <img src="{{ topic.image.url }}" alt="{{ topic.title }}">
+                    {% else %}
+                        <div class="feature-icon"><i class="{{ topic.icon }}"></i></div>
+                    {% endif %}
+                    <div class="feature-body">
+                        <h2>{{ topic.title }}</h2>
+                        <p>{{ topic.short_summary }}</p>
+                        <a href="{% url 'consultation_detail' topic.slug %}" class="btn btn-outline-success">View Details</a>
                     </div>
-
-                </form>
-
-            </div>
-
+                </article>
+            {% empty %}
+                <div class="feature-empty">
+                    <i class="bi bi-person-video3"></i>
+                    <h2>No consultation topics available</h2>
+                    <p>Please check again later.</p>
+                </div>
+            {% endfor %}
         </div>
 
+        <section class="consult-form-panel" id="consultation-request">
+            <div class="form-copy">
+                <span>Request Form</span>
+                <h2>Submit Consultation Request</h2>
+                <p>Share your farm details and preferred consultation date.</p>
+            </div>
+            <div class="form-body">
+                {% if success %}
+                    <div class="alert alert-success">Consultation request submitted successfully.</div>
+                {% endif %}
+                {% if form.errors %}
+                    <div class="alert alert-danger">Please correct the highlighted fields.</div>
+                {% endif %}
+                <form method="POST" class="styled-form">
+                    {% csrf_token %}
+                    {{ form.as_p }}
+                    <button type="submit" class="btn btn-success btn-lg">Book Consultation</button>
+                </form>
+            </div>
+        </section>
     </div>
-
 </div>
 
-</div>
-
-{% endblock %} {% endcomment %}
+<style>
+.consult-page {
+    background:
+        radial-gradient(circle at top right, rgba(25, 135, 84, .07), transparent 28rem),
+        #f6f8f3;
+    min-height: calc(100vh - 76px);
+}
+.consult-hero {
+    max-width: 760px;
+}
+.consult-hero span,
+.consult-form-panel span {
+    color: #17633a;
+    font-weight: 800;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    font-size: .78rem;
+}
+.consult-hero h1,
+.feature-card h2,
+.consult-form-panel h2 {
+    font-weight: 850;
+}
+.consult-hero p,
+.feature-card p,
+.consult-form-panel p {
+    color: #607168;
+}
+.feature-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 1rem;
+    align-items: stretch;
+}
+.feature-card,
+.consult-form-panel,
+.feature-empty {
+    background: #fff;
+    border: 1px solid rgba(15, 61, 46, .1);
+    border-radius: 8px;
+    box-shadow: 0 12px 30px rgba(15, 61, 46, .08);
+}
+.feature-card {
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    transition: transform .2s ease, box-shadow .2s ease, border-color .2s ease;
+}
+.feature-card:hover {
+    border-color: rgba(25, 135, 84, .22);
+    transform: translateY(-3px);
+    box-shadow: 0 18px 36px rgba(15, 61, 46, .12);
+}
+.feature-card img,
+.feature-icon {
+    width: 100%;
+    aspect-ratio: 16 / 10;
+}
+.feature-card img {
+    object-fit: cover;
+}
+.feature-icon {
+    display: grid;
+    place-items: center;
+    background: #e4f4ea;
+    color: #17633a;
+    font-size: 2.4rem;
+}
+.feature-body {
+    padding: 1rem;
+    display: grid;
+    grid-template-rows: auto 1fr auto;
+    gap: .5rem;
+    flex: 1;
+}
+.feature-card h2 {
+    font-size: 1.15rem;
+    margin: 0;
+    overflow-wrap: anywhere;
+}
+.feature-card p {
+    overflow-wrap: anywhere;
+}
+.feature-card .btn {
+    align-self: end;
+    justify-self: start;
+}
+.feature-empty {
+    grid-column: 1 / -1;
+    padding: 3rem 1rem;
+    text-align: center;
+}
+.feature-empty i {
+    color: #17633a;
+    font-size: 2.4rem;
+}
+.consult-form-panel {
+    display: grid;
+    grid-template-columns: 320px minmax(0, 1fr);
+    gap: 1.5rem;
+    padding: 1.25rem;
+    overflow: hidden;
+}
+.form-copy {
+    margin: -1.25rem 0 -1.25rem -1.25rem;
+    padding: 1.25rem;
+    background: linear-gradient(135deg, #17633a, #0f3d2e);
+    color: #fff;
+}
+.form-copy span,
+.form-copy p {
+    color: rgba(255,255,255,.78);
+}
+.form-copy h2 {
+    color: #fff;
+}
+.form-body {
+    min-width: 0;
+}
+.styled-form p {
+    margin-bottom: 1rem;
+}
+.styled-form label {
+    display: block;
+    font-weight: 700;
+    margin-bottom: .35rem;
+}
+.styled-form input,
+.styled-form select,
+.styled-form textarea {
+    width: 100%;
+    border: 1px solid #d7e3da;
+    border-radius: 8px;
+    padding: .7rem .85rem;
+}
+.styled-form input:focus,
+.styled-form select:focus,
+.styled-form textarea:focus {
+    border-color: #198754;
+    box-shadow: 0 0 0 .2rem rgba(25, 135, 84, .12);
+    outline: none;
+}
+.styled-form textarea {
+    min-height: 120px;
+}
+.styled-form .errorlist {
+    color: #b42318;
+    margin-bottom: .4rem;
+    padding-left: 1.1rem;
+    font-size: .92rem;
+}
+@media (max-width: 991.98px) {
+    .feature-grid,
+    .consult-form-panel {
+        grid-template-columns: 1fr;
+    }
+    .form-copy {
+        margin: -1.25rem -1.25rem 0;
+    }
+}
+@media (max-width: 575.98px) {
+    .styled-form .btn,
+    .feature-card .btn {
+        width: 100%;
+    }
+}
+</style>
+{% endblock %}

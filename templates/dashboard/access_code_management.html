@@ -1,0 +1,89 @@
+{% extends 'dashboard/base_admin.html' %}
+
+{% block content %}
+<div class="table-card mb-4">
+    <div class="d-flex justify-content-between align-items-center flex-wrap gap-3 mb-3">
+        <div>
+            <h4 class="mb-1">Access Code Management</h4>
+            <p class="text-muted mb-0">Access codes are stored as hashes. Updated or regenerated codes are shown once after the action completes.</p>
+        </div>
+    </div>
+
+    {% if generated_code %}
+        <div class="alert alert-success d-flex align-items-center justify-content-between gap-3">
+            <div>
+                <strong>New code generated:</strong>
+                <code>{{ generated_code }}</code>
+            </div>
+        </div>
+    {% endif %}
+
+    {% if form.non_field_errors %}
+        <div class="alert alert-danger">
+            {% for error in form.non_field_errors %}
+                <div>{{ error }}</div>
+            {% endfor %}
+        </div>
+    {% endif %}
+
+    <div class="table-responsive">
+        <table class="table align-middle table-hover">
+            <thead class="table-dark">
+                <tr>
+                    <th>Code Type</th>
+                    <th>Current Value</th>
+                    <th>Rotations</th>
+                    <th>Last Rotated</th>
+                    <th>Updated By</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for access_code in access_codes %}
+                    <tr>
+                        <td>
+                            <span class="badge {% if access_code.code_type == 'super_admin' %}bg-dark{% else %}bg-secondary{% endif %}">{{ access_code.code_label }}</span>
+                        </td>
+                        <td><code>{{ access_code.masked_code }}</code></td>
+                        <td>{{ access_code.rotation_count }}</td>
+                        <td>{% if access_code.last_rotated_at %}{{ access_code.last_rotated_at|date:'M d, Y H:i' }}{% else %}Never{% endif %}</td>
+                        <td>{% if access_code.updated_by %}{{ access_code.updated_by.get_full_name|default:access_code.updated_by.username }}{% else %}System{% endif %}</td>
+                        <td>
+                            <div class="d-flex flex-column gap-2">
+                                <form method="post" class="d-flex gap-2 flex-wrap">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="code_type" value="{{ access_code.code_type }}">
+                                    <input type="hidden" name="action" value="update">
+                                    <input type="password" name="code_value" class="form-control form-control-sm" style="max-width: 220px;" placeholder="Enter new code">
+                                    <button class="btn btn-sm btn-primary">Update</button>
+                                </form>
+                                <div class="d-flex gap-2 flex-wrap">
+                                    <form method="post" class="d-inline">
+                                        {% csrf_token %}
+                                        <input type="hidden" name="code_type" value="{{ access_code.code_type }}">
+                                        <input type="hidden" name="action" value="rotate">
+                                        <button class="btn btn-sm btn-outline-dark">Rotate</button>
+                                    </form>
+                                    <form method="post" class="d-inline">
+                                        {% csrf_token %}
+                                        <input type="hidden" name="code_type" value="{{ access_code.code_type }}">
+                                        <input type="hidden" name="action" value="regenerate">
+                                        <button class="btn btn-sm btn-outline-secondary">Regenerate</button>
+                                    </form>
+                                </div>
+                                {% for error in form.code_value.errors %}
+                                    <div class="text-danger small">{{ error }}</div>
+                                {% endfor %}
+                            </div>
+                        </td>
+                    </tr>
+                {% empty %}
+                    <tr>
+                        <td colspan="6" class="text-center text-muted py-4">No access codes found.</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

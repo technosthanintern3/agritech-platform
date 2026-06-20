@@ -43,6 +43,15 @@
                             <label class="form-label fw-semibold">Admin Code</label>
                             {{ form.admin_code }}
                         </div>
+                        {% for field in form %}
+                            {% if field.name != 'full_name' and field.name != 'email' and field.name != 'phone_number' and field.name != 'admin_code' and field.name != 'password' and field.name != 'confirm_password' %}
+                                <div class="col-md-6">
+                                    <label class="form-label fw-semibold">{{ field.label }}</label>
+                                    {{ field }}
+                                    {% if field.help_text %}<div class="form-text">{{ field.help_text }}</div>{% endif %}
+                                </div>
+                            {% endif %}
+                        {% endfor %}
                         <div class="col-md-6 password-field-group">
                             <label class="form-label fw-semibold">Password</label>
                             {{ form.password }}

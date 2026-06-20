@@ -1,0 +1,495 @@
+{% extends 'dashboard/base_admin.html' %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-start flex-wrap gap-3 mb-4">
+    <div>
+        <h2 class="fw-bold mb-1">Content Management</h2>
+        <p class="text-muted mb-0">Manage public content that appears across AgroSthan.</p>
+    </div>
+</div>
+
+<ul class="nav nav-pills mb-4 gap-2">
+    <li class="nav-item">
+        <a class="nav-link {% if active_tab == 'services' %}active{% endif %}" href="{% url 'content_management' %}?tab=services">Services</a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link {% if active_tab == 'products' %}active{% endif %}" href="{% url 'content_management' %}?tab=products">Products</a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link {% if active_tab == 'consultations' %}active{% endif %}" href="{% url 'content_management' %}?tab=consultations">Consultation Categories</a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link {% if active_tab == 'crop-problems' %}active{% endif %}" href="{% url 'content_management' %}?tab=crop-problems">Crop Problems / Support</a>
+    </li>
+</ul>
+
+<div class="row g-4">
+    <div class="col-xl-5">
+        <div class="card border-0 shadow-sm">
+            <div class="card-body">
+                <h5 class="fw-semibold mb-3">
+                    {% if editing_obj %}Edit{% else %}Add{% endif %}
+                    {% if active_tab == 'services' %}Service{% elif active_tab == 'products' %}Product{% elif active_tab == 'consultations' %}Consultation Category{% else %}Crop Problem Guide{% endif %}
+                </h5>
+
+                <form method="post" enctype="multipart/form-data" class="content-form">
+                    {% csrf_token %}
+                    <input type="hidden" name="content_type" value="{{ active_tab }}">
+                    {% if editing_obj %}
+                        <input type="hidden" name="object_id" value="{{ editing_obj.id }}">
+                    {% endif %}
+
+                    {% if active_tab == 'services' %}
+                        {{ service_form.as_p }}
+                    {% elif active_tab == 'products' %}
+                        {% for field in product_form %}
+                            <div class="mb-3">
+                                {% if field.name == 'crop' %}
+                                    <div class="d-flex align-items-end gap-2 crop-field-row">
+                                        <div class="flex-grow-1">
+                                            <label class="form-label">{{ field.label }}</label>
+                                            {{ field }}
+                                            {% if field.help_text %}<div class="form-text">{{ field.help_text }}</div>{% endif %}
+                                            {% for error in field.errors %}<div class="text-danger small">{{ error }}</div>{% endfor %}
+                                        </div>
+                                        <button type="button" class="btn btn-outline-success btn-sm crop-add-btn" data-bs-toggle="modal" data-bs-target="#cropManagerModal" onclick="openCropModal()" aria-label="Add crop">
+                                            + Add Crop
+                                        </button>
+                                    </div>
+                                {% else %}
+                                    <label class="form-label">{{ field.label }}</label>
+                                    {{ field }}
+                                    {% if field.help_text %}<div class="form-text">{{ field.help_text }}</div>{% endif %}
+                                    {% for error in field.errors %}<div class="text-danger small">{{ error }}</div>{% endfor %}
+                                {% endif %}
+                            </div>
+                        {% endfor %}
+                    {% elif active_tab == 'consultations' %}
+                        {{ consultation_form.as_p }}
+                    {% else %}
+                        {{ crop_problem_form.as_p }}
+                    {% endif %}
+
+                    <div class="d-flex gap-2">
+                        <button class="btn btn-success" type="submit">Save</button>
+                        {% if editing_obj %}
+                            <a class="btn btn-outline-secondary" href="{% url 'content_management' %}?tab={{ active_tab }}">Cancel</a>
+                        {% endif %}
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xl-7">
+        <div class="card border-0 shadow-sm">
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle">
+                        <thead>
+                            <tr>
+                                <th>Content</th>
+                                <th>Order</th>
+                                <th>Status</th>
+                                <th class="text-end">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% if active_tab == 'services' %}
+                                {% for item in services %}
+                                    {% include 'dashboard/partials/content_row.html' with item=item content_type='services' label=item.title image=item.image %}
+                                {% empty %}
+                                    <tr><td colspan="4" class="text-center text-muted py-4">No services found.</td></tr>
+                                {% endfor %}
+                            {% elif active_tab == 'products' %}
+                                {% for item in products %}
+                                    {% include 'dashboard/partials/content_row.html' with item=item content_type='products' label=item.name image=item.image %}
+                                {% empty %}
+                                    <tr><td colspan="4" class="text-center text-muted py-4">No products found.</td></tr>
+                                {% endfor %}
+                            {% elif active_tab == 'consultations' %}
+                                {% for item in consultation_topics %}
+                                    {% include 'dashboard/partials/content_row.html' with item=item content_type='consultations' label=item.title image=item.image %}
+                                {% empty %}
+                                    <tr><td colspan="4" class="text-center text-muted py-4">No consultation categories found.</td></tr>
+                                {% endfor %}
+                            {% else %}
+                                {% for item in crop_problem_guides %}
+                                    {% include 'dashboard/partials/content_row.html' with item=item content_type='crop-problems' label=item.title image=item.image %}
+                                {% empty %}
+                                    <tr><td colspan="4" class="text-center text-muted py-4">No crop problem guides found.</td></tr>
+                                {% endfor %}
+                            {% endif %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% if active_tab == 'products' %}
+<div class="modal fade" id="cropManagerModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+        <div class="modal-content border-0 shadow">
+            <div class="modal-header">
+                <div>
+                    <h5 class="modal-title mb-0">Crop Management</h5>
+                    <small class="text-muted">Create, edit, activate, or deactivate crops without leaving the page.</small>
+                </div>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div id="cropModalFeedback" class="mb-3"></div>
+
+                <form id="cropManagerForm" class="row g-3" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    <input type="hidden" name="crop_id" id="crop_id">
+
+                    <div class="col-md-6">
+                        <label class="form-label fw-semibold">Crop Name</label>
+                        {{ crop_form.name }}
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label fw-semibold">Status</label>
+                        {{ crop_form.status }}
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label fw-semibold">Crop Image</label>
+                        {{ crop_form.image }}
+                    </div>
+                    <div class="col-md-6 d-flex align-items-end">
+                        <div class="w-100">
+                            <label class="form-label fw-semibold">Image Preview</label>
+                            <div class="border rounded-3 p-2 bg-light text-center">
+                                <img id="cropImagePreview" src="" alt="Crop preview" class="img-fluid rounded d-none" style="max-height: 120px; object-fit: cover;">
+                                <div id="cropImagePlaceholder" class="text-muted small py-3">No image selected</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-12">
+                        <label class="form-label fw-semibold">Description</label>
+                        {{ crop_form.description }}
+                    </div>
+                    <div class="col-12 d-flex gap-2">
+                        <button type="submit" class="btn btn-success" id="cropSaveButton">Save Crop</button>
+                        <button type="button" class="btn btn-outline-secondary" onclick="openCropModal()">Reset</button>
+                    </div>
+                </form>
+
+                <hr class="my-4">
+
+                <div class="table-responsive">
+                    <table class="table align-middle table-hover">
+                        <thead>
+                            <tr>
+                                <th>Crop</th>
+                                <th>Status</th>
+                                <th>Linked Products</th>
+                                <th class="text-end">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="cropListBody">
+                            {% for crop in crops %}
+                                <tr id="crop-row-{{ crop.id }}">
+                                    <td>
+                                        <div class="d-flex align-items-center gap-2">
+                                            {% if crop.image %}
+                                                <img src="{{ crop.image.url }}" alt="{{ crop.name }}" width="42" height="42" class="rounded" style="object-fit:cover;">
+                                            {% else %}
+                                                <span class="bg-light border rounded d-inline-flex align-items-center justify-content-center" style="width:42px;height:42px;"><i class="bi bi-image text-muted"></i></span>
+                                            {% endif %}
+                                            <div>
+                                                <div class="fw-semibold">{{ crop.name }}</div>
+                                                {% if crop.description %}<small class="text-muted">{{ crop.description|truncatechars:40 }}</small>{% endif %}
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <span class="badge {% if crop.is_active %}bg-success{% else %}bg-secondary{% endif %}" id="crop-status-{{ crop.id }}">{% if crop.is_active %}Active{% else %}Inactive{% endif %}</span>
+                                    </td>
+                                    <td><span class="badge bg-light text-dark">{{ crop.product_count|default:0 }}</span></td>
+                                    <td class="text-end text-nowrap">
+                                        <button type="button" class="btn btn-sm btn-outline-primary" onclick="editCrop({{ crop.id }})">Edit</button>
+                                        <button type="button" class="btn btn-sm btn-outline-warning" onclick="toggleCropStatus({{ crop.id }})">{% if crop.is_active %}Deactivate{% else %}Activate{% endif %}</button>
+                                        <button type="button" class="btn btn-sm btn-outline-danger" onclick="deleteCrop({{ crop.id }})">Delete</button>
+                                    </td>
+                                </tr>
+                            {% empty %}
+                                <tr id="crop-empty-row"><td colspan="4" class="text-center text-muted py-4">No crops found.</td></tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+<style>
+.content-form p {
+    margin-bottom: 1rem;
+}
+.content-form label {
+    font-weight: 600;
+    margin-bottom: .35rem;
+}
+.content-form input,
+.content-form select,
+.content-form textarea {
+    display: block;
+    width: 100%;
+    border: 1px solid #dee2e6;
+    border-radius: .5rem;
+    padding: .55rem .75rem;
+}
+.content-form input[type="checkbox"] {
+    display: inline-block;
+    width: auto;
+    margin-right: .4rem;
+}
+.crop-field-row .crop-add-btn {
+    min-width: 120px;
+}
+</style>
+
+{% if active_tab == 'products' %}
+<script>
+function getCookie(name) {
+    const value = `; ${document.cookie}`;
+    const parts = value.split(`; ${name}=`);
+    if (parts.length === 2) {
+        return parts.pop().split(';').shift();
+    }
+    return '';
+}
+
+const cropModalForm = document.getElementById('cropManagerForm');
+const cropModalFeedback = document.getElementById('cropModalFeedback');
+const cropSelect = document.getElementById('id_crop');
+const cropImageInput = document.getElementById('id_image');
+const cropImagePreview = document.getElementById('cropImagePreview');
+const cropImagePlaceholder = document.getElementById('cropImagePlaceholder');
+
+function showCropFeedback(message, type) {
+    cropModalFeedback.innerHTML = `<div class="alert alert-${type} mb-0">${message}</div>`;
+}
+
+function clearCropFeedback() {
+    cropModalFeedback.innerHTML = '';
+}
+
+function resetCropForm() {
+    cropModalForm.reset();
+    document.getElementById('crop_id').value = '';
+    cropImagePreview.src = '';
+    cropImagePreview.classList.add('d-none');
+    cropImagePlaceholder.classList.remove('d-none');
+    clearCropFeedback();
+}
+
+function openCropModal() {
+    resetCropForm();
+}
+
+function updateCropSelect(crop) {
+    if (!cropSelect) {
+        return;
+    }
+
+    let option = cropSelect.querySelector(`option[value="${crop.id}"]`);
+    if (!option) {
+        option = document.createElement('option');
+        option.value = crop.id;
+        cropSelect.appendChild(option);
+    }
+
+    option.textContent = crop.label;
+    if (crop.is_active) {
+        option.removeAttribute('data-inactive');
+    } else {
+        option.setAttribute('data-inactive', '1');
+    }
+    cropSelect.value = crop.id;
+}
+
+function removeCropSelect(cropId) {
+    if (!cropSelect) {
+        return;
+    }
+
+    const option = cropSelect.querySelector(`option[value="${cropId}"]`);
+    if (option) {
+        option.remove();
+    }
+}
+
+function renderCropRow(crop) {
+    const tbody = document.getElementById('cropListBody');
+    const emptyRow = document.getElementById('crop-empty-row');
+    if (emptyRow) {
+        emptyRow.remove();
+    }
+
+    const rowId = `crop-row-${crop.id}`;
+    const existingRow = document.getElementById(rowId);
+    const imageCell = crop.image_url
+        ? `<img src="${crop.image_url}" alt="${crop.name}" width="42" height="42" class="rounded" style="object-fit:cover;">`
+        : `<span class="bg-light border rounded d-inline-flex align-items-center justify-content-center" style="width:42px;height:42px;"><i class="bi bi-image text-muted"></i></span>`;
+    const description = crop.description ? `<small class="text-muted">${crop.description.slice(0, 40)}</small>` : '';
+    const rowHtml = `
+        <td>
+            <div class="d-flex align-items-center gap-2">
+                ${imageCell}
+                <div>
+                    <div class="fw-semibold">${crop.name}</div>
+                    ${description}
+                </div>
+            </div>
+        </td>
+        <td><span class="badge ${crop.is_active ? 'bg-success' : 'bg-secondary'}" id="crop-status-${crop.id}">${crop.is_active ? 'Active' : 'Inactive'}</span></td>
+        <td><span class="badge bg-light text-dark">${crop.product_count}</span></td>
+        <td class="text-end text-nowrap">
+            <button type="button" class="btn btn-sm btn-outline-primary" onclick="editCrop(${crop.id})">Edit</button>
+            <button type="button" class="btn btn-sm btn-outline-warning" onclick="toggleCropStatus(${crop.id})">${crop.is_active ? 'Deactivate' : 'Activate'}</button>
+            <button type="button" class="btn btn-sm btn-outline-danger" onclick="deleteCrop(${crop.id})">Delete</button>
+        </td>
+    `;
+
+    if (existingRow) {
+        existingRow.innerHTML = rowHtml;
+    } else {
+        const row = document.createElement('tr');
+        row.id = rowId;
+        row.innerHTML = rowHtml;
+        tbody.prepend(row);
+    }
+}
+
+async function editCrop(cropId) {
+    clearCropFeedback();
+    const response = await fetch(`{% url 'crop_detail' 0 %}`.replace('/0/', `/${cropId}/`));
+    const data = await response.json();
+    if (!data.success) {
+        showCropFeedback('Unable to load crop details.', 'danger');
+        return;
+    }
+
+    const crop = data.crop;
+    document.getElementById('crop_id').value = crop.id;
+    document.getElementById('id_name').value = crop.name || '';
+    document.getElementById('id_description').value = crop.description || '';
+    document.getElementById('id_status').value = String(crop.is_active);
+
+    if (crop.image_url) {
+        cropImagePreview.src = crop.image_url;
+        cropImagePreview.classList.remove('d-none');
+        cropImagePlaceholder.classList.add('d-none');
+    } else {
+        cropImagePreview.src = '';
+        cropImagePreview.classList.add('d-none');
+        cropImagePlaceholder.classList.remove('d-none');
+    }
+
+    const modal = bootstrap.Modal.getOrCreateInstance(document.getElementById('cropManagerModal'));
+    modal.show();
+}
+
+if (cropImageInput) {
+    cropImageInput.addEventListener('change', function () {
+        const file = this.files && this.files[0];
+        if (!file) {
+            cropImagePreview.src = '';
+            cropImagePreview.classList.add('d-none');
+            cropImagePlaceholder.classList.remove('d-none');
+            return;
+        }
+
+        cropImagePreview.src = URL.createObjectURL(file);
+        cropImagePreview.classList.remove('d-none');
+        cropImagePlaceholder.classList.add('d-none');
+    });
+}
+
+cropModalForm.addEventListener('submit', async function (event) {
+    event.preventDefault();
+    clearCropFeedback();
+
+    const formData = new FormData(cropModalForm);
+    const response = await fetch('{% url "crop_save" %}', {
+        method: 'POST',
+        headers: {
+            'X-CSRFToken': getCookie('csrftoken'),
+        },
+        body: formData,
+    });
+    const data = await response.json();
+
+    if (!response.ok) {
+        const errorList = Object.values(data.errors || {}).flat().join('<br>') || 'Unable to save crop.';
+        showCropFeedback(errorList, 'danger');
+        return;
+    }
+
+    updateCropSelect(data.crop);
+    renderCropRow(data.crop);
+    showCropFeedback(data.message || 'Crop saved successfully.', 'success');
+    document.getElementById('crop_id').value = data.crop.id;
+});
+
+async function toggleCropStatus(cropId) {
+    clearCropFeedback();
+    const response = await fetch(`{% url 'crop_toggle_status' 0 %}`.replace('/0/', `/${cropId}/`), {
+        method: 'POST',
+        headers: {
+            'X-CSRFToken': getCookie('csrftoken'),
+        },
+    });
+    const data = await response.json();
+    if (response.ok && data.success) {
+        updateCropSelect(data.crop);
+        renderCropRow(data.crop);
+        showCropFeedback(data.message, 'success');
+    }
+}
+
+async function deleteCrop(cropId) {
+    if (!confirm('Delete this crop? Linked products will preserve their crop data and the crop will be deactivated instead.')) {
+        return;
+    }
+
+    clearCropFeedback();
+    const response = await fetch(`{% url 'crop_delete' 0 %}`.replace('/0/', `/${cropId}/`), {
+        method: 'POST',
+        headers: {
+            'X-CSRFToken': getCookie('csrftoken'),
+        },
+    });
+    const data = await response.json();
+    if (!response.ok) {
+        showCropFeedback('Unable to delete crop.', 'danger');
+        return;
+    }
+
+    if (data.deleted) {
+        removeCropSelect(cropId);
+        const row = document.getElementById(`crop-row-${cropId}`);
+        if (row) {
+            row.remove();
+        }
+
+        const tbody = document.getElementById('cropListBody');
+        if (!tbody.querySelector('tr')) {
+            tbody.innerHTML = '<tr id="crop-empty-row"><td colspan="4" class="text-center text-muted py-4">No crops found.</td></tr>';
+        }
+    } else if (data.crop) {
+        updateCropSelect(data.crop);
+        renderCropRow(data.crop);
+    }
+
+    showCropFeedback(data.message, data.warning ? 'warning' : 'success');
+}
+</script>
+{% endif %}
+{% endblock %}

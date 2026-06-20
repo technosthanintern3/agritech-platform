@@ -3,19 +3,22 @@ from functools import wraps
 from django.contrib import messages
 from django.contrib.auth import login, logout
 from django.contrib.auth import get_user_model
+from django.contrib.auth import update_session_auth_hash
 from django.contrib.auth.forms import AuthenticationForm
+from django.core.paginator import Paginator
 from django.shortcuts import render
 from django.shortcuts import get_object_or_404, redirect
+from django.urls import reverse
 from django.utils import timezone
-from accounts.models import Farmer, Doctor, Consultant, IdentityChangeRequest, AdminProfile
+from accounts.models import Farmer, Doctor, Consultant, IdentityChangeRequest, AdminProfile, RegistrationField, Role, VerificationHistory
 from products.models import SeedVariety
 from dashboard.forms import ProductForm
 from machinery.models import Machinery, TractorBooking
 from dashboard.forms import MachineryForm
 from orders.models import Order
-from consultation.models import ConsultationRequest
+from consultation.models import ConsultationRequest, ConsultationTopic
 from services.models import ServiceInfo
-from farmer_support.models import CropProblem
+from farmer_support.models import CropProblem, CropProblemGuide
 from farmer_support.models import (
     CropProblem,
     AdminReply
@@ -25,6 +28,7 @@ from django.db.models import Q
 from services.models import ServiceRequest
 from products.models import Crop, Review, SeedVariety
 from django.http import JsonResponse
+from django.views.decorators.http import require_POST
 from django.utils.text import slugify
 from company.models import SiteSettings
 from accounts.models import (
@@ -33,16 +37,34 @@ from accounts.models import (
     FooterSettings,
     RolePageSettings
 )
+from accounts.models import AccessCode
 
 from dashboard.forms import (
     SiteSettingsForm,
     WhyChooseUsForm,
     FooterSettingsForm,
-    RolePageSettingsForm
+    RolePageSettingsForm,
+    AdminCreateForm,
+    AdminProfileForm,
+    AccessCodeManagementForm,
+    RegistrationFieldForm,
+    RoleManagementForm,
+    ServiceInfoForm,
+    ConsultationTopicForm,
+    CropProblemGuideForm,
+    CropForm,
 )
+from accounts.forms import PasswordChangeForm
 
 
 User = get_user_model()
+
+CONTENT_MODELS = {
+    'services': (ServiceInfo, ServiceInfoForm, 'service_form'),
+    'products': (SeedVariety, ProductForm, 'product_form'),
+    'consultations': (ConsultationTopic, ConsultationTopicForm, 'consultation_form'),
+    'crop-problems': (CropProblemGuide, CropProblemGuideForm, 'crop_problem_form'),
+}
 
 
 def admin_required(view_func):
@@ -69,6 +91,17 @@ def admin_required(view_func):
         )
 
     return wrapper
+
+
+def _is_super_admin(user):
+    profile = getattr(user, 'agritech_profile', None)
+    return bool(user.is_superuser or (profile and profile.is_super_admin))
+
+
+def _can_manage_admin(request_user, target_profile):
+    if not target_profile.is_super_admin:
+        return True
+    return _is_super_admin(request_user)
 
 
 def admin_login_view(request):
@@ -197,6 +230,11 @@ def admin_dashboard(request):
         "identity_change_requests": IdentityChangeRequest.objects.filter(
             status=IdentityChangeRequest.STATUS_PENDING
         ).count(),
+        "total_admins": AdminProfile.objects.count(),
+        "pending_verifications": (
+            Doctor.objects.exclude(verification_status=Doctor.STATUS_VERIFIED).count()
+            + Consultant.objects.exclude(verification_status=Consultant.STATUS_VERIFIED).count()
+        ),
         "verification_rows": verification_rows,
     }
 
@@ -205,6 +243,337 @@ def admin_dashboard(request):
         "dashboard/admin_dashboard.html",
         context
     )
+
+
+@admin_required
+def content_management(request):
+
+    active_tab = request.GET.get('tab', 'services')
+    if active_tab not in CONTENT_MODELS:
+        active_tab = 'services'
+
+    editing_type = request.GET.get('type', active_tab)
+    editing_pk = request.GET.get('id')
+    editing_obj = None
+
+    if editing_type in CONTENT_MODELS and editing_pk:
+        model, _, _ = CONTENT_MODELS[editing_type]
+        editing_obj = get_object_or_404(model, pk=editing_pk)
+        active_tab = editing_type
+
+    forms = {}
+    for content_type, (_, form_class, form_key) in CONTENT_MODELS.items():
+        instance = editing_obj if editing_type == content_type else None
+        forms[form_key] = form_class(instance=instance)
+
+    if request.method == 'POST':
+        content_type = request.POST.get('content_type', active_tab)
+
+        if content_type not in CONTENT_MODELS:
+            messages.error(request, 'Invalid content type.')
+            return redirect('content_management')
+
+        model, form_class, form_key = CONTENT_MODELS[content_type]
+        instance = None
+        object_id = request.POST.get('object_id')
+
+        if object_id:
+            instance = get_object_or_404(model, pk=object_id)
+
+        form = form_class(request.POST, request.FILES, instance=instance)
+        forms[form_key] = form
+
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Content saved successfully.')
+            return redirect(f'{reverse("content_management")}?tab={content_type}')
+
+        active_tab = content_type
+        editing_obj = instance
+
+    context = {
+        'active_tab': active_tab,
+        'editing_type': editing_type,
+        'editing_obj': editing_obj,
+        'services': ServiceInfo.objects.all(),
+        'products': SeedVariety.objects.select_related('crop').all(),
+        'consultation_topics': ConsultationTopic.objects.all(),
+        'crop_problem_guides': CropProblemGuide.objects.all(),
+        'crops': Crop.objects.annotate(product_count=Count('seedvariety')).order_by('name'),
+        'crop_form': CropForm(),
+        **forms,
+    }
+
+    return render(request, 'dashboard/content_management.html', context)
+
+
+def _serialize_crop(crop):
+
+    product_count = getattr(crop, 'product_count', None)
+
+    if product_count is None:
+        product_count = SeedVariety.objects.filter(crop=crop).count()
+
+    return {
+        'id': crop.id,
+        'name': crop.name,
+        'description': crop.description,
+        'image_url': crop.image.url if crop.image else '',
+        'is_active': crop.is_active,
+        'product_count': product_count,
+        'label': f"{crop.name} {'(Inactive)' if not crop.is_active else ''}".strip(),
+    }
+
+
+@admin_required
+def crop_detail(request, pk):
+
+    crop = get_object_or_404(Crop, pk=pk)
+
+    return JsonResponse({
+        'success': True,
+        'crop': _serialize_crop(crop),
+    })
+
+
+@admin_required
+@require_POST
+def crop_save(request):
+
+    crop_id = request.POST.get('crop_id')
+    instance = get_object_or_404(Crop, pk=crop_id) if crop_id else None
+    form = CropForm(request.POST, request.FILES, instance=instance)
+
+    if form.is_valid():
+        crop = form.save()
+        return JsonResponse({
+            'success': True,
+            'crop': _serialize_crop(crop),
+            'message': 'Crop saved successfully.',
+        })
+
+    return JsonResponse({
+        'success': False,
+        'errors': form.errors,
+    }, status=400)
+
+
+@admin_required
+@require_POST
+def crop_toggle_status(request, pk):
+
+    crop = get_object_or_404(Crop, pk=pk)
+    crop.is_active = not crop.is_active
+    crop.save(update_fields=['is_active'])
+
+    return JsonResponse({
+        'success': True,
+        'crop': _serialize_crop(crop),
+        'message': f"Crop {'activated' if crop.is_active else 'deactivated'} successfully.",
+    })
+
+
+@admin_required
+@require_POST
+def crop_delete(request, pk):
+
+    crop = get_object_or_404(Crop, pk=pk)
+    linked_products = SeedVariety.objects.filter(crop=crop).count()
+
+    if linked_products:
+        crop.is_active = False
+        crop.save(update_fields=['is_active'])
+        return JsonResponse({
+            'success': True,
+            'crop': _serialize_crop(crop),
+            'warning': True,
+            'message': 'Crop is linked to products. It has been deactivated instead of deleted.',
+        })
+
+    crop.delete()
+    return JsonResponse({
+        'success': True,
+        'deleted': True,
+        'crop_id': pk,
+        'message': 'Crop deleted successfully.',
+    })
+
+
+@admin_required
+def content_toggle_status(request, content_type, pk):
+
+    if content_type not in CONTENT_MODELS:
+        messages.error(request, 'Invalid content type.')
+        return redirect('content_management')
+
+    model, _, _ = CONTENT_MODELS[content_type]
+    obj = get_object_or_404(model, pk=pk)
+
+    if hasattr(obj, 'is_active'):
+        obj.is_active = not obj.is_active
+        obj.save(update_fields=['is_active'])
+        messages.success(request, 'Status updated successfully.')
+
+    return redirect(f'{reverse("content_management")}?tab={content_type}')
+
+
+@admin_required
+def content_delete(request, content_type, pk):
+
+    if content_type not in CONTENT_MODELS:
+        messages.error(request, 'Invalid content type.')
+        return redirect('content_management')
+
+    model, _, _ = CONTENT_MODELS[content_type]
+    obj = get_object_or_404(model, pk=pk)
+
+    if request.method == 'POST':
+        obj.delete()
+        messages.success(request, 'Content deleted successfully.')
+
+    return redirect(f'{reverse("content_management")}?tab={content_type}')
+
+
+@admin_required
+def admins_management(request):
+
+    search_query = request.GET.get('q', '')
+    role_filter = request.GET.get('role', '')
+    status_filter = request.GET.get('status', '')
+
+    admins = AdminProfile.objects.select_related('user').all()
+
+    if search_query:
+        admins = admins.filter(
+            Q(full_name__icontains=search_query) |
+            Q(user__username__icontains=search_query) |
+            Q(user__email__icontains=search_query)
+        )
+
+    if role_filter:
+        admins = admins.filter(role=role_filter)
+
+    if status_filter == 'active':
+        admins = admins.filter(user__is_active=True)
+    elif status_filter == 'inactive':
+        admins = admins.filter(user__is_active=False)
+
+    paginator = Paginator(admins, 10)
+    page_obj = paginator.get_page(request.GET.get('page'))
+
+    return render(
+        request,
+        'dashboard/admins_management.html',
+        {
+            'page_obj': page_obj,
+            'admins': page_obj.object_list,
+            'search_query': search_query,
+            'role_filter': role_filter,
+            'status_filter': status_filter,
+            'role_choices': AdminProfile.ROLE_CHOICES,
+            'total_admins': AdminProfile.objects.count(),
+            'active_admins': AdminProfile.objects.filter(user__is_active=True).count(),
+            'inactive_admins': AdminProfile.objects.filter(user__is_active=False).count(),
+        }
+    )
+
+
+@admin_required
+def access_code_management(request):
+
+    if not _is_super_admin(request.user):
+        messages.error(request, 'Only Super Admins can manage access codes.')
+        return redirect('admin_dashboard')
+
+    access_codes = AccessCode.objects.all()
+    form = AccessCodeManagementForm(request.POST or None)
+    generated_code = None
+
+    if request.method == 'POST' and form.is_valid():
+        code_type = form.cleaned_data['code_type']
+        action = form.cleaned_data['action']
+        code_value = form.cleaned_data['code_value']
+        access_code = get_object_or_404(AccessCode, code_type=code_type)
+
+        if action == AccessCodeManagementForm.ACTION_UPDATE:
+            generated_code = access_code.update_code(code_value, updated_by=request.user)
+            messages.success(request, f'{access_code.code_label} updated successfully.')
+        elif action in (AccessCodeManagementForm.ACTION_ROTATE, AccessCodeManagementForm.ACTION_REGENERATE):
+            generated_code = access_code.rotate_code(updated_by=request.user)
+            messages.success(request, f'{access_code.code_label} rotated successfully.')
+
+    return render(
+        request,
+        'dashboard/access_code_management.html',
+        {
+            'access_codes': access_codes,
+            'form': form,
+            'generated_code': generated_code,
+        }
+    )
+
+
+@admin_required
+def admin_create(request):
+
+    form = AdminCreateForm(request.POST or None, request.FILES or None, request_user=request.user)
+
+    if request.method == 'POST' and form.is_valid():
+        profile = form.save()
+        messages.success(request, f'{profile.full_name} was created successfully.')
+        return redirect('admins_management')
+
+    return render(request, 'dashboard/admin_form.html', {'form': form, 'title': 'Create Admin'})
+
+
+@admin_required
+def admin_detail(request, pk):
+
+    profile = get_object_or_404(AdminProfile.objects.select_related('user'), pk=pk)
+
+    return render(request, 'dashboard/admin_detail.html', {'profile': profile})
+
+
+@admin_required
+def admin_edit(request, pk):
+
+    profile = get_object_or_404(AdminProfile.objects.select_related('user'), pk=pk)
+
+    if not _can_manage_admin(request.user, profile):
+        messages.error(request, 'Normal Admins cannot modify Super Admin permissions.')
+        return redirect('admins_management')
+
+    form = AdminProfileForm(
+        request.POST or None,
+        request.FILES or None,
+        instance=profile,
+        request_user=request.user,
+    )
+
+    if request.method == 'POST' and form.is_valid():
+        form.save()
+        messages.success(request, 'Admin updated successfully.')
+        return redirect('admins_management')
+
+    return render(request, 'dashboard/admin_form.html', {'form': form, 'title': 'Edit Admin'})
+
+
+@admin_required
+def admin_delete(request, pk):
+
+    profile = get_object_or_404(AdminProfile.objects.select_related('user'), pk=pk)
+
+    if profile.is_super_admin:
+        messages.error(request, 'Super Admin cannot be deleted.')
+        return redirect('admins_management')
+
+    if request.method == 'POST':
+        user = profile.user
+        profile.delete()
+        user.delete()
+        messages.success(request, 'Admin deleted successfully.')
+
+    return redirect('admins_management')
 
 
 def farmers_list(request):
@@ -1018,6 +1387,8 @@ def doctors_management(request):
         doctors = doctors.filter(is_approved=True)
     elif status_filter == 'pending':
         doctors = doctors.filter(is_approved=False)
+    elif status_filter in dict(Doctor.VERIFICATION_STATUS_CHOICES):
+        doctors = doctors.filter(verification_status=status_filter)
 
     if availability_filter == 'online':
         doctors = doctors.filter(is_online=True)
@@ -1032,22 +1403,33 @@ def doctors_management(request):
             'search_query': search_query,
             'status_filter': status_filter,
             'availability_filter': availability_filter,
+            'verification_status_choices': Doctor.VERIFICATION_STATUS_CHOICES,
         }
     )
 
 
+@require_POST
 def doctor_action(request, pk, action):
 
     doctor = get_object_or_404(Doctor, pk=pk)
 
     if action == 'approve':
         doctor.is_approved = True
+        doctor.verification_status = Doctor.STATUS_VERIFIED
         messages.success(request, 'Doctor approved successfully.')
     elif action == 'reject':
         doctor.is_approved = False
         doctor.is_active_status = False
         doctor.is_online = False
+        doctor.verification_status = Doctor.STATUS_REJECTED
         messages.success(request, 'Doctor rejected successfully.')
+    elif action == 'review':
+        doctor.verification_status = Doctor.STATUS_UNDER_REVIEW
+        messages.success(request, 'Doctor marked under review.')
+    elif action == 'request-documents':
+        doctor.verification_status = Doctor.STATUS_UNDER_REVIEW
+        doctor.verification_note = request.POST.get('note', '').strip()
+        messages.success(request, 'Additional documents requested from doctor.')
     elif action == 'activate':
         doctor.is_active_status = True
         messages.success(request, 'Doctor activated successfully.')
@@ -1056,9 +1438,41 @@ def doctor_action(request, pk, action):
         doctor.is_online = False
         messages.success(request, 'Doctor deactivated successfully.')
 
+    doctor.verification_note = request.POST.get('note', doctor.verification_note)
     doctor.save()
 
+    if action in {'approve', 'reject', 'review', 'request-documents'}:
+        VerificationHistory.objects.create(
+            role=VerificationHistory.ROLE_DOCTOR,
+            account_id=doctor.id,
+            action={
+                'approve': VerificationHistory.ACTION_APPROVED,
+                'reject': VerificationHistory.ACTION_REJECTED,
+                'review': VerificationHistory.ACTION_UNDER_REVIEW,
+                'request-documents': VerificationHistory.ACTION_REQUESTED_DOCUMENTS,
+            }[action],
+            note=request.POST.get('note', ''),
+            performed_by=request.user,
+        )
+
     return redirect('doctors_management')
+
+
+def doctor_detail(request, pk):
+
+    doctor = get_object_or_404(Doctor, pk=pk)
+    history = VerificationHistory.objects.filter(role=VerificationHistory.ROLE_DOCTOR, account_id=doctor.id)
+
+    return render(
+        request,
+        'dashboard/verification_detail.html',
+        {
+            'account': doctor,
+            'role_label': 'Doctor',
+            'history': history,
+            'action_url_name': 'doctor_action',
+        }
+    )
 
 
 def consultant_management(request):
@@ -1080,6 +1494,8 @@ def consultant_management(request):
         consultants = consultants.filter(is_approved=True)
     elif status_filter == 'pending':
         consultants = consultants.filter(is_approved=False)
+    elif status_filter in dict(Consultant.VERIFICATION_STATUS_CHOICES):
+        consultants = consultants.filter(verification_status=status_filter)
 
     if availability_filter == 'online':
         consultants = consultants.filter(is_online=True)
@@ -1094,22 +1510,33 @@ def consultant_management(request):
             'search_query': search_query,
             'status_filter': status_filter,
             'availability_filter': availability_filter,
+            'verification_status_choices': Consultant.VERIFICATION_STATUS_CHOICES,
         }
     )
 
 
+@require_POST
 def consultant_action(request, pk, action):
 
     consultant = get_object_or_404(Consultant, pk=pk)
 
     if action == 'approve':
         consultant.is_approved = True
+        consultant.verification_status = Consultant.STATUS_VERIFIED
         messages.success(request, 'Consultant approved successfully.')
     elif action == 'reject':
         consultant.is_approved = False
         consultant.is_active_status = False
         consultant.is_online = False
+        consultant.verification_status = Consultant.STATUS_REJECTED
         messages.success(request, 'Consultant rejected successfully.')
+    elif action == 'review':
+        consultant.verification_status = Consultant.STATUS_UNDER_REVIEW
+        messages.success(request, 'Consultant marked under review.')
+    elif action == 'request-documents':
+        consultant.verification_status = Consultant.STATUS_UNDER_REVIEW
+        consultant.verification_note = request.POST.get('note', '').strip()
+        messages.success(request, 'Additional documents requested from consultant.')
     elif action == 'activate':
         consultant.is_active_status = True
         messages.success(request, 'Consultant activated successfully.')
@@ -1118,9 +1545,113 @@ def consultant_action(request, pk, action):
         consultant.is_online = False
         messages.success(request, 'Consultant deactivated successfully.')
 
+    consultant.verification_note = request.POST.get('note', consultant.verification_note)
     consultant.save()
 
+    if action in {'approve', 'reject', 'review', 'request-documents'}:
+        VerificationHistory.objects.create(
+            role=VerificationHistory.ROLE_CONSULTANT,
+            account_id=consultant.id,
+            action={
+                'approve': VerificationHistory.ACTION_APPROVED,
+                'reject': VerificationHistory.ACTION_REJECTED,
+                'review': VerificationHistory.ACTION_UNDER_REVIEW,
+                'request-documents': VerificationHistory.ACTION_REQUESTED_DOCUMENTS,
+            }[action],
+            note=request.POST.get('note', ''),
+            performed_by=request.user,
+        )
+
     return redirect('consultant_management')
+
+
+def consultant_detail(request, pk):
+
+    consultant = get_object_or_404(Consultant, pk=pk)
+    history = VerificationHistory.objects.filter(role=VerificationHistory.ROLE_CONSULTANT, account_id=consultant.id)
+
+    return render(
+        request,
+        'dashboard/verification_detail.html',
+        {
+            'account': consultant,
+            'role_label': 'Consultant',
+            'history': history,
+            'action_url_name': 'consultant_action',
+        }
+    )
+
+
+@admin_required
+def registration_fields(request, pk=None):
+
+    field_obj = get_object_or_404(RegistrationField, pk=pk) if pk else None
+    form = RegistrationFieldForm(request.POST or None, instance=field_obj)
+
+    if request.method == 'POST' and form.is_valid():
+        form.save()
+        messages.success(request, 'Registration field saved successfully.')
+        return redirect('registration_fields')
+
+    return render(
+        request,
+        'dashboard/registration_fields.html',
+        {
+            'form': form,
+            'fields': RegistrationField.objects.all(),
+            'editing_field': field_obj,
+        }
+    )
+
+
+@admin_required
+def registration_field_delete(request, pk):
+
+    field_obj = get_object_or_404(RegistrationField, pk=pk)
+
+    if request.method == 'POST':
+        field_obj.delete()
+        messages.success(request, 'Registration field deleted successfully.')
+
+    return redirect('registration_fields')
+
+
+@admin_required
+def roles_management(request, pk=None):
+
+    role_obj = get_object_or_404(Role, pk=pk) if pk else None
+    form = RoleManagementForm(request.POST or None, instance=role_obj)
+
+    if request.method == 'POST' and form.is_valid():
+        form.save()
+        messages.success(request, 'Role saved successfully.')
+        return redirect('roles_management')
+
+    return render(
+        request,
+        'dashboard/roles_management.html',
+        {
+            'form': form,
+            'roles': Role.objects.all(),
+            'editing_role': role_obj,
+        }
+    )
+
+
+@admin_required
+def role_delete(request, pk):
+
+    role_obj = get_object_or_404(Role, pk=pk)
+
+    if role_obj.is_system:
+        messages.error(request, 'System roles cannot be deleted.')
+        return redirect('roles_management')
+
+    if request.method == 'POST':
+        role_obj.delete()
+        messages.success(request, 'Role deleted successfully.')
+
+    return redirect('roles_management')
 
 
 @admin_required
@@ -1178,6 +1709,38 @@ def delete_consultant(request, pk):
 
     messages.success(request, 'Consultant deleted permanently.')
     return redirect('consultant_management')
+
+
+@admin_required
+def admin_profile(request):
+
+    profile = getattr(request.user, 'agritech_profile', None)
+    password_form = PasswordChangeForm(request.POST or None)
+
+    if request.method == 'POST' and request.POST.get('change_password'):
+
+        if password_form.is_valid():
+
+            current_password = password_form.cleaned_data['current_password']
+            new_password = password_form.cleaned_data['new_password']
+
+            if not request.user.check_password(current_password):
+                password_form.add_error('current_password', 'Current password is incorrect.')
+            else:
+                request.user.set_password(new_password)
+                request.user.save(update_fields=['password'])
+                update_session_auth_hash(request, request.user)
+                messages.success(request, 'Password changed successfully.')
+                return redirect('admin_profile')
+
+    return render(
+        request,
+        'dashboard/admin_profile.html',
+        {
+            'profile': profile,
+            'password_form': password_form,
+        }
+    )
 
 
 def product_reviews_management(request):

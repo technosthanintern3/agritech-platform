@@ -1,0 +1,60 @@
+{% extends 'dashboard/base_admin.html' %}
+
+{% block content %}
+<div class="row g-4">
+    <div class="col-lg-4">
+        <div class="table-card">
+            <h4 class="mb-3">{% if editing_role %}Edit Role{% else %}Create Role{% endif %}</h4>
+            <form method="post">
+                {% csrf_token %}
+                {% for field in form %}
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">{{ field.label }}</label>
+                        {{ field }}
+                        {% for error in field.errors %}<div class="text-danger small">{{ error }}</div>{% endfor %}
+                    </div>
+                {% endfor %}
+                <button class="btn btn-success w-100">Save Role</button>
+            </form>
+        </div>
+    </div>
+    <div class="col-lg-8">
+        <div class="table-card">
+            <h4 class="mb-3">Dynamic Roles</h4>
+            <div class="table-responsive">
+                <table class="table align-middle table-hover">
+                    <thead class="table-dark">
+                        <tr>
+                            <th>Name</th>
+                            <th>Slug</th>
+                            <th>Register</th>
+                            <th>Dashboard</th>
+                            <th>Status</th>
+                            <th>System</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    {% for role in roles %}
+                        <tr>
+                            <td>{{ role.icon }} {{ role.name }}</td>
+                            <td><code>{{ role.slug }}</code></td>
+                            <td>{{ role.register_url }}</td>
+                            <td>{{ role.dashboard_url }}</td>
+                            <td>{% if role.is_active %}<span class="badge bg-success">Active</span>{% else %}<span class="badge bg-secondary">Disabled</span>{% endif %}</td>
+                            <td>{% if role.is_system %}<span class="badge bg-dark">Protected</span>{% else %}<span class="badge bg-light text-dark">Custom</span>{% endif %}</td>
+                            <td class="text-nowrap">
+                                <a href="{% url 'edit_role' role.id %}" class="btn btn-sm btn-outline-secondary"><i class="bi bi-pencil"></i></a>
+                                <form method="post" action="{% url 'delete_role' role.id %}" class="d-inline">{% csrf_token %}<button class="btn btn-sm btn-outline-danger" {% if role.is_system %}disabled{% endif %}><i class="bi bi-trash"></i></button></form>
+                            </td>
+                        </tr>
+                    {% empty %}
+                        <tr><td colspan="7" class="text-center text-muted py-4">No roles found.</td></tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

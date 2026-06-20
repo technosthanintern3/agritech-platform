@@ -1,6 +1,76 @@
 from django.db import models
+from django.utils.text import slugify
 from accounts.models import Farmer
 from accounts.models import Doctor, Consultant
+
+
+class ConsultationTopic(models.Model):
+
+    title = models.CharField(max_length=160)
+
+    slug = models.SlugField(unique=True, blank=True)
+
+    icon = models.CharField(max_length=80, default='bi bi-person-video3')
+
+    category = models.CharField(max_length=120, blank=True)
+
+    short_summary = models.TextField()
+
+    detailed_description = models.TextField()
+
+    image = models.ImageField(
+        upload_to='consultation_topics/',
+        blank=True,
+        null=True
+    )
+
+    hero_image = models.ImageField(
+        upload_to='consultation_topics/hero/',
+        blank=True,
+        null=True
+    )
+
+    benefits = models.TextField(
+        help_text='Enter one benefit per line',
+        blank=True
+    )
+
+    use_cases = models.TextField(
+        help_text='Enter one use case per line',
+        blank=True
+    )
+
+    guidance_steps = models.TextField(
+        help_text='Enter one process/guidance step per line',
+        blank=True
+    )
+
+    display_order = models.PositiveIntegerField(default=0)
+
+    is_active = models.BooleanField(default=True)
+
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['display_order', 'title']
+
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            self.slug = slugify(self.title)
+
+        super().save(*args, **kwargs)
+
+    def get_benefits_list(self):
+        return self.benefits.splitlines()
+
+    def get_use_cases_list(self):
+        return self.use_cases.splitlines()
+
+    def get_guidance_steps_list(self):
+        return self.guidance_steps.splitlines()
+
+    def __str__(self):
+        return self.title
 
 class ConsultationRequest(models.Model):
 

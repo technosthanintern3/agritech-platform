@@ -1,110 +1,471 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<div class="container py-5">
-    <div class="row g-4">
-        <div class="col-lg-6">
-            <div class="card shadow-sm border-0 overflow-hidden">
-                <img src="{{ seed.image.url }}" class="img-fluid" alt="{{ seed.name }}">
+<div class="product-detail-page">
+    <div class="container py-4 py-lg-5">
+        <section class="product-hero-grid">
+            <div class="product-media-card">
+                {% if seed.hero_image %}
+                    <img src="{{ seed.hero_image.url }}" alt="{{ seed.name }}">
+                {% elif seed.image %}
+                    <img src="{{ seed.image.url }}" alt="{{ seed.name }}">
+                {% else %}
+                    <div class="product-media-fallback"><i class="bi bi-basket2"></i></div>
+                {% endif %}
             </div>
-        </div>
 
-        <div class="col-lg-6">
-            <div class="card shadow-sm border-0 p-4 h-100">
-                <div class="d-flex justify-content-between align-items-start gap-3">
-                    <div>
-                        <h1 class="h2 mb-2">{{ seed.name }}</h1>
-                        <p class="text-muted mb-2"><strong>Crop:</strong> {{ seed.crop }}</p>
-                    </div>
-                    <h3 class="text-success mb-0">₹ {{ seed.price }}</h3>
+            <div class="product-info-card">
+                <div class="product-badges">
+                    <span><i class="bi bi-flower1 me-1"></i>{{ seed.crop }}</span>
+                    <span><i class="bi bi-check2-circle me-1"></i>Available</span>
                 </div>
 
+                <h1>{{ seed.name }}</h1>
+                <p class="product-summary">{{ seed.description }}</p>
+
                 {% if average_rating %}
-                    <div class="mt-3 mb-2">
-                        <span class="badge bg-warning text-dark">⭐ {{ average_rating|floatformat:1 }}/5</span>
-                        <span class="text-muted ms-2">{{ total_reviews }} visible reviews</span>
+                    <div class="rating-row">
+                        <span class="rating-badge"><i class="bi bi-star-fill"></i> {{ average_rating|floatformat:1 }}/5</span>
+                        <small>{{ total_reviews }} visible reviews</small>
                     </div>
                 {% endif %}
 
-                <div class="mt-3">
-                    <p class="mb-1"><strong>Soil Type:</strong> {{ seed.soil_type }}</p>
-                    <p class="mb-1"><strong>Season:</strong> {{ seed.season }}</p>
-                    <p class="mb-1"><strong>Water Requirement:</strong> {{ seed.water_requirement }}</p>
-                    <p class="mb-0"><strong>Description:</strong> {{ seed.description }}</p>
+                <div class="price-row">
+                    <span>Price</span>
+                    <strong>Rs {{ seed.price }}</strong>
                 </div>
 
-                <form method="POST" action="{% url 'add_to_cart' seed.id %}" class="mt-4">
+                <form method="POST" action="{% url 'add_to_cart' seed.id %}" class="cart-form">
                     {% csrf_token %}
-                    <div class="row g-2 align-items-end">
-                        <div class="col-sm-4">
-                            <label class="form-label">Quantity</label>
-                            <input type="number" name="quantity" value="1" min="1" class="form-control">
-                        </div>
-                        <div class="col-sm-8 d-flex gap-2">
-                            <button type="submit" class="btn btn-success px-4">🛒 Add To Cart</button>
-                            <a href="{% url 'cart' %}" class="btn btn-outline-success">View Cart</a>
-                        </div>
+                    <label for="quantityInput">Quantity</label>
+                    <div class="purchase-row">
+                        <input id="quantityInput" type="number" name="quantity" value="1" min="1" class="form-control">
+                        <button type="submit" class="btn btn-success btn-lg">
+                            <i class="bi bi-cart-plus me-1"></i> Add To Cart
+                        </button>
+                        <a href="{% url 'cart' %}" class="btn btn-outline-success btn-lg">View Cart</a>
                     </div>
                 </form>
             </div>
-        </div>
-    </div>
+        </section>
 
-    <div class="row mt-5 g-4">
-        <div class="col-lg-4">
-            <div class="card shadow-sm border-0 p-4 h-100">
-                <h4 class="mb-3">Rating Breakdown</h4>
-                {% for star, count in rating_breakdown %}
-                    <div class="d-flex align-items-center gap-2 mb-2">
-                        <div style="width: 50px;">{{ star }} star</div>
-                        <div class="progress flex-grow-1" style="height: 10px;">
-                            <div class="progress-bar bg-success" role="progressbar" style="width: {% if total_reviews %}{% widthratio count total_reviews 100 %}{% else %}0{% endif %}%"></div>
+        <section class="product-content-grid">
+            <div class="content-main">
+                <div class="detail-panel">
+                    <span class="section-kicker">Description</span>
+                    <h2>Product Overview</h2>
+                    <p>{{ seed.description }}</p>
+                </div>
+
+                <div class="detail-panel">
+                    <span class="section-kicker">Specifications</span>
+                    <h2>Growing Information</h2>
+                    <div class="spec-grid">
+                        {% for specification in seed.get_specifications_list %}
+                        <div>
+                            <i class="bi bi-check2-circle"></i>
+                            <span>Specification</span>
+                            <strong>{{ specification }}</strong>
                         </div>
-                        <span class="small text-muted">{{ count }}</span>
+                        {% empty %}
+                        <div>
+                            <i class="bi bi-flower1"></i>
+                            <span>Crop</span>
+                            <strong>{{ seed.crop }}</strong>
+                        </div>
+                        <div>
+                            <i class="bi bi-calendar3"></i>
+                            <span>Season</span>
+                            <strong>{{ seed.season }}</strong>
+                        </div>
+                        <div>
+                            <i class="bi bi-moisture"></i>
+                            <span>Water Requirement</span>
+                            <strong>{{ seed.water_requirement }}</strong>
+                        </div>
+                        <div>
+                            <i class="bi bi-layers"></i>
+                            <span>Soil Type</span>
+                            <strong>{{ seed.soil_type }}</strong>
+                        </div>
+                        {% endfor %}
                     </div>
-                {% endfor %}
-            </div>
-        </div>
+                </div>
 
-        <div class="col-lg-8">
-            <div class="card shadow-sm border-0 p-4 mb-4">
-                <h4 class="mb-3">Customer Reviews</h4>
-                {% for review in reviews %}
-                    <div class="border rounded-3 p-3 mb-3">
-                        <div class="d-flex justify-content-between align-items-center mb-2">
-                            <div>
-                                <strong>{{ review.name }}</strong>
-                                <div class="small text-muted">{% if review.farmer %}Verified farmer{% else %}Customer{% endif %}</div>
+                <div class="detail-panel">
+                    <span class="section-kicker">Related Products</span>
+                    <h2>Similar Farm Inputs</h2>
+                    <div class="related-products-grid">
+                        {% for product in related_products %}
+                            <a href="{% url 'product_detail' product.id %}" class="related-product-card">
+                                {% if product.image %}
+                                    <img src="{{ product.image.url }}" alt="{{ product.name }}">
+                                {% else %}
+                                    <span><i class="bi bi-basket2"></i></span>
+                                {% endif %}
+                                <strong>{{ product.name }}</strong>
+                                <small>{{ product.crop }} | Rs {{ product.price }}</small>
+                            </a>
+                        {% empty %}
+                            <div class="related-product-empty">Related products will appear here when more items are added for this crop.</div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+
+            <aside class="review-column">
+                <div class="detail-panel">
+                    <span class="section-kicker">Reviews</span>
+                    <h2>Rating Breakdown</h2>
+                    {% for star, count in rating_breakdown %}
+                        <div class="rating-breakdown-row">
+                            <span>{{ star }} star</span>
+                            <div class="progress">
+                                <div class="progress-bar bg-success" role="progressbar" style="width: {% if total_reviews %}{% widthratio count total_reviews 100 %}{% else %}0{% endif %}%"></div>
                             </div>
-                            <span class="badge bg-success">{{ review.rating }}/5</span>
+                            <small>{{ count }}</small>
                         </div>
-                        <p class="mb-0">{{ review.review_text }}</p>
-                    </div>
-                {% empty %}
-                    <div class="alert alert-info mb-0">No approved reviews yet.</div>
-                {% endfor %}
-            </div>
+                    {% endfor %}
+                </div>
 
-            <div class="card shadow-sm border-0 p-4">
-                <h4 class="mb-3">Write a Review</h4>
-                <form method="POST">
-                    {% csrf_token %}
-                    <div class="mb-3">
-                        <label class="form-label">Your Name</label>
-                        {{ form.name }}
+                <div class="detail-panel">
+                    <span class="section-kicker">Customer Reviews</span>
+                    <h2>Farmer Feedback</h2>
+                    <div class="reviews-list">
+                        {% for review in reviews %}
+                            <div class="review-card">
+                                <div>
+                                    <strong>{{ review.name }}</strong>
+                                    <span>{% if review.farmer %}Verified farmer{% else %}Customer{% endif %}</span>
+                                </div>
+                                <b>{{ review.rating }}/5</b>
+                                <p>{{ review.review_text }}</p>
+                            </div>
+                        {% empty %}
+                            <div class="review-empty">No approved reviews yet.</div>
+                        {% endfor %}
                     </div>
-                    <div class="mb-3">
-                        <label class="form-label">Rating</label>
-                        {{ form.rating }}
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label">Your Review</label>
-                        {{ form.review_text }}
-                    </div>
-                    <button type="submit" class="btn btn-success">Submit Review</button>
-                </form>
-            </div>
-        </div>
+                </div>
+
+                <div class="detail-panel">
+                    <span class="section-kicker">Write a Review</span>
+                    <h2>Share Your Experience</h2>
+                    <form method="POST" class="review-form">
+                        {% csrf_token %}
+                        <div class="mb-3">
+                            <label class="form-label">Your Name</label>
+                            {{ form.name }}
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Rating</label>
+                            {{ form.rating }}
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Your Review</label>
+                            {{ form.review_text }}
+                        </div>
+                        <button type="submit" class="btn btn-success w-100">Submit Review</button>
+                    </form>
+                </div>
+            </aside>
+        </section>
     </div>
 </div>
+
+<style>
+.product-detail-page {
+    background:
+        radial-gradient(circle at top right, rgba(25, 135, 84, .07), transparent 28rem),
+        #f6f8f3;
+    min-height: calc(100vh - 76px);
+}
+.product-hero-grid {
+    display: grid;
+    grid-template-columns: minmax(280px, 520px) minmax(0, 1fr);
+    gap: 1.25rem;
+    align-items: stretch;
+}
+.product-media-card,
+.product-info-card,
+.detail-panel,
+.related-product-card,
+.related-product-empty {
+    background: #fff;
+    border: 1px solid rgba(15, 61, 46, .1);
+    border-radius: 8px;
+    box-shadow: 0 12px 30px rgba(15, 61, 46, .08);
+}
+.product-media-card {
+    overflow: hidden;
+    min-height: 420px;
+}
+.product-media-card img,
+.product-media-fallback {
+    width: 100%;
+    height: 100%;
+    min-height: 420px;
+}
+.product-media-card img {
+    object-fit: cover;
+}
+.product-media-fallback {
+    display: grid;
+    place-items: center;
+    background: #e8efe7;
+    color: #17633a;
+    font-size: 4rem;
+}
+.product-info-card {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: clamp(1.25rem, 4vw, 2rem);
+    min-width: 0;
+}
+.product-badges {
+    display: flex;
+    flex-wrap: wrap;
+    gap: .5rem;
+    margin-bottom: .75rem;
+}
+.product-badges span,
+.rating-badge {
+    display: inline-flex;
+    align-items: center;
+    border-radius: 999px;
+    background: #e4f4ea;
+    color: #17633a;
+    font-size: .82rem;
+    font-weight: 800;
+    padding: .4rem .7rem;
+}
+.product-info-card h1 {
+    font-size: clamp(2rem, 4vw, 3.35rem);
+    font-weight: 900;
+    line-height: 1.04;
+    overflow-wrap: anywhere;
+}
+.product-summary,
+.detail-panel p,
+.review-card p,
+.related-product-card small,
+.related-product-empty,
+.review-empty {
+    color: #607168;
+    overflow-wrap: anywhere;
+}
+.rating-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: .65rem;
+    align-items: center;
+    margin: .75rem 0;
+}
+.rating-badge {
+    background: #fff7df;
+    color: #8a5a00;
+}
+.price-row {
+    display: grid;
+    gap: .1rem;
+    margin: 1rem 0;
+}
+.price-row span,
+.cart-form label,
+.section-kicker {
+    color: #17633a;
+    font-size: .78rem;
+    font-weight: 850;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+}
+.price-row strong {
+    color: #17633a;
+    font-size: 2rem;
+    line-height: 1;
+}
+.cart-form {
+    margin-top: .75rem;
+}
+.purchase-row {
+    display: grid;
+    grid-template-columns: 110px auto auto;
+    gap: .75rem;
+    align-items: center;
+    margin-top: .45rem;
+}
+.purchase-row .form-control {
+    min-height: 48px;
+    border-color: #d7e3da;
+    border-radius: 8px;
+}
+.product-content-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 360px;
+    gap: 1.25rem;
+    align-items: start;
+    margin-top: 1.25rem;
+}
+.content-main,
+.review-column {
+    display: grid;
+    gap: 1rem;
+    min-width: 0;
+}
+.review-column {
+    position: sticky;
+    top: 92px;
+}
+.detail-panel {
+    padding: 1.25rem;
+}
+.detail-panel h2 {
+    font-weight: 850;
+    margin: .25rem 0 .85rem;
+}
+.spec-grid,
+.related-products-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: .85rem;
+}
+.spec-grid div {
+    display: grid;
+    gap: .25rem;
+    padding: .9rem;
+    border: 1px solid #e4ece6;
+    border-radius: 8px;
+    background: #fbfdfb;
+}
+.spec-grid i {
+    color: #198754;
+    font-size: 1.35rem;
+}
+.spec-grid span {
+    color: #607168;
+    font-size: .88rem;
+}
+.spec-grid strong {
+    overflow-wrap: anywhere;
+}
+.related-product-card {
+    display: grid;
+    grid-template-rows: 140px auto auto;
+    gap: .55rem;
+    padding: .75rem;
+    color: #17352a;
+    text-decoration: none;
+    transition: transform .2s ease, box-shadow .2s ease, border-color .2s ease;
+}
+.related-product-card:hover {
+    color: #0f5132;
+    border-color: rgba(25, 135, 84, .24);
+    transform: translateY(-3px);
+    box-shadow: 0 18px 36px rgba(15, 61, 46, .12);
+}
+.related-product-card img,
+.related-product-card > span {
+    width: 100%;
+    height: 140px;
+    border-radius: 8px;
+    object-fit: cover;
+    background: #e8efe7;
+}
+.related-product-card > span {
+    display: grid;
+    place-items: center;
+    color: #17633a;
+    font-size: 2rem;
+}
+.related-product-card strong {
+    overflow-wrap: anywhere;
+}
+.related-product-empty {
+    grid-column: 1 / -1;
+    padding: 1rem;
+}
+.rating-breakdown-row {
+    display: grid;
+    grid-template-columns: 58px minmax(0, 1fr) 28px;
+    gap: .5rem;
+    align-items: center;
+    margin-bottom: .65rem;
+}
+.rating-breakdown-row .progress {
+    height: 9px;
+}
+.reviews-list {
+    display: grid;
+    gap: .75rem;
+}
+.review-card {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: .5rem;
+    padding: .85rem;
+    border: 1px solid #e4ece6;
+    border-radius: 8px;
+    background: #fbfdfb;
+}
+.review-card span {
+    display: block;
+    color: #607168;
+    font-size: .86rem;
+}
+.review-card b {
+    color: #17633a;
+}
+.review-card p {
+    grid-column: 1 / -1;
+    margin: 0;
+}
+.review-empty {
+    padding: .85rem;
+    border-radius: 8px;
+    background: #eef7ee;
+}
+.review-form input,
+.review-form select,
+.review-form textarea {
+    width: 100%;
+    border: 1px solid #d7e3da;
+    border-radius: 8px;
+    padding: .7rem .85rem;
+}
+.review-form textarea {
+    min-height: 110px;
+}
+.review-form input:focus,
+.review-form select:focus,
+.review-form textarea:focus,
+.purchase-row .form-control:focus {
+    border-color: #198754;
+    box-shadow: 0 0 0 .2rem rgba(25, 135, 84, .12);
+    outline: none;
+}
+@media (max-width: 991.98px) {
+    .product-hero-grid,
+    .product-content-grid {
+        grid-template-columns: 1fr;
+    }
+    .review-column {
+        position: static;
+    }
+}
+@media (max-width: 767.98px) {
+    .product-media-card,
+    .product-media-card img,
+    .product-media-fallback {
+        min-height: 280px;
+    }
+    .purchase-row,
+    .spec-grid,
+    .related-products-grid {
+        grid-template-columns: 1fr;
+    }
+    .purchase-row .btn {
+        width: 100%;
+    }
+}
+</style>
 {% endblock %}

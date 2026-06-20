@@ -1,0 +1,85 @@
+{% extends 'dashboard/base_admin.html' %}
+{% load humanize %}
+
+{% block content %}
+<div class="row g-4">
+    <div class="col-lg-8">
+        <div class="table-card">
+            <div class="d-flex align-items-center gap-3 flex-wrap mb-4">
+                {% if account.profile_photo %}
+                    <img src="{{ account.profile_photo.url }}" class="rounded-circle" width="72" height="72" style="object-fit:cover;" alt="{{ role_label }} photo">
+                {% endif %}
+                <div>
+                    <h3 class="mb-1">{{ account.full_name }}</h3>
+                    <span class="badge bg-info text-dark">{{ account.get_verification_status_display }}</span>
+                    <span class="badge {% if account.is_approved %}bg-success{% else %}bg-warning text-dark{% endif %}">{% if account.is_approved %}Approved{% else %}Pending{% endif %}</span>
+                </div>
+            </div>
+
+            <h5>Personal Details</h5>
+            <div class="row g-3 mb-4">
+                <div class="col-md-4"><div class="text-muted small">Email</div><div class="fw-semibold">{{ account.email }}</div></div>
+                <div class="col-md-4"><div class="text-muted small">Mobile</div><div class="fw-semibold">{{ account.phone }}</div></div>
+                <div class="col-md-4"><div class="text-muted small">Registered</div><div class="fw-semibold">{{ account.registration_date|date:'M d, Y' }}</div></div>
+            </div>
+
+            <h5>Identity Details</h5>
+            <div class="row g-3 mb-4">
+                <div class="col-md-4"><div class="text-muted small">Aadhaar</div><div class="fw-semibold">{{ account.aadhaar_number }}</div></div>
+                <div class="col-md-4"><div class="text-muted small">PAN</div><div class="fw-semibold">{{ account.pan_number }}</div></div>
+                <div class="col-md-4">
+                    <div class="text-muted small">Government ID</div>
+                    {% if account.identity_photo_upload %}<a href="{{ account.identity_photo_upload.url }}" target="_blank">Preview Document</a>{% else %}<span class="text-muted">Not uploaded</span>{% endif %}
+                </div>
+            </div>
+
+            <h5>Professional Details</h5>
+            <div class="row g-3 mb-4">
+                <div class="col-md-4"><div class="text-muted small">Qualification</div><div class="fw-semibold">{{ account.qualification|default:'-' }}</div></div>
+                <div class="col-md-4"><div class="text-muted small">Experience</div><div class="fw-semibold">{{ account.experience|default:'-' }}</div></div>
+                <div class="col-md-4"><div class="text-muted small">Specialization</div><div class="fw-semibold">{{ account.specialization|default:'-' }}</div></div>
+                <div class="col-md-4">
+                    <div class="text-muted small">Certifications</div>
+                    {% if account.certification_upload %}<a href="{{ account.certification_upload.url }}" target="_blank">Preview Certification</a>{% else %}<span class="text-muted">Not uploaded</span>{% endif %}
+                </div>
+            </div>
+
+            {% if account.dynamic_fields %}
+                <h5>Dynamic Registration Data</h5>
+                <div class="row g-3">
+                    {% for key,value in account.dynamic_fields.items %}
+                        <div class="col-md-4"><div class="text-muted small">{{ key|title }}</div><div class="fw-semibold">{{ value }}</div></div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        </div>
+    </div>
+    <div class="col-lg-4">
+        <div class="table-card mb-4">
+            <h5 class="mb-3">Verification Actions</h5>
+            <form method="post" action="{% url action_url_name account.id 'request-documents' %}">
+                {% csrf_token %}
+                <textarea name="note" class="form-control mb-2" rows="3" placeholder="Admin note or document request">{{ account.verification_note }}</textarea>
+                <div class="d-grid gap-2">
+                    <button formaction="{% url action_url_name account.id 'approve' %}" class="btn btn-success">Approve</button>
+                    <button formaction="{% url action_url_name account.id 'review' %}" class="btn btn-warning">Mark Under Review</button>
+                    <button class="btn btn-outline-primary">Request Documents</button>
+                    <button formaction="{% url action_url_name account.id 'reject' %}" class="btn btn-danger">Reject</button>
+                </div>
+            </form>
+        </div>
+        <div class="table-card">
+            <h5 class="mb-3">Verification History</h5>
+            {% for item in history %}
+                <div class="border-bottom pb-2 mb-2">
+                    <div class="fw-semibold">{{ item.get_action_display }}</div>
+                    <div class="small text-muted">{{ item.created_at|naturaltime }} by {{ item.performed_by|default:'System' }}</div>
+                    {% if item.note %}<div class="small">{{ item.note }}</div>{% endif %}
+                </div>
+            {% empty %}
+                <div class="text-muted">No history yet.</div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endblock %}

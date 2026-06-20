@@ -1,6 +1,7 @@
 from django.urls import path
 from .views import (
     consultation,
+    consultation_topic_detail,
     my_consultations,
     doctor_dashboard,
     consultant_dashboard,
@@ -74,6 +75,12 @@ urlpatterns = [
         'consultant-dashboard/availability/',
         update_consultant_availability,
         name='update_consultant_availability'
+    ),
+
+    path(
+        '<slug:slug>/',
+        consultation_topic_detail,
+        name='consultation_detail'
     ),
 
 ]
